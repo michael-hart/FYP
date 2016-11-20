@@ -1,32 +1,61 @@
 """Contains driver for eDVS 4337 hardware used in final year project"""
 
+import binascii
 import logging
 import serial
+import time
+from Queue import Queue
+from serial.threaded import LineReader, ReaderThread
+
+# Define constants
+DVS_BAUD_RATE = 115200
 
 
-class DVSException(Exception):
-    """Custom exception for DVS Exceptions"""
-    pass
+class DVSReader(LineReader):
+    """Threaded Protocol instance to read and display data from serial port"""
+
+    def __init__(self, *args, **kwargs):
+        self._log = logging.getLogger("DVSReader")
+        super(DVSReader, self).__init__(*args, **kwargs)
+        self.TERMINATOR = b'\n'
+
+    def connection_made(self, transport):
+        super(DVSReader, self).connection_made(transport)
+        self._log.info("Opened port successfully")
+
+    def handle_line(self, data):
+        self._log.debug(">>> %s :: RAW %s" % (data, binascii.hexlify(data.encode('utf-8'))))
+
+    def connection_lost(self, exc):
+        if exc:
+            self._log.exception(exc)
+        self._log.info("Port closed")
+
+    def led_set(self, led_state):
+        """Sets LED state to the given number"""
+        assert type(led_state) == int
+        assert 0 <= led_state <= 3
+        self.write_line("!L{}".format(led_state))
 
 
-class DVS:
-    """DVS class is driver for eDVS device"""
+class DVSReaderThread(ReaderThread):
 
-    def __init__(self):
-        """Initialise function for DVS class"""
-        self._log = logging.getLogger("eDVS_driver")
-        self._log.debug("Created DVS instance")
+    def __init__(self, *args, **kwargs):
+        """Override initialise to create standard serial object"""
+        self._log = logging.getLogger("DVSReaderThread")
 
+        # Get list of valid COM ports
+        valid_ports = self.list_ports()
+        # Raise exception if too few ports exist
+        if len(valid_ports) < 2:
+            raise DVSException("Too few COM ports")
+        ser = serial.Serial(valid_ports[1], baudrate=DVS_BAUD_RATE, parity=serial.PARITY_NONE,
+                            stopbits=serial.STOPBITS_ONE, rtscts=True)
 
-    def open(self, com):
-        """Opens device on given COM port"""
-        self._log.debug("Attempting to open COM port on %s", com)
-        self.ctx = serial.Serial(com)
-        self._log.debug("No exceptions; COM port open successfully")
+        super(DVSReaderThread, self).__init__(ser, *args, **kwargs)
 
-
-    def open_default(self):
-        """Opens second valid COM port in list"""
+    def list_ports(self):
+        """List the valid COM ports; currently Windows only"""
         # Get valid COM ports in list
         valid = []
         for i in range(256):
@@ -38,25 +67,19 @@ class DVS:
                 valid += [port]
             except (OSError, serial.SerialException):
                 pass
+        return valid
 
-        # Raise exception if too few ports exist
-        if len(valid) < 2:
-            raise DVSException("Too few COM ports")
 
-        # Open serial connection
-        self._log.debug("Attempting to open COM port on %s", valid[1])
-        self.ctx = serial.Serial(valid[1])
-        self._log.debug("No exceptions; COM port opened successfully")
-
-    def close(self):
-        """Closes any currently open COM port"""
-        if hasattr(self, ctx) and ctx is not None:
-            ctx.close()
-        self.ctx = None
-
-if __name__=='__main__':
+if __name__ == '__main__':
     from loggers import init_loggers
     init_loggers()
-    dvs = DVS()
-    dvs.open_default()
-
+    logger = logging.getLogger("Main")
+    with DVSReaderThread(DVSReader) as dvs:
+        logger.info("LED Off")
+        dvs.led_set(0)
+        time.sleep(3)
+        logger.info("LED On")
+        dvs.led_set(1)
+        time.sleep(3)
+        logger.info("LED Blinking")
+        dvs.led_set(2)

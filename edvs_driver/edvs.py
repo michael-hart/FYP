@@ -14,6 +14,7 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
+
 def decode_events(raw, evt_fmt):
     """Decodes raw given format num_bytes and returns list of events"""
     if len(raw) % (evt_fmt + 4) != 0:
@@ -159,9 +160,11 @@ if __name__ == '__main__':
         # logger.info("LED Blinking")
         # dvs.led_set(2)
         # time.sleep(3)
+
         def event_listener(data):
             for event in data:
-                print "x:{} y:{} polarity:{}".format(event[0], event[1], event[2])
+                print "x:{} y:{} polarity:{}".format(
+                    event[0], event[1], event[2])
         dvs.add_event_listener(event_listener)
         print("Listening for ten seconds")
         time.sleep(10)

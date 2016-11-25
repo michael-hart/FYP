@@ -16,22 +16,25 @@ def grouper(iterable, n, fillvalue=None):
 
 
 def decode_events(raw, evt_fmt):
-    """Decodes raw given format num_bytes and returns list of events"""
-    if len(raw) % (evt_fmt + 4) != 0:
-        return []
+    """Decodes raw given format num_bytes"""
+    # Reduce list to correct size
+    # raw += '\n'
+    leftover_size = len(raw) % (evt_fmt + 4)
+    data = raw[:-leftover_size]
+    leftover = raw[-leftover_size:]
     events = []
     # Let each event simply be x,y co-ordinates with up=True or False
-    for group in grouper(raw, evt_fmt + 4, 0):
+    for group in grouper(raw, evt_fmt + 4, '0'):
         # Check that first byte starts with 1, else it is not event data
         if ord(group[0]) & 0x80 == 0:
-            return []
+            continue
         # Format is 1yyyyyyy.pxxxxxxx
         y = ord(group[0]) & 0x7F
         x = ord(group[1]) & 0x7F
         polarity = (ord(group[1]) & 0x80) > 0
         events += [(x, y, polarity)]
 
-    return events
+    return (events, leftover)
 
 
 class DVSException(Exception):
@@ -43,6 +46,7 @@ class DVSReader(LineReader):
     """Threaded Protocol instance to read and display data from serial port"""
 
     listeners = []
+    buf = ''
 
     def __init__(self, *args, **kwargs):
         self._log = logging.getLogger("DVSReader")
@@ -63,9 +67,10 @@ class DVSReader(LineReader):
         self._log.debug(">>> %s :: RAW %s" %
                         (data, binascii.hexlify(data.encode('utf-8'))))
         # Attempt to decode as event data
-        event_data = decode_events(data, self.edvs_config['event_bytes'])
+        data = self.buf + data
+        event_data, self.buf = decode_events(data, self.edvs_config['event_bytes'])
         if event_data != []:
-            self._log.info("Events decoded: {}".format(event_data))
+            self._log.debug("Events decoded: {}".format(event_data))
             for listener in self.listeners:
                 listener(event_data)
 
@@ -151,15 +156,6 @@ if __name__ == '__main__':
     logger = logging.getLogger("Main")
     with DVSReaderThread(DVSReader) as dvs:
         dvs.set_event_sending(True)
-        # logger.info("LED Off")
-        # dvs.led_set(0)
-        # time.sleep(3)
-        # logger.info("LED On")
-        # dvs.led_set(1)
-        # time.sleep(3)
-        # logger.info("LED Blinking")
-        # dvs.led_set(2)
-        # time.sleep(3)
 
         def event_listener(data):
             for event in data:

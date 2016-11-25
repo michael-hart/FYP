@@ -1,0 +1,5 @@
+# Default configuration for EDVS
+baud: 4000000
+terminator: '
+
+  '

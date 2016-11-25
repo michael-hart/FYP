@@ -6,9 +6,12 @@ import serial
 import time
 from Queue import Queue
 from serial.threaded import LineReader, ReaderThread
+import yaml
 
-# Define constants
-DVS_BAUD_RATE = 115200
+
+class DVSException(Exception):
+    """Custom exception for DVS"""
+    pass
 
 
 class DVSReader(LineReader):
@@ -17,18 +20,30 @@ class DVSReader(LineReader):
     def __init__(self, *args, **kwargs):
         self._log = logging.getLogger("DVSReader")
         super(DVSReader, self).__init__(*args, **kwargs)
+        self.edvs_config = yaml.load(file("edvs_config.yaml"))
         self.TERMINATOR = b'\n'
 
     def connection_made(self, transport):
         super(DVSReader, self).connection_made(transport)
         self._log.info("Opened port successfully")
+        # Set some default params
+        self.serial = transport.serial
+        self.set_baud_rate(self.edvs_config['baud'])
+        self.write_line("!U0")
 
     def handle_line(self, data):
         self._log.debug(">>> %s :: RAW %s" % (data, binascii.hexlify(data.encode('utf-8'))))
 
+    def write_line(self, data):
+        self._log.debug("<<< %s :: RAW %s" % (data, binascii.hexlify(data.encode('utf-8'))))
+        super(DVSReader, self).write_line(data)
+
     def connection_lost(self, exc):
         if exc:
             self._log.exception(exc)
+        with open('edvs_config.yaml', 'w') as f:
+            f.write("# Default configuration for EDVS\n")
+            yaml.dump(self.edvs_config, f, default_flow_style=False)
         self._log.info("Port closed")
 
     def led_set(self, led_state):
@@ -36,6 +51,20 @@ class DVSReader(LineReader):
         assert type(led_state) == int
         assert 0 <= led_state <= 3
         self.write_line("!L{}".format(led_state))
+
+    def set_baud_rate(self, rate):
+        """Sets baud rate to given rate"""
+        assert type(rate) == int
+        self.write_line("!U={}".format(rate))
+        self.edvs_config['baud'] = rate
+        self.serial.baudrate = rate
+
+    def set_event_sending(self, enable):
+        """Sets whether to send event data"""
+        if enable:
+            self.write_line("E+")
+        else:
+            self.write_line("E-")
 
 
 class DVSReaderThread(ReaderThread):
@@ -49,10 +78,10 @@ class DVSReaderThread(ReaderThread):
         # Raise exception if too few ports exist
         if len(valid_ports) < 2:
             raise DVSException("Too few COM ports")
-        ser = serial.Serial(valid_ports[1], baudrate=DVS_BAUD_RATE, parity=serial.PARITY_NONE,
+        ser = serial.Serial(valid_ports[1], parity=serial.PARITY_NONE,
                             stopbits=serial.STOPBITS_ONE, rtscts=True)
-
         super(DVSReaderThread, self).__init__(ser, *args, **kwargs)
+
 
     def list_ports(self):
         """List the valid COM ports; currently Windows only"""
@@ -75,6 +104,7 @@ if __name__ == '__main__':
     init_loggers()
     logger = logging.getLogger("Main")
     with DVSReaderThread(DVSReader) as dvs:
+        dvs.set_event_sending(False)
         logger.info("LED Off")
         dvs.led_set(0)
         time.sleep(3)
@@ -83,3 +113,4 @@ if __name__ == '__main__':
         time.sleep(3)
         logger.info("LED Blinking")
         dvs.led_set(2)
+        time.sleep(3)

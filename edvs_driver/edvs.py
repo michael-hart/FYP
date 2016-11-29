@@ -3,11 +3,15 @@
 import binascii
 from itertools import izip_longest
 import logging
+import os
 import serial
 import time
 from Queue import Queue
 from serial.threaded import LineReader, ReaderThread
 import yaml
+
+
+EDVS_CONFIG = os.path.join(os.path.split(__file__)[0], "edvs_config.yaml")
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -51,7 +55,7 @@ class DVSReader(LineReader):
     def __init__(self, *args, **kwargs):
         self._log = logging.getLogger("DVSReader")
         super(DVSReader, self).__init__(*args, **kwargs)
-        self.edvs_config = yaml.load(file("edvs_config.yaml"))
+        self.edvs_config = yaml.load(file(EDVS_CONFIG))
         self.TERMINATOR = b'\n'
 
     def connection_made(self, transport):
@@ -68,7 +72,8 @@ class DVSReader(LineReader):
                         (data, binascii.hexlify(data.encode('utf-8'))))
         # Attempt to decode as event data
         data = self.buf + data
-        event_data, self.buf = decode_events(data, self.edvs_config['event_bytes'])
+        event_data, self.buf = decode_events(data,
+                                             self.edvs_config['event_bytes'])
         if event_data != []:
             self._log.debug("Events decoded: {}".format(event_data))
             for listener in self.listeners:

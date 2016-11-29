@@ -1,6 +1,7 @@
 """Contains driver for eDVS 4337 hardware used in final year project"""
 
 import binascii
+from enum import Enum
 from itertools import izip_longest
 import logging
 import os
@@ -12,6 +13,11 @@ import yaml
 
 
 EDVS_CONFIG = os.path.join(os.path.split(__file__)[0], "edvs_config.yaml")
+
+
+class EDVSState(Enum):
+    COMMAND = 0
+    EVENT = 1
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -51,6 +57,7 @@ class DVSReader(LineReader):
 
     listeners = []
     buf = ''
+    state = EDVSState.COMMAND
 
     def __init__(self, *args, **kwargs):
         self._log = logging.getLogger("DVSReader")
@@ -66,18 +73,20 @@ class DVSReader(LineReader):
         self.write_line("!U{}".format(self.edvs_config['echo']))
         self.set_baud_rate(self.edvs_config['baud'])
         self.set_event_bytes(self.edvs_config['event_bytes'])
+        self.set_event_sending(False)
 
     def handle_line(self, data):
         self._log.debug(">>> %s :: RAW %s" %
                         (data, binascii.hexlify(data.encode('utf-8'))))
-        # Attempt to decode as event data
-        data = self.buf + data
-        event_data, self.buf = decode_events(data,
-                                             self.edvs_config['event_bytes'])
-        if event_data != []:
-            self._log.debug("Events decoded: {}".format(event_data))
-            for listener in self.listeners:
-                listener(event_data)
+        if self.state == EDVSState.EVENT:
+            # Attempt to decode as event data
+            data = self.buf + data
+            event_data, self.buf = decode_events(data,
+                                                 self.edvs_config['event_bytes'])
+            if event_data != []:
+                self._log.debug("Events decoded: {}".format(event_data))
+                for listener in self.listeners:
+                    listener(event_data)
 
     def write_line(self, data):
         self._log.debug("<<< %s :: RAW %s" %
@@ -113,8 +122,10 @@ class DVSReader(LineReader):
         """Sets whether to send event data"""
         if enable:
             self.write_line("E+")
+            self.state = EDVSState.EVENT
         else:
             self.write_line("E-")
+            self.state = EDVSState.COMMAND
 
     def set_event_bytes(self, _bytes):
         """Sets format for number of bytes"""
@@ -160,6 +171,7 @@ if __name__ == '__main__':
     init_loggers()
     logger = logging.getLogger("Main")
     with DVSReaderThread(DVSReader) as dvs:
+        dvs.set_baud_rate = 4000000
         dvs.set_event_sending(True)
 
         def event_listener(data):

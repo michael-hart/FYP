@@ -3,3 +3,10 @@
 
 # Ignore log files
 */logs/*
+
+# Ignore cache files
+*/.cache/*
+
+# Ignore Eclipse folders
+.metadata/*
+RemoteSystemsTempFiles/*

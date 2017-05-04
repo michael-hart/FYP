@@ -1,0 +1,8 @@
+# Test libraries for running tests
+pytest
+pytest-html
+pytest-pep8
+
+# Libraries to be used in controller
+pyserial
+

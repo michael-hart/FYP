@@ -10,3 +10,7 @@
 # Ignore Eclipse folders
 .metadata/*
 RemoteSystemsTempFiles/*
+
+# Ignore downloaded FreeRTOS files
+FreeRTOS/*
+edvs_receiver/Common/*

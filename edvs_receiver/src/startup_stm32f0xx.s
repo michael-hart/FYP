@@ -121,7 +121,7 @@ __vector_table
         THUMB
 
         PUBWEAK Reset_Handler
-        SECTION .text:CODE:REORDER(2)
+        SECTION .text:CODE:REORDER:NOROOT(2)
 Reset_Handler
 
         LDR   R0,=??DataTable22

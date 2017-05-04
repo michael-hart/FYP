@@ -39,12 +39,12 @@ class DVSCanvas(wx.Panel):
         w, h = self.GetClientSize()
         pens = [
             wx.Pen(wx.BLACK, 1),
-            wx.Pen(wx.Colour(180, 180, 180), 4),
+            wx.Pen(wx.Colour(180, 180, 180), 1),
             wx.Pen(wx.WHITE, 1),
         ]
         brushes = [
             wx.Brush(wx.BLACK, wx.SOLID),
-            wx.Brush(wx.RED, wx.SOLID),
+            wx.Brush(wx.Colour(180, 180, 180), wx.SOLID),
             wx.Brush(wx.WHITE, wx.SOLID),
         ]
         dc = wx.AutoBufferedPaintDC(self)

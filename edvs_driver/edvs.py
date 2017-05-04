@@ -28,21 +28,33 @@ def grouper(iterable, n, fillvalue=None):
 def decode_events(raw, evt_fmt):
     """Decodes raw given format num_bytes"""
     # Reduce list to correct size
-    # raw += '\n'
-    leftover_size = len(raw) % (evt_fmt + 4)
-    data = raw[:-leftover_size]
-    leftover = raw[-leftover_size:]
+    raw += '\n'
+    # leftover_size = len(raw) % (evt_fmt + 2)
+    # data = raw[:-leftover_size]
+    # leftover = raw[-leftover_size:]
+    leftover = []
     events = []
-    # Let each event simply be x,y co-ordinates with up=True or False
-    for group in grouper(raw, evt_fmt + 4, '0'):
-        # Check that first byte starts with 1, else it is not event data
-        if ord(group[0]) & 0x80 == 0:
+    index = 0
+    while index < len(raw):
+        group = [ord(i) for i in raw[index:index+2]]
+        if group[0] & 0x80 == 0:
+            index += 1
             continue
-        # Format is 1yyyyyyy.pxxxxxxx
-        y = ord(group[0]) & 0x7F
-        x = ord(group[1]) & 0x7F
-        polarity = (ord(group[1]) & 0x80) > 0
+        y = group[0] & 0x7F
+        x = group[1] & 0x7F
+        polarity = (group[1] & 0x80) > 0
         events += [(x, y, polarity)]
+        index += 2
+    # Let each event simply be x,y co-ordinates with up=True or False
+    # for group in grouper(raw, evt_fmt + 2, '0'):
+    #     # Check that first byte starts with 1, else it is not event data
+    #     if ord(group[0]) & 0x80 == 0:
+    #         continue
+    #     # Format is 1yyyyyyy.pxxxxxxx
+    #     y = ord(group[0]) & 0x7F
+    #     x = ord(group[1]) & 0x7F
+    #     polarity = (ord(group[1]) & 0x80) > 0
+    #     events += [(x, y, polarity)]
 
     return (events, leftover)
 
@@ -171,7 +183,9 @@ if __name__ == '__main__':
     init_loggers()
     logger = logging.getLogger("Main")
     with DVSReaderThread(DVSReader) as dvs:
-        dvs.set_baud_rate = 4000000
+        request_baud = 115200
+        if dvs.edvs_config['baud'] != request_baud:
+            dvs.set_baud_rate(request_baud)
         dvs.set_event_sending(True)
 
         def event_listener(data):

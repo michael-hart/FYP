@@ -6,7 +6,7 @@
 #include "timers.h"
 
 /* Hardware */
-#include "stm320518_eval.h"
+#include "stm32f0xx.h"
 
 /* C Standard Libraries */
 #include <stdbool.h>
@@ -21,15 +21,9 @@
 /*******************************************************************************
  * Local Definitions
  ******************************************************************************/
-/* LED Timer Definitions */
-#define LED_TIMER_NAME "LEDTimer"
-#define LED_TIMER_PRIORITY (tskIDLE_PRIORITY)
-#define LED_TIMER_PERIOD (1000u / portTICK_PERIOD_MS)
-//#define LED_TIMER_PORT LED3_GPIO_PORT
-//#define LED_TIMER_PIN LED3_PIN
-#define LED_TIMER_PORT LED1_GPIO_PORT
-#define LED_TIMER_PIN LED1_PIN
-#define LED_TIMER_LED LED1
+/* IWDG Timer Definitions */
+#define IWDG_TIMER_NAME "LEDTimer"
+#define IWDG_TIMER_PERIOD (100u / portTICK_PERIOD_MS)
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -39,46 +33,39 @@
 /*******************************************************************************
  * Private Function Declarations (static)
  ******************************************************************************/
-static void led_timer_callback(TimerHandle_t timer);
+static void iwdg_init(void);
+static void iwdg_kick(TimerHandle_t timer);
 static void error_loop(void);
 
-static bool timer_on = 0;
-TimerHandle_t led_timer = NULL;
 
 /*******************************************************************************
  * Public Function Definitions 
  ******************************************************************************/
 void main_receiver(void)
 {
-//    STM_EVAL_LEDInit(LED_TIMER_LED);
-    // STM_EVAL_LEDInit(LED1);
-    // STM_EVAL_LEDInit(LED2);
-    // STM_EVAL_LEDInit(LED3);
-    // STM_EVAL_LEDInit(LED4);
-//    STM_EVAL_LEDOn(LED_TIMER_LED);
-    // STM_EVAL_LEDOn(LED1);
-    // STM_EVAL_LEDOn(LED2);
-    // STM_EVAL_LEDOn(LED3);
-    // STM_EVAL_LEDOn(LED4);
-    
-    /* Create timer */
-    TimerHandle_t led_timer = NULL;
-    led_timer = xTimerCreate(LED_TIMER_NAME,      /* timer name */
-                             LED_TIMER_PERIOD,    /* timer period */
-                             pdTRUE,              /* auto-reload */
-                             (void*) 0,           /* no id specified */
-                             led_timer_callback); /* callback function */
 
-    USART_Config();
-    
+    /* Create timer for telling watchdog not to reset */
+    TimerHandle_t iwdg_kicker = NULL;
+    iwdg_kicker = xTimerCreate(IWDG_TIMER_NAME,   /* timer name */
+                               IWDG_TIMER_PERIOD, /* timer period */
+                               pdTRUE,            /* auto-reload */
+                               (void*) 0,         /* no id specified */
+                               iwdg_kick);        /* callback function */
+ 
     /* Check timer created successfully */
-    if (led_timer == NULL)
+    if (iwdg_kicker == NULL)
     {
         error_loop();
     }
 
+    /* Set up USART tasks */
+    USART_Config();
+    
+    /* Set up Watchdog Timer */
+    iwdg_init();
+
     /* Start timer running in non-blocking mode */
-    xTimerStart(led_timer, 0L);
+    xTimerStart(iwdg_kicker, 0L);
 
     vTaskStartScheduler();
 
@@ -94,7 +81,26 @@ void main_receiver(void)
 
 /**
  * DESCRIPTION
- * Callback function for LED timer to toggle LED
+ * Static function to set up independent watchdog timer with window disabled
+ * 
+ * INPUTS
+ * None
+ *
+ * RETURNS
+ * Nothing
+ */
+static void iwdg_init(void)
+{
+    IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+    IWDG_SetPrescaler(IWDG_Prescaler_16);
+    IWDG_SetReload(2500);
+    IWDG_ReloadCounter();
+    IWDG_Enable();
+}
+
+/**
+ * DESCRIPTION
+ * Callback function for timer to kick watchdog
  * 
  * INPUTS
  * timer (TimerHandle_t) : FreeRTOS Timer Handle that hit 
@@ -102,21 +108,10 @@ void main_receiver(void)
  * RETURNS
  * Nothing
  */
-static void led_timer_callback(TimerHandle_t timer)
+static void iwdg_kick(TimerHandle_t timer)
 {
-    timer_on = !timer_on;
-    //STM_EVAL_LEDToggle(LED_TIMER_LED);
-    USART_SendByte(0x14);
-//    if (timer_on)
-//    {
-//        STM_EVAL_LEDOn(LED_TIMER_LED);
-//    }
-//    else
-//    {
-//        STM_EVAL_LEDOff(LED_TIMER_LED);
-//    }
-//    GPIO_WriteBit(LED_TIMER_PORT, LED_TIMER_PIN, 
-//                  timer_on ? Bit_SET : Bit_RESET);
+    /* Reset IWDG counter to reset value */
+    IWDG_ReloadCounter();
 }
 
 /**

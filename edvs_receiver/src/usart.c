@@ -10,6 +10,8 @@
 #include "task.h"
 #include "queue.h"
 
+#include "string.h"
+
 /*******************************************************************************
  * Local Includes
  ******************************************************************************/
@@ -19,7 +21,7 @@
  * Local Definitions
  ******************************************************************************/
 #define USART_GPIO GPIOA
-#define BUFFER_LENGTH 40	//length of TX, RX and command buffers
+#define BUFFER_LENGTH 40    //length of TX, RX and command buffers
 #define USART_ECHO
 #define USART_BAUD_RATE 3000000
 
@@ -32,16 +34,6 @@
  * Local Variable Declarations
  ******************************************************************************/
 xQueueHandle usart_txq, usart_rxq;
-USART_InitTypeDef usart_init;
-//USART_InitTypeDef usart_init = 
-//{ 
-//    4000000,
-//    USART_HardwareFlowControl_None,
-//    USART_Parity_No,
-//    USART_StopBits_1,
-//    USART_WordLength_8b,
-//    USART_Mode_Rx | USART_Mode_Tx,
-//};
 
 
 /*******************************************************************************
@@ -68,15 +60,15 @@ void USART_Config(void)
 void USART_SendByte(uint8_t data)
 {
 //    xQueueSend(usart_txq, &data, 100/portTICK_RATE_MS);
-    xQueueSend(usart_txq, &data, 100);
-//    xQueueSend(usart_txq, &data, portMAX_DELAY);
+//    xQueueSend(usart_txq, &data, 100);
+    xQueueSend(usart_txq, &data, portMAX_DELAY);
 }
 
 void USART_SendString(char * str)
 {
     while(* str) {
-	USART_SendByte(*str);
-	str++;
+        USART_SendByte(*str);
+        str++;
     }
 }
 
@@ -86,12 +78,12 @@ void USART1_IRQHandler(void)
     static portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
     if (USART_GetITStatus(USART1, USART_IT_RXNE)==SET) {
-	data = USART_ReceiveData(USART1);
-	xQueueSendFromISR(usart_rxq, &data, &xHigherPriorityTaskWoken);
-//	if (xHigherPriorityTaskWoken==pdTRUE)
-//	    portSWITCH_CONTEXT();
+    data = USART_ReceiveData(USART1);
+    xQueueSendFromISR(usart_rxq, &data, &xHigherPriorityTaskWoken);
+//  if (xHigherPriorityTaskWoken==pdTRUE)
+//      portSWITCH_CONTEXT();
 
-	USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+    USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     }
 }
 
@@ -117,7 +109,7 @@ static void hal_init(void)
     GPIO_PinAFConfig(GPIOA,  GPIO_PinSource10, GPIO_AF_1);
 
 
-    //USART init: USART1 9600 8n1
+    //USART init: USART1 3M 8n1
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
     usart_init.USART_BaudRate = USART_BAUD_RATE;
     usart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
@@ -158,45 +150,59 @@ static void usart_tx_task(void *pvParameters)
 {
     uint8_t data;
     for (;;) {
-	if (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
-	    vTaskDelay(1);
-	} else {
-	    GPIO_ResetBits(GPIOC, GPIO_Pin_8);
-//	    if (pdPASS == xQueueReceive(usart_txq, &data, portMAX_DELAY)) {
-	    if (pdPASS == xQueueReceive(usart_txq, &data, 100)) {
-		GPIO_SetBits(GPIOC, GPIO_Pin_8);
-		USART_SendData(USART1, data);
-	    }
-	}
+        if (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
+            vTaskDelay(1);
+        } else {
+            GPIO_ResetBits(GPIOC, GPIO_Pin_8);
+    //      if (pdPASS == xQueueReceive(usart_txq, &data, portMAX_DELAY)) {
+            if (pdPASS == xQueueReceive(usart_txq, &data, 100)) {
+                GPIO_SetBits(GPIOC, GPIO_Pin_8);
+                USART_SendData(USART1, data);
+            }
+        }
     }
-    // vTaskDelete(NULL);
 }
 
 static void usart_rx_task(void *pvParameters)
 {
-    uint8_t i=0;
+    uint8_t i = 0;
     char data_buf[BUFFER_LENGTH];
+    char cmd_buf[5];
+
     for (;;) {
-	if (pdPASS == xQueueReceive(usart_rxq, &data_buf[i], portMAX_DELAY)) {
+        if (pdPASS == xQueueReceive(usart_rxq, &data_buf[i++], portMAX_DELAY)) {
+
 #ifdef USART_ECHO
-	    USART_SendByte(data_buf[i]);
+            USART_SendByte(data_buf[i-1]);
 #endif
-	    if (data_buf[i]=='\r') {
-		data_buf[i+1]='\0';
-		if (i) {
-		    USART_SendString("\r\nReceived data: ");
-		    USART_SendString(data_buf);
-		};
-#ifndef USART_ECHO
-		USART_SendByte('\r');
-#endif
-		USART_SendByte('\n');
-		i=0;
-	    } else if (i<BUFFER_LENGTH-1)
-		i++;
-	}
+
+            if (data_buf[i] == '\r')
+            {
+                /* Copy out the command characters */
+                memcpy(data_buf, cmd_buf, 4);
+                cmd_buf[4] = 0;
+
+                /* Switch based on the command */
+                if (strcmp(cmd_buf, "id  ") == 0)
+                {
+                    USART_SendString("Interface");
+                }
+
+                i = 0;
+            }
+
+            /* If buffer is overflowing, reset to 0 */
+            if (i == BUFFER_LENGTH-1)
+            {
+                i = 0;
+            }
+
+        }
+        else
+        {
+            i = 5;
+        }
     }
-    // vTaskDelete(NULL);
 }
 
 /*******************************************************************************

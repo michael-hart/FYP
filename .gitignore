@@ -14,3 +14,11 @@ RemoteSystemsTempFiles/*
 # Ignore downloaded FreeRTOS files
 FreeRTOS/*
 edvs_receiver/Common/*
+
+# Ignore unnecessary IAR project files
+*.ewd
+*.ewt
+*.dep
+*/Debug/*
+*/BuildLog.log
+*/settings/*

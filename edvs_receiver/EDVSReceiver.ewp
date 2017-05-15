@@ -640,11 +640,11 @@
                 </option>
                 <option>
                     <name>OCOutputOverride</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>RTOSDemo.bin</state>
+                    <state>EDVSReceiver.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -661,7 +661,7 @@
             <archiveVersion>3</archiveVersion>
             <data>
                 <extensions></extensions>
-                <cmdline></cmdline>
+                <cmdline>$PROJ_DIR$\log_build_flash.bat</cmdline>
                 <hasPrio>0</hasPrio>
             </data>
         </settings>
@@ -699,7 +699,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>RTOSDemo.out</state>
+                    <state>EDVSReceiver.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -1064,6 +1064,9 @@
         <file>
             <name>$PROJ_DIR$\include\FreeRTOSConfig.h</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\include\usart.h</name>
+        </file>
     </group>
     <group>
         <name>Libraries</name>
@@ -1079,7 +1082,13 @@
                 <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_gpio.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_misc.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_rcc.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_usart.c</name>
             </file>
         </group>
     </group>
@@ -1095,13 +1104,13 @@
             <name>$PROJ_DIR$\src\main.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\ParTest.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\RegTest.s</name>
+            <name>$PROJ_DIR$\src\main_receiver.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\startup_stm32f0xx.s</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\usart.c</name>
         </file>
     </group>
     <group>

@@ -1095,12 +1095,6 @@
     <group>
         <name>src</name>
         <file>
-            <name>$PROJ_DIR$\src\main-blinky.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\src\main-full.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\src\main.c</name>
         </file>
         <file>

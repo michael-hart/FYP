@@ -20,8 +20,8 @@
  ******************************************************************************/
 #define USART_GPIO GPIOA
 #define BUFFER_LENGTH 40	//length of TX, RX and command buffers
-// #define USART_ECHO
-#define USART_BAUD_RATE 4000000
+#define USART_ECHO
+#define USART_BAUD_RATE 3000000
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -119,7 +119,7 @@ static void hal_init(void)
 
     //USART init: USART1 9600 8n1
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-    usart_init.USART_BaudRate = 4000000;
+    usart_init.USART_BaudRate = USART_BAUD_RATE;
     usart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     usart_init.USART_Parity = USART_Parity_No;
     usart_init.USART_StopBits = USART_StopBits_1;

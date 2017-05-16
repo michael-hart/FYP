@@ -95,7 +95,8 @@ class Controller(object):
             tx_msg += chr(tx_len)
             tx_msg += msg[i*data_size:i*data_size+tx_len]
             self._write(tx_msg)
-            rx_msg = self._read(tx_len)
+            # Read one extra for the carriage return
+            rx_msg = self._read(tx_len + 1)[:-1]
             buf += rx_msg
 
         return buf
@@ -129,4 +130,5 @@ if __name__ == '__main__':
             logger.error("No responding COM port found")
             raise Exception("No responding COM port found")
         c.open(responding[0])
+        assert c.echo("a3") == "a3"
         assert c.echo("Test String") == "Test String"

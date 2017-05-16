@@ -185,14 +185,27 @@ static void usart_rx_task(void *pvParameters)
                 /* Switch based on the command */
                 if (strcmp(cmd_buf, "id  ") == 0)
                 {
-                    USART_SendString("Interface\r");
+                    USART_SendString("Interface");
+                    USART_SendByte('\r');
+                }
+                else if (strcmp(cmd_buf, "echo") == 0)
+                {
+                    /* Check if the number of bytes is correct */
+                    uint8_t expected = data_buf[4];
+                    if (expected + 6 <= i)
+                    {
+                        data_buf[expected + 6] = 0;
+                        USART_SendString(&data_buf[5]);
+                        /* \r included as part of echo command */
+                        //USART_SendByte('\r');
+                    }
                 }
 
                 i = 0;
             }
 
             /* If buffer is overflowing, reset to 0 */
-            if (i == BUFFER_LENGTH-1)
+            if (i == BUFFER_LENGTH)
             {
                 i = 0;
             }

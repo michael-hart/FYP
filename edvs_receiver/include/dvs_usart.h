@@ -19,7 +19,12 @@
 /*******************************************************************************
  * Enum and Type definitions
  ******************************************************************************/
-/* None */
+/* Standard struct for DVS data to fill */
+typedef struct dvs_data_s {
+    uint8_t x;
+    uint8_t y;
+    uint8_t polarity;
+} dvs_data_t;
 
 /*******************************************************************************
  * External Variable Definitions
@@ -41,6 +46,21 @@
  * Nothing
  */
 void DVS_Config(void);
+
+/**
+ * DESCRIPTION
+ * Request forwarding of DVS packets to PC
+ * 
+ * INPUTS
+ * forward (uint8_t) : true or false of whether to forward. Resets any existing
+ *                     state
+ * timeout_ms (uint16_t) : timeout in ms of how long forward packets, or 0 to
+ *                         set state permanently
+ *
+ * RETURNS
+ * Nothing
+ */
+void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms);
 
 #endif /* _DVS_USART_H */
 

@@ -9,11 +9,13 @@
 #include "queue.h"
 
 #include "string.h"
+#include <stdbool.h>
 
 /*******************************************************************************
  * Local Includes
  ******************************************************************************/
 #include "pc_usart.h"
+#include "dvs_usart.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -24,9 +26,11 @@
 #define USART_BAUD_RATE 500000
 
 /* PC Command Definitions */
-#define PC_CMD_ID    "id  "
-#define PC_CMD_ECHO  "echo"
-#define PC_CMD_RESET "rset"
+#define PC_CMD_ID        "id  "
+#define PC_CMD_ECHO      "echo"
+#define PC_CMD_RESET     "rset"
+#define PC_CMD_FWD_DVS   "fdvs"
+#define PC_CMD_FWD_RESET "rdvs"
 
 #define PC_RESP_BAD_CMD "Not recognised"
 
@@ -251,6 +255,23 @@ static void usart_rx_task(void *pvParameters)
                 else if (strcmp(cmd_buf, PC_CMD_RESET) == 0)
                 {
                     NVIC_SystemReset();
+                }
+                else if (strcmp(cmd_buf, PC_CMD_FWD_DVS) == 0)
+                {
+                    if (i >= 6)
+                    {
+                        /* Find out time to forward DVS for */
+                        uint16_t fwd_time = data_buf[4] << 8;
+                        fwd_time += data_buf[5];
+                        /* Enable forwarding - 0 for permanent, else time in 
+                           ms */
+                        DVS_forward_pc(true, fwd_time);
+                    }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_FWD_RESET) == 0)
+                {
+                    /* Reset the forwarding of DVS packets */
+                    DVS_forward_pc(false, 0);
                 }
                 else
                 {

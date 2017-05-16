@@ -23,7 +23,15 @@
 #define USART_GPIO GPIOA
 #define BUFFER_LENGTH 40    //length of TX, RX and command buffers
 #define USART_ECHO
-#define USART_BAUD_RATE 1000000
+#define USART_BAUD_RATE 500000
+
+/* PC Command Definitions */
+#define PC_CMD_ID    "id  "
+#define PC_CMD_ECHO  "echo"
+#define PC_CMD_RESET "rset"
+
+#define PC_RESP_BAD_CMD "Not recognised"
+
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -183,12 +191,12 @@ static void usart_rx_task(void *pvParameters)
                 cmd_buf[4] = 0;
 
                 /* Switch based on the command */
-                if (strcmp(cmd_buf, "id  ") == 0)
+                if (strcmp(cmd_buf, PC_CMD_ID) == 0)
                 {
                     USART_SendString("Interface");
                     USART_SendByte('\r');
                 }
-                else if (strcmp(cmd_buf, "echo") == 0)
+                else if (strcmp(cmd_buf, PC_CMD_ECHO) == 0)
                 {
                     /* Check if the number of bytes is correct */
                     uint8_t expected = data_buf[4];
@@ -197,23 +205,28 @@ static void usart_rx_task(void *pvParameters)
                         data_buf[expected + 6] = 0;
                         USART_SendString(&data_buf[5]);
                         /* \r included as part of echo command */
-                        //USART_SendByte('\r');
                     }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_RESET) == 0)
+                {
+                    NVIC_SystemReset();
+                }
+                else
+                {
+                    /* If command is not recognised, say so */
+                    USART_SendString(PC_RESP_BAD_CMD);
+                    USART_SendByte('\r');
                 }
 
                 i = 0;
             }
 
-            /* If buffer is overflowing, reset to 0 */
+            /* If buffer is overflowing, clear it */
             if (i == BUFFER_LENGTH)
             {
                 i = 0;
             }
 
-        }
-        else
-        {
-            i = 5;
         }
     }
 }

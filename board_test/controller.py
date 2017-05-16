@@ -9,12 +9,16 @@ from binascii import hexlify
 import math
 
 # Constant definitions
-BAUD_RATE = 1000000
+BAUD_RATE = 500000
 DEST_BUF_SIZE = 40
 BOARD_ID = "Interface"
 COMMANDS = {
     "get_id": "id  ",
     "echo": "echo",
+    "reset": "rset",
+}
+RESPONSES = {
+    "bad_cmd": "Not recognised",
 }
 ECHO_ON = True
 
@@ -33,11 +37,7 @@ class Controller(object):
         for port in list_ports.comports()[1:]:
             self.open(port.device)
 
-            # Write get ID and wait 10ms for response
-            self._write(COMMANDS["get_id"])
-            _id = self._read(len(BOARD_ID) + 1)[:-1]
-
-            if _id == BOARD_ID:
+            if self.get_id() == BOARD_ID:
                 responding += [port.device]
                 self.log.debug("Responding device found on port " + port.device)
 
@@ -71,12 +71,26 @@ class Controller(object):
     def open(self, port):
         """Connects to the given port at default baud rate"""
         # Open specified port
-        self.ser = serial.Serial(port, baudrate=BAUD_RATE, timeout=0.1)
+        self.ser = serial.Serial(port, baudrate=BAUD_RATE, timeout=0.001)
 
         # Flush any existing bytes in the buffer
         self._read(1000)
 
+        # Set a higher timeout after buffer flush
+        self.ser.timeout = 0.1
+
         self.log.debug("Opened serial port " + port)
+
+    def get_id(self):
+        """Retrieves currently open device ID"""
+        if self.ser == None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        # Write get ID and get expected length of ID
+        self._write(COMMANDS["get_id"])
+        _id = self._read(len(BOARD_ID) + 1)[:-1]
+        return _id
 
     def echo(self, msg):
         """Requests that the board echoes back the given bytes"""
@@ -88,7 +102,7 @@ class Controller(object):
         # Write the command ID and the number of bytes to echo
         buf = ""
         # data size is buffer size minus command, length, and \r
-        data_size = DEST_BUF_SIZE - 6
+        data_size = DEST_BUF_SIZE - 7
         for i in range(math.ceil(len(msg)/data_size)):
             tx_msg = COMMANDS["echo"]
             tx_len = min(data_size, len(msg) - i*data_size)
@@ -100,6 +114,16 @@ class Controller(object):
             buf += rx_msg
 
         return buf
+
+    def reset(self):
+        """Resets the board. Returns False if command not recognised"""
+        if self.ser == None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["reset"])
+        resp = self._read(len(BOARD_ID) + 1)[:-1]
+        return resp != RESPONSES["bad_cmd"]
+
 
     def __enter__(self):
         return self

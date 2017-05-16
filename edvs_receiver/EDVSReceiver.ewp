@@ -1062,6 +1062,9 @@
     <group>
         <name>include</name>
         <file>
+            <name>$PROJ_DIR$\include\dvs_usart.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\include\FreeRTOSConfig.h</name>
         </file>
         <file>
@@ -1097,6 +1100,9 @@
     </group>
     <group>
         <name>src</name>
+        <file>
+            <name>$PROJ_DIR$\src\dvs_usart.c</name>
+        </file>
         <file>
             <name>$PROJ_DIR$\src\main.c</name>
         </file>

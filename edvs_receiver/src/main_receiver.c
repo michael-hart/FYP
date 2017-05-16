@@ -17,6 +17,7 @@
  ******************************************************************************/
 #include "main_receiver.h"
 #include "pc_usart.h"
+#include "dvs_usart.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -60,6 +61,7 @@ void main_receiver(void)
 
     /* Set up USART tasks */
     PC_Config();
+    DVS_Config();
     
     /* Set up Watchdog Timer */
     iwdg_init();

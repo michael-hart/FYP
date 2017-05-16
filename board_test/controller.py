@@ -136,9 +136,8 @@ class Controller(object):
         self.log.info("Controller closing down...")
         return True
 
-
-if __name__ == '__main__':
-    # Do some stuff that actually tests whether stuff is working
+def main():
+    """Simple tests to see if controller is working"""
     from loggers import init_loggers
 
     init_loggers()
@@ -147,12 +146,15 @@ if __name__ == '__main__':
     ports = [x.device for x in list_ports.comports()]
     logger.info("COM ports are: " + str(ports))
 
-    with Controller() as c:
-        responding = c.get_responding()
+    with Controller() as con:
+        responding = con.get_responding()
         logger.info("Responding: " + str(responding))
         if len(responding) == 0:
             logger.error("No responding COM port found")
             raise Exception("No responding COM port found")
-        c.open(responding[0])
-        assert c.echo("a3") == "a3"
-        assert c.echo("Test String") == "Test String"
+        con.open(responding[0])
+        assert con.echo("a3") == "a3"
+        assert con.echo("Test String") == "Test String"
+
+if __name__ == '__main__':
+    main()

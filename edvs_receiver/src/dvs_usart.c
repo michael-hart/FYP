@@ -193,10 +193,10 @@ static void tasks_init(void)
     xTaskCreate(usart_rx_task, (char const *)"DVS_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(decoded_tx_task, (char const *)"DVS_T", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
     reset_timer = xTimerCreate(RESET_TIMER_NAME,  /* timer name */
-                               0,                 /* timer period */
+                               100,               /* timer period */
                                pdFALSE,           /* auto-reload */
                                (void*) 0,         /* no id specified */
-                               reset_fwd_flag);        /* callback function */
+                               reset_fwd_flag);   /* callback function */
 }
 
 

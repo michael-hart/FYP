@@ -29,7 +29,9 @@ def test_echo(board, test_str):
 def test_bad_cmd(board):
     """Tests whether a non-existent command gives an error message"""
     board._write("bad_cmd")
-    resp = board._read(len(RESPONSES["bad_cmd"]) + 1)[:-1]
+    resp = board._read(len(RESPONSES["bad_cmd"]) + 1)
+    if len(resp) > 0:
+        resp = resp[:-1]
     board_assert_equal(resp, RESPONSES["bad_cmd"])
 
 def test_reset(board):

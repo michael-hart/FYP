@@ -21,3 +21,21 @@ def board_assert_not_equal(left, right):
     if left == right:
         time.sleep(WAIT_TIME)
     assert left != right
+
+def board_assert_not_none(assertion):
+    """Helper method to wait for WDT to reset board in case of failure"""
+    if assertion:
+        time.sleep(WAIT_TIME)
+    assert assertion is not None
+
+def board_assert_ge(left, right):
+    """Assert that left is greater than or equal to the right"""
+    if left >= right:
+        time.sleep(WAIT_TIME)
+    assert left >= right
+
+def board_assert_le(left, right):
+    """Assert that left is less than or equal to the right"""
+    if left <= right:
+        time.sleep(WAIT_TIME)
+    assert left <= right

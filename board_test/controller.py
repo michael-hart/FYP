@@ -16,6 +16,8 @@ COMMANDS = {
     "get_id": "id  ",
     "echo": "echo",
     "reset": "rset",
+    "dvs_forward": "fdvs",
+    "dvs_reset": "rdvs",
 }
 RESPONSES = {
     "bad_cmd": "Not recognised",
@@ -83,19 +85,21 @@ class Controller(object):
 
     def get_id(self):
         """Retrieves currently open device ID"""
-        if self.ser == None:
+        if self.ser is None:
             self.log.error("No serial device connected!")
             return ""
 
         # Write get ID and get expected length of ID
         self._write(COMMANDS["get_id"])
-        _id = self._read(len(BOARD_ID) + 1)[:-1]
+        _id = self._read(len(BOARD_ID) + 1)
+        if len(_id) > 0:
+            _id = _id[:-1]
         return _id
 
     def echo(self, msg):
         """Requests that the board echoes back the given bytes"""
 
-        if self.ser == None:
+        if self.ser is None:
             self.log.error("No serial device connected!")
             return ""
 
@@ -110,26 +114,54 @@ class Controller(object):
             tx_msg += msg[i*data_size:i*data_size+tx_len]
             self._write(tx_msg)
             # Read one extra for the carriage return
-            rx_msg = self._read(tx_len + 1)[:-1]
+            rx_msg = self._read(tx_len + 1)
+            if len(rx_msg) > 0:
+                rx_msg = rx_msg[:-1]
             buf += rx_msg
 
         return buf
 
     def reset(self):
         """Resets the board. Returns False if command not recognised"""
-        if self.ser == None:
+        if self.ser is None:
             self.log.error("No serial device connected!")
             return ""
         self._write(COMMANDS["reset"])
-        resp = self._read(len(BOARD_ID) + 1)[:-1]
+        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
+        if len(resp) > 0:
+            resp = resp[:-1]
         return resp != RESPONSES["bad_cmd"]
 
+    def forward_dvs(self, timeout_ms):
+        """Request forwarding for timeout_ms, or 0 for permanently on"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        tx_msg = COMMANDS["dvs_forward"]
+        tx_msg += chr(timeout_ms >> 8)
+        tx_msg += chr(timeout_ms & 0xFF)
+        self._write(tx_msg)
+        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
+        if len(resp) > 0:
+            resp = resp[:-1]
+        return resp != RESPONSES["bad_cmd"]
+
+    def reset_dvs(self):
+        """Cancels forwarding for DVS packets"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["dvs_reset"])
+        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
+        if len(resp) > 0:
+            resp = resp[:-1]
+        return resp != RESPONSES["bad_cmd"]
 
     def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
-        if self.ser != None:
+        if self.ser is not None:
             self.ser.close()
         if value != None:
             self.log.error("Received exception: {}".format(value))

@@ -9,12 +9,14 @@ from binascii import hexlify
 import math
 
 # Constant definitions
-BAUD_RATE = 115200
+BAUD_RATE = 1000000
+DEST_BUF_SIZE = 40
 BOARD_ID = "Interface"
 COMMANDS = {
-        "get_id": "id  ",
-        "echo": "echo",
+    "get_id": "id  ",
+    "echo": "echo",
 }
+ECHO_ON = True
 
 class Controller(object):
     """Controller class that supports with statements for connecting to board"""
@@ -23,16 +25,17 @@ class Controller(object):
         """Set up object attributes including loggers"""
         self.ser = None
         self.log = logging.getLogger("Controller")
+        self.expected = 0
 
     def get_responding(self):
         """Checks all connected Windows COM ports for responding device"""
         responding = []
-        for port in list_ports.comports():
+        for port in list_ports.comports()[1:]:
             self.open(port.device)
 
             # Write get ID and wait 10ms for response
             self._write(COMMANDS["get_id"])
-            _id = self._read(len(BOARD_ID))
+            _id = self._read(len(BOARD_ID) + 1)[:-1]
 
             if _id == BOARD_ID:
                 responding += [port.device]
@@ -46,24 +49,31 @@ class Controller(object):
     def _write(self, msg):
         """Helper method to write bytes and log"""
         if self.ser != None:
-            tx_msg = bytes(msg, 'utf-8')
+            # Add carriage return to signify end of command
+            tx_msg = bytes(msg + '\r', 'utf-8')
             self.log.debug("<<< {} : \'{}\'".format(hexlify(tx_msg), msg))
             self.ser.write(tx_msg)
+
+            # Track how many bytes we're expecting to be echoed back
+            if ECHO_ON:
+                self.expected = self.expected + len(tx_msg)
 
     def _read(self, length):
         """Helper method to read number of bytes and log"""
         if self.ser != None:
-            rx_msg = self.ser.read(length)
+            rx_msg = self.ser.read(self.expected + length)
             self.log.debug(">>> {} : {}".format(hexlify(rx_msg), rx_msg))
-            return rx_msg.decode('utf-8')
+            msg = rx_msg[self.expected:]
+            self.expected = 0
+            return msg.decode('utf-8')
         return ""
 
     def open(self, port):
         """Connects to the given port at default baud rate"""
         # Open specified port
-        self.ser = serial.Serial(port, baudrate=BAUD_RATE, timeout=5)
+        self.ser = serial.Serial(port, baudrate=BAUD_RATE, timeout=0.1)
 
-        # Print out any existing bytes in the buffer
+        # Flush any existing bytes in the buffer
         self._read(1000)
 
         self.log.debug("Opened serial port " + port)
@@ -77,11 +87,13 @@ class Controller(object):
 
         # Write the command ID and the number of bytes to echo
         buf = ""
-        for i in range(math.ceil(len(msg)/256)):
+        # data size is buffer size minus command, length, and \r
+        data_size = DEST_BUF_SIZE - 6
+        for i in range(math.ceil(len(msg)/data_size)):
             tx_msg = COMMANDS["echo"]
-            tx_len = min(256, len(msg) - i*256)
+            tx_len = min(data_size, len(msg) - i*data_size)
             tx_msg += chr(tx_len)
-            tx_msg += msg[i*256:i*256+tx_len]
+            tx_msg += msg[i*data_size:i*data_size+tx_len]
             self._write(tx_msg)
             rx_msg = self._read(tx_len)
             buf += rx_msg
@@ -94,7 +106,7 @@ class Controller(object):
     def __exit__(self, type, value, traceback):
         if self.ser != None:
             self.ser.close()
-        if not value:
+        if value != None:
             self.log.error("Received exception: {}".format(value))
         self.log.info("Controller closing down...")
         return True
@@ -111,12 +123,10 @@ if __name__ == '__main__':
     logger.info("COM ports are: " + str(ports))
 
     with Controller() as c:
-        # responding = c.get_responding()
-        # print(responding)
-        # if len(responding) == 0:
-        #     logger.error("No responding COM port found")
-        #     raise Exception("No responding COM port found")
-        # c.open(responding[0])
-        c.open("COM4")
+        responding = c.get_responding()
+        logger.info("Responding: " + str(responding))
+        if len(responding) == 0:
+            logger.error("No responding COM port found")
+            raise Exception("No responding COM port found")
+        c.open(responding[0])
         assert c.echo("Test String") == "Test String"
- 

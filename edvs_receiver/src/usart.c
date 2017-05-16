@@ -23,7 +23,7 @@
 #define USART_GPIO GPIOA
 #define BUFFER_LENGTH 40    //length of TX, RX and command buffers
 #define USART_ECHO
-#define USART_BAUD_RATE 3000000
+#define USART_BAUD_RATE 1000000
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -78,12 +78,12 @@ void USART1_IRQHandler(void)
     static portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
     if (USART_GetITStatus(USART1, USART_IT_RXNE)==SET) {
-    data = USART_ReceiveData(USART1);
-    xQueueSendFromISR(usart_rxq, &data, &xHigherPriorityTaskWoken);
-//  if (xHigherPriorityTaskWoken==pdTRUE)
-//      portSWITCH_CONTEXT();
+        data = USART_ReceiveData(USART1);
+        xQueueSendFromISR(usart_rxq, &data, &xHigherPriorityTaskWoken);
+    //  if (xHigherPriorityTaskWoken==pdTRUE)
+    //      portSWITCH_CONTEXT();
 
-    USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+        USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     }
 }
 
@@ -139,8 +139,8 @@ static void irq_init(void)
 
 static void tasks_init(void)
 {
-    usart_txq = xQueueCreate(BUFFER_LENGTH,sizeof(uint8_t));
-    usart_rxq = xQueueCreate(BUFFER_LENGTH,sizeof(uint8_t));
+    usart_txq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
+    usart_rxq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
 
     xTaskCreate(usart_tx_task, (char const *)"USART_T", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(usart_rx_task, (char const *)"USART_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -150,12 +150,12 @@ static void usart_tx_task(void *pvParameters)
 {
     uint8_t data;
     for (;;) {
+        
         if (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
             vTaskDelay(1);
         } else {
             GPIO_ResetBits(GPIOC, GPIO_Pin_8);
-    //      if (pdPASS == xQueueReceive(usart_txq, &data, portMAX_DELAY)) {
-            if (pdPASS == xQueueReceive(usart_txq, &data, 100)) {
+            if (pdPASS == xQueueReceive(usart_txq, &data, portMAX_DELAY)) {
                 GPIO_SetBits(GPIOC, GPIO_Pin_8);
                 USART_SendData(USART1, data);
             }
@@ -176,16 +176,16 @@ static void usart_rx_task(void *pvParameters)
             USART_SendByte(data_buf[i-1]);
 #endif
 
-            if (data_buf[i] == '\r')
+            if (data_buf[i-1] == '\r')
             {
                 /* Copy out the command characters */
-                memcpy(data_buf, cmd_buf, 4);
+                memcpy(cmd_buf, data_buf, 4);
                 cmd_buf[4] = 0;
 
                 /* Switch based on the command */
                 if (strcmp(cmd_buf, "id  ") == 0)
                 {
-                    USART_SendString("Interface");
+                    USART_SendString("Interface\r");
                 }
 
                 i = 0;

@@ -1065,7 +1065,7 @@
             <name>$PROJ_DIR$\include\FreeRTOSConfig.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\include\usart.h</name>
+            <name>$PROJ_DIR$\include\pc_usart.h</name>
         </file>
     </group>
     <group>
@@ -1104,10 +1104,10 @@
             <name>$PROJ_DIR$\src\main_receiver.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\startup_stm32f0xx.s</name>
+            <name>$PROJ_DIR$\src\pc_usart.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\src\usart.c</name>
+            <name>$PROJ_DIR$\src\startup_stm32f0xx.s</name>
         </file>
     </group>
     <group>

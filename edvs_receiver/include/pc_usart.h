@@ -1,5 +1,5 @@
 
-#ifndef _USART_H
+#ifndef _PC_USART_H
 
 /*******************************************************************************
  * Global Includes
@@ -29,26 +29,44 @@
 /*******************************************************************************
  * Public Function Declarations
  ******************************************************************************/
-/* None */
 
-void USART_Config(void);
-void USART_SendByte(uint8_t data);
-void USART_SendString(char * str);
-
-
-/* Template function descriptor */
 /**
  * DESCRIPTION
- * <Description here>
+ * Initial setup for PC USART comms
  * 
  * INPUTS
- * <Input name> (<input type>) : <Input description>
+ * None
  *
  * RETURNS
- * <Output name (<output type>) : <Output description>
+ * Nothing
  */
+void PC_Config(void);
 
-#endif /* _USART_H */
+/**
+ * DESCRIPTION
+ * Transmit byte to PC
+ * 
+ * INPUTS
+ * data (uint8_t) : byte to transmit
+ *
+ * RETURNS
+ * Nothing
+ */
+void PC_SendByte(uint8_t data);
+
+/**
+ * DESCRIPTION
+ * Transmit null-terminated string to PC
+ * 
+ * INPUTS
+ * str (char *) : Null-terminated string to transmit
+ *
+ * RETURNS
+ * Nothing
+ */
+void PC_SendString(char * str);
+
+#endif /* _PC_USART_H */
 
 /*******************************************************************************
  * End of File

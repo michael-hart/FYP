@@ -16,7 +16,7 @@
  * Local Includes
  ******************************************************************************/
 #include "main_receiver.h"
-#include "usart.h"
+#include "pc_usart.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -59,7 +59,7 @@ void main_receiver(void)
     }
 
     /* Set up USART tasks */
-    USART_Config();
+    PC_Config();
     
     /* Set up Watchdog Timer */
     iwdg_init();

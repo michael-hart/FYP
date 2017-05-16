@@ -3,8 +3,6 @@
  ******************************************************************************/
 #include "stm32f0xx.h"
 
-//#include "stdio.h"
-
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -15,7 +13,7 @@
 /*******************************************************************************
  * Local Includes
  ******************************************************************************/
-#include "usart.h"
+#include "pc_usart.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -57,7 +55,7 @@ static void usart_rx_task(void *pvParameters);
 /*******************************************************************************
  * Public Function Definitions 
  ******************************************************************************/
-void USART_Config(void)
+void PC_Config(void)
 {
     hal_init();
     irq_init();
@@ -65,15 +63,15 @@ void USART_Config(void)
 
 }
 
-void USART_SendByte(uint8_t data)
+void PC_SendByte(uint8_t data)
 {
     xQueueSend(usart_txq, &data, portMAX_DELAY);
 }
 
-void USART_SendString(char * str)
+void PC_SendString(char * str)
 {
     while(* str) {
-        USART_SendByte(*str);
+        PC_SendByte(*str);
         str++;
     }
 }
@@ -94,6 +92,17 @@ void USART2_IRQHandler(void)
 /*******************************************************************************
  * Private Function Definitions (static)
  ******************************************************************************/
+
+/**
+ * DESCRIPTION
+ * Configure hardware to allow USART connection
+ * 
+ * INPUTS
+ * None
+ *
+ * RETURNS
+ * Nothing
+ */
 static void hal_init(void)
 {
     GPIO_InitTypeDef port_init;
@@ -126,6 +135,16 @@ static void hal_init(void)
 
 }
 
+/**
+ * DESCRIPTION
+ * Initialise and register interrupt routines
+ * 
+ * INPUTS
+ * None
+ *
+ * RETURNS
+ * Nothing
+ */
 static void irq_init(void)
 {
     NVIC_InitTypeDef nvic;
@@ -137,9 +156,18 @@ static void irq_init(void)
     NVIC_Init(&nvic);
 
     USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-
 }
 
+/**
+ * DESCRIPTION
+ * Initialise tasks and start running
+ * 
+ * INPUTS
+ * None
+ *
+ * RETURNS
+ * Nothing
+ */
 static void tasks_init(void)
 {
     usart_txq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
@@ -149,6 +177,16 @@ static void tasks_init(void)
     xTaskCreate(usart_rx_task, (char const *)"USART_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
 }
 
+/**
+ * DESCRIPTION
+ * Task to transmit queued data
+ * 
+ * INPUTS
+ * pvParameters (void*) : FreeRTOS struct with task information
+ *
+ * RETURNS
+ * Nothing
+ */
 static void usart_tx_task(void *pvParameters)
 {
     uint8_t data;
@@ -164,6 +202,16 @@ static void usart_tx_task(void *pvParameters)
     }
 }
 
+/**
+ * DESCRIPTION
+ * Task to retrieve queued characters and act upon commands
+ * 
+ * INPUTS
+ * pvParameters (void*) : FreeRTOS struct with task information
+ *
+ * RETURNS
+ * Nothing
+ */
 static void usart_rx_task(void *pvParameters)
 {
     uint8_t i = 0;
@@ -174,7 +222,7 @@ static void usart_rx_task(void *pvParameters)
         if (pdPASS == xQueueReceive(usart_rxq, &data_buf[i++], portMAX_DELAY)) {
 
 #ifdef USART_ECHO
-            USART_SendByte(data_buf[i-1]);
+            PC_SendByte(data_buf[i-1]);
 #endif
 
             if (data_buf[i-1] == '\r')
@@ -186,8 +234,8 @@ static void usart_rx_task(void *pvParameters)
                 /* Switch based on the command */
                 if (strcmp(cmd_buf, PC_CMD_ID) == 0)
                 {
-                    USART_SendString("Interface");
-                    USART_SendByte('\r');
+                    PC_SendString("Interface");
+                    PC_SendByte('\r');
                 }
                 else if (strcmp(cmd_buf, PC_CMD_ECHO) == 0)
                 {
@@ -196,7 +244,7 @@ static void usart_rx_task(void *pvParameters)
                     if (expected + 6 <= i)
                     {
                         data_buf[expected + 6] = 0;
-                        USART_SendString(&data_buf[5]);
+                        PC_SendString(&data_buf[5]);
                         /* \r included as part of echo command */
                     }
                 }
@@ -207,8 +255,8 @@ static void usart_rx_task(void *pvParameters)
                 else
                 {
                     /* If command is not recognised, say so */
-                    USART_SendString(PC_RESP_BAD_CMD);
-                    USART_SendByte('\r');
+                    PC_SendString(PC_RESP_BAD_CMD);
+                    PC_SendByte('\r');
                 }
 
                 i = 0;

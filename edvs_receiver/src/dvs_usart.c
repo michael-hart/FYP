@@ -187,7 +187,8 @@ static void irq_init(void)
  */
 static void tasks_init(void)
 {
-    xFwdSemaphore = xSemaphoreCreateMutex();
+    xFwdSemaphore = xSemaphoreCreateBinary();
+    xSemaphoreGive(xFwdSemaphore);
     dvs_rxq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
     dvs_dataq = xQueueCreate(DATA_LENGTH, sizeof(dvs_data_t));
     xTaskCreate(usart_rx_task, (char const *)"DVS_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);

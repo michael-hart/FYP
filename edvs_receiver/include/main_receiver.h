@@ -1,5 +1,6 @@
 
 #ifndef _MAIN_RECEIVER_H
+#define _MAIN_RECEIVER_H
 
 /*******************************************************************************
  * Global Includes

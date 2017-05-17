@@ -1070,6 +1070,9 @@
         <file>
             <name>$PROJ_DIR$\include\pc_usart.h</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\include\spinn_channel.h</name>
+        </file>
     </group>
     <group>
         <name>Libraries</name>
@@ -1111,6 +1114,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\src\pc_usart.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\spinn_channel.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\src\startup_stm32f0xx.s</name>

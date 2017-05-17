@@ -18,6 +18,7 @@
  ******************************************************************************/
 #include "dvs_usart.h"
 #include "pc_usart.h"
+#include "spinn_channel.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -274,7 +275,9 @@ static void decoded_tx_task(void *pvParameters)
     {
         /* Wait on queue */
         if (pdPASS == xQueueReceive(dvs_dataq, &data, portMAX_DELAY)) {
-            /* TODO: Send decoded data to SpiNNaker */
+            /* Send decoded data to SpiNNaker */
+            spinn_send_dvs(data);
+
             if (xSemaphoreTake(xFwdSemaphore, portMAX_DELAY) == pdTRUE
                 && forward_pc_flag == true)
             {

@@ -1,18 +1,16 @@
 
-#ifndef _DVS_USART_H
-#define _DVS_USART_H
+#ifndef _SPINN_CHANNEL_H
+#define _SPINN_CHANNEL_H
 
 /*******************************************************************************
  * Global Includes
  ******************************************************************************/
-#include "stm32f0xx.h"
-   
-#include <stdint.h>
+/* None */
 
 /*******************************************************************************
  * Local Includes
  ******************************************************************************/
-/* None */
+#include "dvs_usart.h"
 
 /*******************************************************************************
  * Global Processor Definitions
@@ -22,12 +20,12 @@
 /*******************************************************************************
  * Enum and Type definitions
  ******************************************************************************/
-/* Standard struct for DVS data to fill */   
-typedef struct dvs_data_s {
-    uint8_t x;
-    uint8_t y;
-    uint8_t polarity;
-} dvs_data_t;
+typedef enum spin_mode_e {
+    SPIN_MODE_128 = 0,
+    SPIN_MODE_64 = 1,
+    SPIN_MODE_32 = 2,
+    SPIN_MODE_16 = 3,
+} spin_mode_t;
 
 /*******************************************************************************
  * External Variable Definitions
@@ -40,7 +38,7 @@ typedef struct dvs_data_s {
 
 /**
  * DESCRIPTION
- * Initial setup for DVS USART comms
+ * Configure hardware and setup tasks for SpiNNaker link
  * 
  * INPUTS
  * None
@@ -48,11 +46,11 @@ typedef struct dvs_data_s {
  * RETURNS
  * Nothing
  */
-void DVS_Config(void);
+void spinn_config(void);
 
 /**
  * DESCRIPTION
- * Request forwarding of DVS packets to PC
+ * Request forwarding of SpiNNaker packets to PC; replaces SpiNNaker GPIO link
  * 
  * INPUTS
  * forward (uint8_t) : true or false of whether to forward. Resets any existing
@@ -63,9 +61,23 @@ void DVS_Config(void);
  * RETURNS
  * Nothing
  */
-void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms);
+void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms);
 
-#endif /* _DVS_USART_H */
+/**
+ * DESCRIPTION
+ * Queues DVS packet to be sent to the SpiNNaker
+ * 
+ * INPUTS
+ * data (dvs_data_t) : Struct containing data to be sent
+ *
+ * RETURNS
+ * Nothing
+ */
+void spinn_send_dvs(dvs_data_t data);
+
+/* TODO: spinn_encode, spinn_decode functions */
+
+#endif /* _SPINN_CHANNEL_H */
 
 /*******************************************************************************
  * End of File

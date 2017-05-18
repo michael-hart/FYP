@@ -228,7 +228,7 @@ class Controller(object):
         # Retrieve packet or time out
         pkt = self._read()
         if len(pkt) >= 3:
-            return DVSPacket(pkt[0], pkt[1], pkt[2])
+            return DVSPacket(ord(pkt[0]), ord(pkt[1]), ord(pkt[2]))
         else:
             return None
 

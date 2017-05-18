@@ -95,6 +95,15 @@ void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms)
     }
 }
 
+void DVS_put_sim(dvs_data_t data)
+{
+    uint8_t first, second;
+    first = 0x80 + data.y;
+    second = ((data.polarity & 0x1) << 7) + data.x;
+    xQueueSendToBack(dvs_rxq, &first, portMAX_DELAY);
+    xQueueSendToBack(dvs_rxq, &second, portMAX_DELAY);
+}
+
 void USART1_IRQHandler(void)
 {
     uint8_t data;

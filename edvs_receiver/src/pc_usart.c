@@ -325,7 +325,7 @@ static void usart_rx_task(void *pvParameters)
                         dvs_data.polarity = data_buf[6];
 
                         /* Use as DVS packet */
-                        spinn_send_dvs(dvs_data);
+                        DVS_put_sim(dvs_data);
                     }
                     else if (i > 8)
                     {

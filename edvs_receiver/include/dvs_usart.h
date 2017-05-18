@@ -65,6 +65,19 @@ void DVS_Config(void);
  */
 void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms);
 
+/**
+ * DESCRIPTION
+ * Place a simulated packet into the queue to be treated as a normal packet
+ * 
+ * INPUTS
+ * data (dvs_data_t) : struct containing simulated data
+ *
+ * RETURNS
+ * Nothing
+ */
+void DVS_put_sim(dvs_data_t data);
+
+
 #endif /* _DVS_USART_H */
 
 /*******************************************************************************

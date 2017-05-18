@@ -1,6 +1,6 @@
 """Module to contain SpiNNaker packet wrapper"""
 
-SPINN_PACKET_SHORT = 10
+SPINN_PACKET_SHORT = 11
 
 class SpiNNPacket(object):
     """SpiNNaker packet wrapper"""

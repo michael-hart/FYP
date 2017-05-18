@@ -62,7 +62,7 @@ spin_mode_t spin_mode = SPIN_MODE_128;
 
 /* Virtual chip address symbols to queue */
 /* TODO assign actual address instead of guessing it */
-uint8_t virtual_chip_address[] = {0x02, 0x01, 0x28, 0x24};
+uint8_t virtual_chip_address[] = {0x44, 0x42, 0x41, 0x28};
 
 /*******************************************************************************
  * Private Function Declarations (static)
@@ -132,16 +132,16 @@ void spinn_send_dvs(dvs_data_t data)
     switch (spin_mode)
     {
         case SPIN_MODE_64:
-            mapped_event += ((data.y & 0x7E) << 6);
-            mapped_event +=  (data.x & 0x7E);
+            mapped_event += ((data.y & 0x7E) << 5);
+            mapped_event += ((data.x & 0x7E) >> 1);
             break;
         case SPIN_MODE_32:
-            mapped_event += ((data.y & 0x7C) << 5);
-            mapped_event +=  (data.x & 0x7C);
+            mapped_event += ((data.y & 0x7C) << 3);
+            mapped_event += ((data.x & 0x7C) >> 2);
             break;
         case SPIN_MODE_16:
-            mapped_event += ((data.y & 0x79) << 4);
-            mapped_event +=  (data.x & 0x79);
+            mapped_event += ((data.y & 0x78) << 1);
+            mapped_event += ((data.x & 0x78) >> 3);
             break;
         case SPIN_MODE_128:
         default:
@@ -154,10 +154,10 @@ void spinn_send_dvs(dvs_data_t data)
     xor_all = virtual_chip_address[3] ^ virtual_chip_address[2] ^ 
               virtual_chip_address[1] ^ virtual_chip_address[0] ^
               ((mapped_event & 0xFF00) >> 8) ^ (mapped_event & 0xFF);
-    odd_parity = 1 ^ (xor_all & 0x80) ^ (xor_all & 0x40) ^
-                     (xor_all & 0x20) ^ (xor_all & 0x10) ^
-                     (xor_all & 0x08) ^ (xor_all & 0x04) ^
-                     (xor_all & 0x02) ^ (xor_all & 0x01);
+    odd_parity = 1 ^ ((xor_all & 0x80) >> 7) ^ ((xor_all & 0x40) >> 6) ^
+                     ((xor_all & 0x20) >> 5) ^ ((xor_all & 0x10) >> 4) ^
+                     ((xor_all & 0x08) >> 3) ^ ((xor_all & 0x04) >> 2) ^
+                     ((xor_all & 0x02) >> 1) ^ (xor_all & 0x01);
 
     /* Add header to queue */
     xQueueSendToBack(spinn_txq, &symbol_table[odd_parity], portMAX_DELAY);
@@ -314,7 +314,7 @@ static void spinn_tx_task(void *pvParameters)
                 {
                     PC_SendByte(data);
                     /* Send carriage return to signify EOP */ 
-                    if (++sent_bytes == SPINN_SHORT_SYMS)
+                    if (++sent_bytes == SPINN_SHORT_SYMS + 1)
                     {
                         PC_SendString(PC_EOL);
                         sent_bytes = 0;

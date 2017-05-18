@@ -40,6 +40,8 @@ class Controller(object):
         self.ser = None
         self.log = logging.getLogger("Controller")
         self.expected = 0
+        self.returns = 0
+        self.echo_returns = 0
 
     def get_responding(self):
         """Checks all connected Windows COM ports for responding device"""
@@ -68,8 +70,14 @@ class Controller(object):
             # Track how many packets we're expecting to be echoed back
             if ECHO_ON:
                 self.expected += 1
+                # Track how many carriage returns were just sent
+                self.returns = msg.count('\r')
 
-    def _read(self):
+            # Special case where we have requested echo
+            if msg.startswith(COMMANDS["echo"]):
+                self.echo_returns += msg.count('\r')
+
+    def _read(self, echo_expected=False):
         """Helper method to read packet"""
         buf = ""
         raw = 0
@@ -89,6 +97,19 @@ class Controller(object):
                     # If string is empty, we timed out, so return
                     break
                 buf += char
+
+                if echo_expected:
+                    if self.echo_returns > 0 and char == '\r':
+                        self.echo_returns -= 1
+                        char = 0
+                        continue
+                    else:
+                        self.echo_expected = False
+
+                if self.returns > 0 and char == '\r':
+                    char = 0
+                    self.returns -= 1
+
             log_buf = bytes([ord(x) for x in buf])
             self.log.debug(">>> {} : {}".format(hexlify(log_buf), log_buf))
 
@@ -147,7 +168,7 @@ class Controller(object):
                 self.log.info("Response received: " + resp_msg)
 
             # Read echoed packet
-            rx_msg = self._read()
+            rx_msg = self._read(echo_expected=True)
             buf += rx_msg
 
         return buf
@@ -210,6 +231,26 @@ class Controller(object):
             return DVSPacket(pkt[0], pkt[1], pkt[2])
         else:
             return None
+
+    def use_dvs(self, pkt):
+        """Sends given packet as simulated DVS message"""
+
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        # Put packet data into buffer and send
+        buf = [pkt.x, pkt.y, pkt.pol]
+        str_buf = COMMANDS["dvs_use"] + ''.join([chr(x) for x in buf])
+        self._write(str_buf)
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
 
     def __enter__(self):
         return self

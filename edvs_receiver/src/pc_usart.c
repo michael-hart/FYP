@@ -258,13 +258,18 @@ static void usart_rx_task(void *pvParameters)
                 {
                     /* Check if the number of bytes is correct */
                     uint8_t expected = data_buf[4];
-                    if (expected + 6 <= i)
+                    if (expected + 6 == i)
                     {
                         PC_SendString(PC_RESP_OK);
                         data_buf[expected + 6] = 0;
                         PC_SendString(&data_buf[5]);
                         /* \r included as part of echo command */
                         PC_SendByte('\n');
+                    }
+                    else if (expected + 6 > i)
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
                     }
                     else
                     {
@@ -280,7 +285,7 @@ static void usart_rx_task(void *pvParameters)
                 else if (strcmp(cmd_buf, PC_CMD_DVS_FWD) == 0)
                 {
                     /* 7 bytes is 4 command, 2 data, 1 \r */
-                    if (i >= 7)
+                    if (i == 7)
                     {
                         PC_SendString(PC_RESP_OK);
                         /* Find out time to forward DVS for */
@@ -290,9 +295,14 @@ static void usart_rx_task(void *pvParameters)
                            ms */
                         DVS_forward_pc(true, fwd_time);
                     }
-                    else
+                    else if (i > 7)
                     {
                         PC_SendString(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
                     }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_RESET) == 0)
@@ -305,7 +315,7 @@ static void usart_rx_task(void *pvParameters)
                 {
                     /* Retrieve next 3 bytes and use as DVS packet */
                     /* 8 bytes is 4 command, 3 data, 1 \r */
-                    if (i >= 8)
+                    if (i == 8)
                     {
                         PC_SendString(PC_RESP_OK);
 
@@ -317,16 +327,21 @@ static void usart_rx_task(void *pvParameters)
                         /* Use as DVS packet */
                         spinn_send_dvs(dvs_data);
                     }
-                    else
+                    else if (i > 8)
                     {
                         PC_SendString(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
                     }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_SPN_FWD) == 0)
                 {
                     /* Request forwarding of SpiNNaker packets */
                     /* 7 bytes is 4 command, 2 data, 1 \r */
-                    if (i >= 7)
+                    if (i == 7)
                     {
                         PC_SendString(PC_RESP_OK);
                         /* Find out time to forward SpiNN for */
@@ -336,9 +351,14 @@ static void usart_rx_task(void *pvParameters)
                            ms */
                         spinn_forward_pc(true, fwd_time);
                     }
-                    else
+                    else if (i > 7)
                     {
                         PC_SendString(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
                     }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_SPN_RESET) == 0)
@@ -351,7 +371,7 @@ static void usart_rx_task(void *pvParameters)
                 {
                     /* Retrieve requested mode and set in spinn_channel.c */
                     /* 6 bytes is 4 command, 1 data, 1 \r */
-                    if (i >= 6)
+                    if (i == 6)
                     {
                         uint8_t req_mode = data_buf[4];
                         if (req_mode < SPIN_NUM_MODES)
@@ -364,9 +384,14 @@ static void usart_rx_task(void *pvParameters)
                             PC_SendString(PC_RESP_BAD_PARAM);
                         }
                     }
-                    else
+                    else if (i > 6)
                     {
                         PC_SendString(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
                     }
                 }
                 else

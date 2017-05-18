@@ -110,7 +110,10 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
     else
     {
         /* Cancel reset timer and reset flag */
-        xTimerStop(spinn_reset_timer, portMAX_DELAY);
+        if (xTimerIsTimerActive(spinn_reset_timer))
+        {
+            xTimerStop(spinn_reset_timer, portMAX_DELAY);
+        }
         spinn_reset_fwd_flag(NULL);
         /* Take semaphore such that task waits for interrupt */
         xSemaphoreTake(xTxSemaphore, portMAX_DELAY);

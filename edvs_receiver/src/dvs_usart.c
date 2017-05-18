@@ -88,7 +88,10 @@ void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms)
     else
     {
         /* Cancel reset timer and reset flag */
-        xTimerStop(reset_timer, portMAX_DELAY);
+        if (xTimerIsTimerActive(reset_timer))
+        {
+            xTimerStop(reset_timer, portMAX_DELAY);
+        }
         reset_fwd_flag(NULL);
     }
 }

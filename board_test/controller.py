@@ -65,7 +65,7 @@ class Controller(object):
             # Add carriage return to signify end of command
 
             tx_msg = bytes([ord(x) for x in msg + '\r'])
-            self.log.debug("<<< {} : \'{}\'".format(hexlify(tx_msg), msg))
+            self.log.debug("<<< %s : \'%s\'", hexlify(tx_msg), msg)
             self.ser.write(tx_msg)
 
             # Track how many packets we're expecting to be echoed back
@@ -104,15 +104,13 @@ class Controller(object):
                         self.echo_returns -= 1
                         char = 0
                         continue
-                    else:
-                        self.echo_expected = False
 
                 if self.returns > 0 and char == '\r':
                     char = 0
                     self.returns -= 1
 
             log_buf = bytes([ord(x) for x in buf])
-            self.log.debug(">>> {} : {}".format(hexlify(log_buf), log_buf))
+            self.log.debug(">>> %s : %s", hexlify(log_buf), log_buf)
 
             if len(buf) > 0:
                 return buf[:-1]
@@ -125,7 +123,7 @@ class Controller(object):
 
         # Flush any existing bytes in the buffer
         flushed = self.ser.read(1000)
-        self.log.debug(">>> {} : {}".format(hexlify(flushed), flushed))
+        self.log.debug(">>> %s : %s", hexlify(flushed), flushed)
 
         # Set a higher timeout after buffer flush
         self.ser.timeout = 0.1
@@ -317,11 +315,11 @@ class Controller(object):
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, _type, _value, traceback):
         if self.ser is not None:
             self.ser.close()
-        if value != None:
-            self.log.error("Received exception: {}".format(value))
+        if _value != None:
+            self.log.error("Received exception: %s", _value)
         self.log.info("Controller closing down...")
         return True
 

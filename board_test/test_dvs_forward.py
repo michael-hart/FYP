@@ -6,19 +6,19 @@ from common import (board_assert_equal, board_assert_ge, board_assert_le,
 from controller import RESPONSES
 from dvs_packet import DVSPacket
 
-def test_fwd_permanent_on(board):
+def test_dvs_fwd_permanent_on(board):
     """Tests that turning forwarding on permanently works"""
     board_assert_equal(board.forward_dvs(0), RESPONSES["success"])
 
-def test_fwd_reset(board):
+def test_dvs_fwd_reset(board):
     """Tests that resetting the forwarding works"""
     board_assert_equal(board.reset_dvs(), RESPONSES["success"])
 
-def test_fwd_temp(board):
+def test_dvs_fwd_temp(board):
     """Tests that setting temporary forwarding is accepted"""
     board_assert_equal(board.forward_dvs(1000), RESPONSES["success"])
 
-def test_fwd_packets(board):
+def test_dvs_packets_received(board):
     """Tests that board receives actual DVS packets"""
 
     # Set new timeout to allow time for actual DVS to supply packets

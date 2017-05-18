@@ -21,6 +21,8 @@ def test_id(board):
     "a"*38,
     "a"*8 + "b"*8 + "c"*8 + "d"*8 + "e"*8 + "f"*8,
     "g"*200,
+    '\r',
+    '\r'*5,
     ])
 def test_echo(board, test_str):
     """Tests echo functionality of board"""

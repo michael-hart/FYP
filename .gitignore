@@ -22,3 +22,7 @@ edvs_receiver/Common/*
 */Debug/*
 */BuildLog.log
 */settings/*
+
+# Ignore html files from test run
+*.html
+*.css

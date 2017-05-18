@@ -4,7 +4,7 @@ import logging
 import time
 import pytest
 from controller import Controller
-from common import board_assert_ge
+from common import WAIT_TIME
 
 @pytest.fixture(scope="session", autouse=True)
 def log():
@@ -22,7 +22,12 @@ def board(log):
     """Returns an open controller connection to the board"""
     with Controller() as con:
         responding = con.get_responding()
-        board_assert_ge(len(responding)+1, 0)
+
+        # Allow one single retry after a wait
+        if len(responding) == 0:
+            time.sleep(WAIT_TIME)
+            responding = con.get_responding()
+
         con.open(responding[0])
         yield con
         con.reset()

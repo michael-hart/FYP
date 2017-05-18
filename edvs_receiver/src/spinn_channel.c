@@ -96,8 +96,7 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
             if (timeout_ms > 0)
             {
                 /* Set up a timeout to cancel the forwarding */
-                xTimerChangePeriod(spinn_reset_timer, 
-                                   timeout_ms / portTICK_PERIOD_MS,
+                xTimerChangePeriod(spinn_reset_timer, timeout_ms, 
                                    portMAX_DELAY);
 
             }
@@ -116,7 +115,8 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
         }
         spinn_reset_fwd_flag(NULL);
         /* Take semaphore such that task waits for interrupt */
-        xSemaphoreTake(xTxSemaphore, portMAX_DELAY);
+        /* Only wait 100ms in case semaphore has not previously been given */
+        xSemaphoreTake(xTxSemaphore, 100);
     }
 }
 
@@ -249,7 +249,7 @@ static void tasks_init(void)
 
     /* Create semaphore for transmission and give to transmit first symbol */
     xTxSemaphore = xSemaphoreCreateBinary();
-    xSemaphoreGive(xTxSemaphore);
+    // xSemaphoreGive(xTxSemaphore);
 
     /* Create task for acting upon queued data */
     xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -298,15 +298,18 @@ static void spinn_tx_task(void *pvParameters)
         /* Wait for interrupt on pin to transmit next symbol */
         if (xSemaphoreTake(xTxSemaphore, portMAX_DELAY) == pdTRUE)
         {
+
             /* Wait for data in the queue to transmit */
             if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY))
             {
-                /* Copy to prevent holding while doing large task */
-                check_flag = spinn_fwd_pc_flag;
-            }
 
-            if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
-            {
+                if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
+                {
+                    /* Copy to prevent holding while doing large task */
+                    check_flag = spinn_fwd_pc_flag;
+                    xSemaphoreGive(spinFwdSemaphore);
+                }
+
                 if (check_flag)
                 {
                     PC_SendByte(data);

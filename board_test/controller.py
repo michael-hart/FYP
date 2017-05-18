@@ -8,6 +8,7 @@ import logging
 import serial
 from serial.tools import list_ports
 from dvs_packet import DVSPacket
+from spinn_packet import SPINN_PACKET_SHORT, SpiNNPacket
 
 # Constant definitions
 BAUD_RATE = 500000
@@ -250,6 +251,67 @@ class Controller(object):
             self.log.info("Response received: " + resp_msg)
 
         return resp_msg
+
+    def forward_spinn(self, timeout_ms):
+        """Request SpiNN forwarding for timeout_ms, or 0 for permanently on"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        tx_msg = COMMANDS["spinn_forward"]
+        tx_msg += chr((timeout_ms & 0xFF00) >> 8)
+        tx_msg += chr(timeout_ms & 0xFF)
+        self._write(tx_msg)
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def reset_spinn(self):
+        """Cancels forwarding for DVS packets"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["spinn_reset"])
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def set_mode_spinn(self, mode):
+        """Sets the mode for the SpiNNaker transmission"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        tx_msg = COMMANDS["spinn_set_mode"]
+        tx_msg += chr(mode)
+        self._write(tx_msg)
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def get_spinn(self):
+        """Retrieve bytes and package into SpiNNaker packet"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        data = self._read()
+        if len(data) == SPINN_PACKET_SHORT:
+            pkt = [ord(x) for x in data]
+            return SpiNNPacket(pkt)
+        else:
+            return None
 
 
     def __enter__(self):

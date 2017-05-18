@@ -25,7 +25,7 @@
  ******************************************************************************/
 #define USART_GPIO GPIOA
 #define BUFFER_LENGTH 40    //length of TX, RX and command buffers
-#define USART_BAUD_RATE 500000
+#define USART_BAUD_RATE 4000000
 #define DATA_LENGTH 20
 
 #define RESET_TIMER_NAME "rst_dvs"
@@ -78,8 +78,7 @@ void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms)
             if (timeout_ms > 0)
             {
                 /* Set up a timeout to cancel the forwarding */
-                xTimerChangePeriod(reset_timer, timeout_ms / portTICK_PERIOD_MS,
-                                   portMAX_DELAY);
+                xTimerChangePeriod(reset_timer, timeout_ms, portMAX_DELAY);
 
             }
             xSemaphoreGive(xFwdSemaphore);

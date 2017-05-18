@@ -179,6 +179,11 @@ void spinn_send_dvs(dvs_data_t data)
 
 }
 
+void spinn_set_mode(spin_mode_t mode)
+{
+    spin_mode = mode;
+}
+
 /*******************************************************************************
  * Private Function Definitions (static)
  ******************************************************************************/
@@ -284,6 +289,7 @@ static void spinn_tx_task(void *pvParameters)
 {
     uint8_t data = 0;
     uint8_t check_flag = false;
+    uint8_t sent_bytes = 0;
 
     for (;;)
     {
@@ -291,7 +297,7 @@ static void spinn_tx_task(void *pvParameters)
         if (xSemaphoreTake(xTxSemaphore, portMAX_DELAY) == pdTRUE)
         {
             /* Wait for data in the queue to transmit */
-            if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY)) 
+            if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY))
             {
                 /* Copy to prevent holding while doing large task */
                 check_flag = spinn_fwd_pc_flag;
@@ -302,6 +308,12 @@ static void spinn_tx_task(void *pvParameters)
                 if (check_flag)
                 {
                     PC_SendByte(data);
+                    /* Send carriage return to signify EOP */ 
+                    if (++sent_bytes == SPINN_SHORT_SYMS)
+                    {
+                        PC_SendByte('\r');
+                        sent_bytes = 0;
+                    }
                     /* If forwarding to PC, do not wait for interrupt */
                     xSemaphoreGive(xTxSemaphore);
                 }

@@ -18,6 +18,7 @@
 #include "main_receiver.h"
 #include "pc_usart.h"
 #include "dvs_usart.h"
+#include "spinn_channel.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -62,6 +63,9 @@ void main_receiver(void)
     /* Set up USART tasks */
     PC_Config();
     DVS_Config();
+    
+    /* Set up SpiNNaker tasks */
+    spinn_config();
     
     /* Set up Watchdog Timer */
     iwdg_init();

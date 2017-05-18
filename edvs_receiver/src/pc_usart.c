@@ -16,6 +16,7 @@
  ******************************************************************************/
 #include "pc_usart.h"
 #include "dvs_usart.h"
+#include "spinn_channel.h"
 
 /*******************************************************************************
  * Local Definitions
@@ -29,8 +30,13 @@
 #define PC_CMD_ID        "id  "
 #define PC_CMD_ECHO      "echo"
 #define PC_CMD_RESET     "rset"
-#define PC_CMD_FWD_DVS   "fdvs"
-#define PC_CMD_FWD_RESET "rdvs"
+#define PC_CMD_DVS_FWD   "fdvs"
+#define PC_CMD_DVS_RESET "rdvs"
+#define PC_CMD_DVS_USE   "udvs"
+#define PC_CMD_SPN_FWD   "fspn"
+#define PC_CMD_SPN_RESET "rspn"
+#define PC_CMD_SPN_MODE  "mspn"
+
 
 #define PC_RESP_BAD_CMD "Not recognised"
 
@@ -221,6 +227,7 @@ static void usart_rx_task(void *pvParameters)
     uint8_t i = 0;
     char data_buf[BUFFER_LENGTH];
     char cmd_buf[5];
+    dvs_data_t dvs_data;
 
     for (;;) {
         if (pdPASS == xQueueReceive(pc_rxq, &data_buf[i++], portMAX_DELAY)) {
@@ -256,9 +263,10 @@ static void usart_rx_task(void *pvParameters)
                 {
                     NVIC_SystemReset();
                 }
-                else if (strcmp(cmd_buf, PC_CMD_FWD_DVS) == 0)
+                else if (strcmp(cmd_buf, PC_CMD_DVS_FWD) == 0)
                 {
-                    if (i >= 6)
+                    /* 7 bytes is 4 command, 2 data, 1 \r */
+                    if (i >= 7)
                     {
                         /* Find out time to forward DVS for */
                         uint16_t fwd_time = data_buf[4] << 8;
@@ -268,10 +276,57 @@ static void usart_rx_task(void *pvParameters)
                         DVS_forward_pc(true, fwd_time);
                     }
                 }
-                else if (strcmp(cmd_buf, PC_CMD_FWD_RESET) == 0)
+                else if (strcmp(cmd_buf, PC_CMD_DVS_RESET) == 0)
                 {
                     /* Reset the forwarding of DVS packets */
                     DVS_forward_pc(false, 0);
+                }
+                else if (strcmp(cmd_buf, PC_CMD_DVS_USE) == 0)
+                {
+                    /* Retrieve next 3 bytes and use as DVS packet */
+                    /* 8 bytes is 4 command, 3 data, 1 \r */
+                    if (i >= 8)
+                    {
+                        /* Unpack received data into dvs_data */
+                        dvs_data.x = data_buf[4];
+                        dvs_data.y = data_buf[5];
+                        dvs_data.polarity = data_buf[6];
+
+                        /* Use as DVS packet */
+                        spinn_send_dvs(dvs_data);
+                    }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_SPN_FWD) == 0)
+                {
+                    /* Request forwarding of SpiNNaker packets */
+                    /* 7 bytes is 4 command, 2 data, 1 \r */
+                    if (i >= 7)
+                    {
+                        /* Find out time to forward SpiNN for */
+                        uint16_t fwd_time = data_buf[4] << 8;
+                        fwd_time += data_buf[5];
+                        /* Enable forwarding - 0 for permanent, else time in 
+                           ms */
+                        spinn_forward_pc(true, fwd_time);
+                    }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_SPN_RESET) == 0)
+                {
+                    /* Reset the forwarding of SpiNN packets */
+                    spinn_forward_pc(false, 0);
+                }
+                else if (strcmp(cmd_buf, PC_CMD_SPN_MODE) == 0)
+                {
+                    /* Retrieve requested mode and set in spinn_channel.c */
+                    /* 6 bytes is 4 command, 1 data, 1 \r */
+                    if (i >= 6)
+                    {
+                        uint8_t req_mode = data_buf[4];
+                        if (req_mode < SPIN_NUM_MODES)
+                        {
+                            spinn_set_mode((spin_mode_t) req_mode);
+                        }
+                    }
                 }
                 else
                 {

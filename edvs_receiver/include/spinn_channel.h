@@ -15,7 +15,7 @@
 /*******************************************************************************
  * Global Processor Definitions
  ******************************************************************************/
-/* None */
+#define SPIN_NUM_MODES (4)
 
 /*******************************************************************************
  * Enum and Type definitions
@@ -74,6 +74,19 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms);
  * Nothing
  */
 void spinn_send_dvs(dvs_data_t data);
+
+/**
+ * DESCRIPTION
+ * Sets SpiNNaker forwarding mode resolution
+ * 
+ * INPUTS
+ * mode (spin_mode_t) : Enum value to convert
+ *
+ * RETURNS
+ * Nothing
+ */
+void spinn_set_mode(spin_mode_t mode);
+
 
 /* TODO: spinn_encode, spinn_decode functions */
 

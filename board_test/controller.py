@@ -3,6 +3,7 @@
 # Import statements
 from binascii import hexlify
 import math
+import struct
 import logging
 import serial
 from serial.tools import list_ports
@@ -59,7 +60,8 @@ class Controller(object):
         """Helper method to write bytes and log"""
         if self.ser != None:
             # Add carriage return to signify end of command
-            tx_msg = bytes(msg + '\r', 'utf-8')
+
+            tx_msg = bytes([ord(x) for x in msg + '\r'])
             self.log.debug("<<< {} : \'{}\'".format(hexlify(tx_msg), msg))
             self.ser.write(tx_msg)
 
@@ -69,24 +71,29 @@ class Controller(object):
 
     def _read(self):
         """Helper method to read packet"""
-        buf = bytes()
+        buf = ""
+        raw = 0
         char = 0
+
         # Handle echoed bytes by recursively discarding packets
         if self.expected > 0:
             self.expected -= 1
             self._read()
+
         if self.ser != None:
-            while char != bytes('\r', 'utf-8'):
-                char = self.ser.read(1)
-                # If string is empty, we timed out, so return
-                if char == bytes("", 'utf-8'):
+            while char != '\r':
+                raw = self.ser.read(1)
+                if len(raw) > 0:
+                    char = chr(struct.unpack("<B", raw)[0])
+                else:
+                    # If string is empty, we timed out, so return
                     break
                 buf += char
-            self.log.debug(">>> {} : {}".format(hexlify(buf), buf))
+            log_buf = bytes([ord(x) for x in buf])
+            self.log.debug(">>> {} : {}".format(hexlify(log_buf), log_buf))
 
             if len(buf) > 0:
-                msg = buf[:-1]
-                return msg.decode('utf-8')
+                return buf[:-1]
         return ""
 
     def open(self, port):
@@ -164,7 +171,7 @@ class Controller(object):
             self.log.error("No serial device connected!")
             return ""
         tx_msg = COMMANDS["dvs_forward"]
-        tx_msg += chr(timeout_ms >> 8)
+        tx_msg += chr((timeout_ms & 0xFF00) >> 8)
         tx_msg += chr(timeout_ms & 0xFF)
         self._write(tx_msg)
 

@@ -26,15 +26,19 @@ def test_echo(board, test_str):
     """Tests echo functionality of board"""
     board_assert_equal(board.echo(test_str), test_str)
 
-def test_bad_cmd(board):
+def test_bad_cmd(board, log):
     """Tests whether a non-existent command gives an error message"""
     board._write("bad_cmd")
-    resp = board._read(len(RESPONSES["bad_cmd"]) + 1)
-    if len(resp) > 0:
-        resp = resp[:-1]
-    board_assert_equal(resp, RESPONSES["bad_cmd"])
+
+    # Log error code
+    resp_msg = board._read()
+    if resp_msg in RESPONSES.values():
+        log.info("Response received: " + resp_msg)
+
+    board_assert_equal(resp_msg, RESPONSES["bad_cmd"])
 
 def test_reset(board):
     """Tests whether the reset command is accepted"""
     reset_result = board.reset()
-    board_assert(reset_result)
+    # If any result is retrieved, reset has failed
+    board_assert(reset_result not in RESPONSES.values())

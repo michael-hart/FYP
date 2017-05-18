@@ -38,7 +38,12 @@
 #define PC_CMD_SPN_MODE  "mspn"
 
 
-#define PC_RESP_BAD_CMD "Not recognised"
+#define PC_RESP_OK        "000 Success\r"
+#define PC_RESP_BAD_CMD   "001 Not recognised\r"
+#define PC_RESP_BAD_LEN   "002 Wrong length\r"
+#define PC_RESP_BAD_PARAM "003 Bad parameter\r"
+
+#define PC_IDENTIFIER "Interface"
 
 
 /*******************************************************************************
@@ -245,8 +250,9 @@ static void usart_rx_task(void *pvParameters)
                 /* Switch based on the command */
                 if (strcmp(cmd_buf, PC_CMD_ID) == 0)
                 {
-                    PC_SendString("Interface");
-                    PC_SendByte('\r');
+                    PC_SendString(PC_RESP_OK);
+                    PC_SendString(PC_IDENTIFIER);
+                    PC_SendString(PC_EOL);
                 }
                 else if (strcmp(cmd_buf, PC_CMD_ECHO) == 0)
                 {
@@ -254,13 +260,21 @@ static void usart_rx_task(void *pvParameters)
                     uint8_t expected = data_buf[4];
                     if (expected + 6 <= i)
                     {
+                        PC_SendString(PC_RESP_OK);
                         data_buf[expected + 6] = 0;
                         PC_SendString(&data_buf[5]);
                         /* \r included as part of echo command */
+                        PC_SendByte('\n');
+                    }
+                    else
+                    {
+                        PC_SendString(PC_RESP_BAD_LEN);
                     }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_RESET) == 0)
                 {
+                    /* No point writing success here as board reset will clear
+                       UART buffer before it can send */
                     NVIC_SystemReset();
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_FWD) == 0)
@@ -268,6 +282,7 @@ static void usart_rx_task(void *pvParameters)
                     /* 7 bytes is 4 command, 2 data, 1 \r */
                     if (i >= 7)
                     {
+                        PC_SendString(PC_RESP_OK);
                         /* Find out time to forward DVS for */
                         uint16_t fwd_time = data_buf[4] << 8;
                         fwd_time += data_buf[5];
@@ -275,9 +290,14 @@ static void usart_rx_task(void *pvParameters)
                            ms */
                         DVS_forward_pc(true, fwd_time);
                     }
+                    else
+                    {
+                        PC_SendString(PC_RESP_BAD_LEN);
+                    }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_RESET) == 0)
                 {
+                    PC_SendString(PC_RESP_OK);
                     /* Reset the forwarding of DVS packets */
                     DVS_forward_pc(false, 0);
                 }
@@ -287,6 +307,8 @@ static void usart_rx_task(void *pvParameters)
                     /* 8 bytes is 4 command, 3 data, 1 \r */
                     if (i >= 8)
                     {
+                        PC_SendString(PC_RESP_OK);
+
                         /* Unpack received data into dvs_data */
                         dvs_data.x = data_buf[4];
                         dvs_data.y = data_buf[5];
@@ -295,6 +317,10 @@ static void usart_rx_task(void *pvParameters)
                         /* Use as DVS packet */
                         spinn_send_dvs(dvs_data);
                     }
+                    else
+                    {
+                        PC_SendString(PC_RESP_BAD_LEN);
+                    }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_SPN_FWD) == 0)
                 {
@@ -302,6 +328,7 @@ static void usart_rx_task(void *pvParameters)
                     /* 7 bytes is 4 command, 2 data, 1 \r */
                     if (i >= 7)
                     {
+                        PC_SendString(PC_RESP_OK);
                         /* Find out time to forward SpiNN for */
                         uint16_t fwd_time = data_buf[4] << 8;
                         fwd_time += data_buf[5];
@@ -309,9 +336,14 @@ static void usart_rx_task(void *pvParameters)
                            ms */
                         spinn_forward_pc(true, fwd_time);
                     }
+                    else
+                    {
+                        PC_SendString(PC_RESP_BAD_LEN);
+                    }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_SPN_RESET) == 0)
                 {
+                    PC_SendString(PC_RESP_OK);
                     /* Reset the forwarding of SpiNN packets */
                     spinn_forward_pc(false, 0);
                 }
@@ -324,17 +356,26 @@ static void usart_rx_task(void *pvParameters)
                         uint8_t req_mode = data_buf[4];
                         if (req_mode < SPIN_NUM_MODES)
                         {
+                            PC_SendString(PC_RESP_OK);
                             spinn_set_mode((spin_mode_t) req_mode);
                         }
+                        else
+                        {
+                            PC_SendString(PC_RESP_BAD_PARAM);
+                        }
+                    }
+                    else
+                    {
+                        PC_SendString(PC_RESP_BAD_LEN);
                     }
                 }
                 else
                 {
                     /* If command is not recognised, say so */
                     PC_SendString(PC_RESP_BAD_CMD);
-                    PC_SendByte('\r');
                 }
 
+                /* Having consumed a command, reset buffer */
                 i = 0;
             }
 

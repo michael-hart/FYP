@@ -1,12 +1,12 @@
 """Controller to control the interface board, to be used for testing the board"""
 
 # Import statements
+from binascii import hexlify
+import math
 import logging
 import serial
 from serial.tools import list_ports
-import time
-from binascii import hexlify
-import math
+from dvs_packet import DVSPacket
 
 # Constant definitions
 BAUD_RATE = 500000
@@ -18,9 +18,16 @@ COMMANDS = {
     "reset": "rset",
     "dvs_forward": "fdvs",
     "dvs_reset": "rdvs",
+    "dvs_use": "udvs",
+    "spinn_forward": "fspn",
+    "spinn_reset": "rspn",
+    "spinn_set_mode": "mspn",
 }
 RESPONSES = {
-    "bad_cmd": "Not recognised",
+    "success": "000 Success",
+    "bad_cmd": "001 Not recognised",
+    "bad_len": "002 Wrong length",
+    "bad_param": "003 Bad parameter",
 }
 ECHO_ON = True
 
@@ -56,18 +63,30 @@ class Controller(object):
             self.log.debug("<<< {} : \'{}\'".format(hexlify(tx_msg), msg))
             self.ser.write(tx_msg)
 
-            # Track how many bytes we're expecting to be echoed back
+            # Track how many packets we're expecting to be echoed back
             if ECHO_ON:
-                self.expected = self.expected + len(tx_msg)
+                self.expected += 1
 
-    def _read(self, length):
-        """Helper method to read number of bytes and log"""
+    def _read(self):
+        """Helper method to read packet"""
+        buf = bytes()
+        char = 0
+        # Handle echoed bytes by recursively discarding packets
+        if self.expected > 0:
+            self.expected -= 1
+            self._read()
         if self.ser != None:
-            rx_msg = self.ser.read(self.expected + length)
-            self.log.debug(">>> {} : {}".format(hexlify(rx_msg), rx_msg))
-            msg = rx_msg[self.expected:]
-            self.expected = 0
-            return msg.decode('utf-8')
+            while char != bytes('\r', 'utf-8'):
+                char = self.ser.read(1)
+                # If string is empty, we timed out, so return
+                if char == bytes("", 'utf-8'):
+                    break
+                buf += char
+            self.log.debug(">>> {} : {}".format(hexlify(buf), buf))
+
+            if len(buf) > 0:
+                msg = buf[:-1]
+                return msg.decode('utf-8')
         return ""
 
     def open(self, port):
@@ -76,7 +95,8 @@ class Controller(object):
         self.ser = serial.Serial(port, baudrate=BAUD_RATE, timeout=0.001)
 
         # Flush any existing bytes in the buffer
-        self._read(1000)
+        flushed = self.ser.read(1000)
+        self.log.debug(">>> {} : {}".format(hexlify(flushed), flushed))
 
         # Set a higher timeout after buffer flush
         self.ser.timeout = 0.1
@@ -91,10 +111,10 @@ class Controller(object):
 
         # Write get ID and get expected length of ID
         self._write(COMMANDS["get_id"])
-        _id = self._read(len(BOARD_ID) + 1)
-        if len(_id) > 0:
-            _id = _id[:-1]
-        return _id
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+        return self._read()
 
     def echo(self, msg):
         """Requests that the board echoes back the given bytes"""
@@ -113,10 +133,14 @@ class Controller(object):
             tx_msg += chr(tx_len)
             tx_msg += msg[i*data_size:i*data_size+tx_len]
             self._write(tx_msg)
-            # Read one extra for the carriage return
-            rx_msg = self._read(tx_len + 1)
-            if len(rx_msg) > 0:
-                rx_msg = rx_msg[:-1]
+
+            # Log error code
+            resp_msg = self._read()
+            if resp_msg in RESPONSES.values():
+                self.log.info("Response received: " + resp_msg)
+
+            # Read echoed packet
+            rx_msg = self._read()
             buf += rx_msg
 
         return buf
@@ -127,10 +151,12 @@ class Controller(object):
             self.log.error("No serial device connected!")
             return ""
         self._write(COMMANDS["reset"])
-        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
-        if len(resp) > 0:
-            resp = resp[:-1]
-        return resp != RESPONSES["bad_cmd"]
+
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
 
     def forward_dvs(self, timeout_ms):
         """Request forwarding for timeout_ms, or 0 for permanently on"""
@@ -141,10 +167,13 @@ class Controller(object):
         tx_msg += chr(timeout_ms >> 8)
         tx_msg += chr(timeout_ms & 0xFF)
         self._write(tx_msg)
-        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
-        if len(resp) > 0:
-            resp = resp[:-1]
-        return resp != RESPONSES["bad_cmd"]
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
 
     def reset_dvs(self):
         """Cancels forwarding for DVS packets"""
@@ -152,10 +181,28 @@ class Controller(object):
             self.log.error("No serial device connected!")
             return ""
         self._write(COMMANDS["dvs_reset"])
-        resp = self._read(len(RESPONSES["bad_cmd"]) + 1)
-        if len(resp) > 0:
-            resp = resp[:-1]
-        return resp != RESPONSES["bad_cmd"]
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def get_dvs(self):
+        """Attempts to retrieve a DVS packet if it exists"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        self.log.info("Attempting to read 3 bytes for 1 packet")
+
+        # Retrieve packet or time out
+        pkt = self._read()
+        if len(pkt) >= 3:
+            return DVSPacket(pkt[0], pkt[1], pkt[2])
+        else:
+            return None
 
     def __enter__(self):
         return self

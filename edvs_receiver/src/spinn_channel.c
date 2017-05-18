@@ -251,7 +251,6 @@ static void tasks_init(void)
     /* Create task for acting upon queued data */
     xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
 
-
     /* Create queue for SpiNN packet data */
     spinn_txq = xQueueCreate(BUFFER_LENGTH * SPINN_SHORT_SYMS, sizeof(uint8_t));
 }
@@ -311,7 +310,7 @@ static void spinn_tx_task(void *pvParameters)
                     /* Send carriage return to signify EOP */ 
                     if (++sent_bytes == SPINN_SHORT_SYMS)
                     {
-                        PC_SendByte('\r');
+                        PC_SendString(PC_EOL);
                         sent_bytes = 0;
                     }
                     /* If forwarding to PC, do not wait for interrupt */

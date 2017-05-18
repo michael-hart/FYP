@@ -284,7 +284,7 @@ static void decoded_tx_task(void *pvParameters)
                 PC_SendByte(data.x);
                 PC_SendByte(data.y);
                 PC_SendByte(data.polarity);
-                PC_SendByte('\r');
+                PC_SendString(PC_EOL);
                 xSemaphoreGive(xFwdSemaphore);
             }
         }

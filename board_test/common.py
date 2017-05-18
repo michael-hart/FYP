@@ -39,3 +39,9 @@ def board_assert_le(left, right):
     if left > right:
         time.sleep(WAIT_TIME)
     assert left <= right
+
+def board_assert_isinstance(obj, classinfo):
+    """Assert that obj is instance of classinfo"""
+    if not isinstance(obj, classinfo):
+        time.sleep(WAIT_TIME)
+    assert isinstance(obj, classinfo)

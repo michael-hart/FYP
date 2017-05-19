@@ -4,6 +4,7 @@ import logging
 import time
 import pytest
 from controller import Controller
+from mbed_controller import MBEDController
 from common import WAIT_TIME
 
 @pytest.fixture(scope="session", autouse=True)
@@ -24,7 +25,7 @@ def board(log):
         responding = con.get_responding()
 
         # Allow one single retry after a wait
-        if len(responding) == 0:
+        if not responding:
             time.sleep(WAIT_TIME)
             responding = con.get_responding()
 
@@ -33,3 +34,12 @@ def board(log):
         con.reset()
         # Allow board time to reset
         time.sleep(0.1)
+
+@pytest.yield_fixture
+def mbed(log):
+    """Returns an open controller connection to the MBED"""
+    with MBEDController() as con:
+        responding = con.get_responding()
+        con.open(responding[0])
+        yield con
+        

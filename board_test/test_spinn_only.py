@@ -1,7 +1,7 @@
 """Module to test SpiNNaker code with no DVS connected"""
 
 import pytest
-from common import (board_assert_equal, board_assert_ge, board_assert_le,
+from common import (board_assert_equal, board_assert_ge
                     board_assert_isinstance, SpiNNMode, spinn_2_to_7)
 from fixtures import board
 from controller import RESPONSES

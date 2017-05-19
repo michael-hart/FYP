@@ -107,13 +107,18 @@ class MBEDController(object):
         self._write(COMMANDS["get_spinn"])
         raw = self._read()
 
+        # Remove first 4 bytes as this is the duration
+        raw_duration = bytes([ord(x) for x in raw[:4]])
+        duration = struct.unpack(">I", raw_duration)[0]
+        raw = raw[4:]
+
         # Package bytes into SpiNNPackets
         packets = []
         while len(raw) >= SPINN_PACKET_SHORT:
             packets += SpiNNPacket(raw[:SPINN_PACKET_SHORT])
             raw = raw[SPINN_PACKET_SHORT:]
 
-        return packets
+        return (duration, packets)
 
     def __enter__(self):
         return self

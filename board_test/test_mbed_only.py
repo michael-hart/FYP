@@ -18,5 +18,6 @@ def test_empty_spinn(mbed):
     # Note that test is flawed as no bytes returned gives the same result
     # as only a carriage return returned. This merely checks that there is
     # nothing in the buffer waiting to be sent
-    packets = mbed.get_spinn()
+    (duration, packets) = mbed.get_spinn()
+    assert duration == 0
     assert not packets

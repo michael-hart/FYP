@@ -76,3 +76,11 @@ def test_spinn_encode(board, dvs_pkt, mode, log):
     log.info("Got packet data: {}".format([hex(x) for x in pkt.data]))
     log.info("Calculated data: {}".format([hex(x) for x in result.data]))
     board_assert_equal(pkt.data, result.data)
+
+def test_spinn_nocrash(board):
+    """Test that sending a DVS packet with no forwarding does not crash board"""
+    pkt = DVSPacket(10, 30, 1)
+    # Send packet
+    board_assert_equal(board.use_dvs(pkt), RESPONSES["success"])
+    # Echo to check that the board replies
+    board_assert_equal(board.echo("test"), "test")

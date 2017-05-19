@@ -8,6 +8,8 @@
 #include "semphr.h"
 #include "timers.h"
 
+#include "stm32f0xx.h"
+
 #include <stdbool.h>
 
 /*******************************************************************************
@@ -25,6 +27,8 @@
 #define EOP_IDX          (16)
 
 #define SPINN_TIMER_NAME "rst_spinn"
+
+#define SPINN_TX_PRIORITY (3)
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -64,11 +68,13 @@ spin_mode_t spin_mode = SPIN_MODE_128;
 /* TODO assign actual address instead of guessing it */
 uint8_t virtual_chip_address[] = {0x44, 0x42, 0x41, 0x28};
 
+/* Previous data byte for XORing due to lack of ToggleBits function */
+uint8_t prev_data = 0x00;
+
 /*******************************************************************************
  * Private Function Declarations (static)
  ******************************************************************************/
 static void hal_init(void);
-static void irq_init(void);
 static void tasks_init(void);
 
 static void spinn_reset_fwd_flag(TimerHandle_t timer);
@@ -81,7 +87,6 @@ static void spinn_tx_task(void *pvParameters);
 void spinn_config(void)
 {
     hal_init();
-    irq_init();
     tasks_init();
 }
 
@@ -204,25 +209,23 @@ void spinn_set_mode(spin_mode_t mode)
  */
 static void hal_init(void)
 {
-    /* TODO: Configure GPIO to SpiNN */
+    GPIO_InitTypeDef port_init;
+
+    /* Enable clock on GPIO pins */
+    RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOB, ENABLE );
+
+    /* Configure pins with given properties */
+    port_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | 
+                         GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+    port_init.GPIO_Mode = GPIO_Mode_OUT; /* Output - PushPull */
+    port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed pins */
+    port_init.GPIO_OType = GPIO_OType_PP;   /* Output type push pull */
+    port_init.GPIO_PuPd = GPIO_PuPd_UP;     /* Pull up */
+    GPIO_Init( GPIOB, &port_init );
+
+    /* Ensure bits are all reset */
+    GPIO_Write(GPIOB, 0);
 }
-
-
-/**
- * DESCRIPTION
- * Initialise and register interrupt routines
- * 
- * INPUTS
- * None
- *
- * RETURNS
- * Nothing
- */
-static void irq_init(void)
-{
-    /* TODO: Configure interrupt on acknowledge pin */
-}
-
 
 /**
  * DESCRIPTION
@@ -249,10 +252,10 @@ static void tasks_init(void)
 
     /* Create semaphore for transmission and give to transmit first symbol */
     xTxSemaphore = xSemaphoreCreateBinary();
-    // xSemaphoreGive(xTxSemaphore);
 
     /* Create task for acting upon queued data */
-    xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, 
+                (void *)NULL, tskIDLE_PRIORITY + SPINN_TX_PRIORITY, NULL);
 
     /* Create queue for SpiNN packet data */
     spinn_txq = xQueueCreate(BUFFER_LENGTH * SPINN_SHORT_SYMS, sizeof(uint8_t));
@@ -313,6 +316,7 @@ static void spinn_tx_task(void *pvParameters)
                 if (check_flag)
                 {
                     PC_SendByte(data);
+                    prev_data = data;
                     /* Send carriage return to signify EOP */ 
                     if (++sent_bytes == SPINN_SHORT_SYMS + 1)
                     {
@@ -324,9 +328,9 @@ static void spinn_tx_task(void *pvParameters)
                 }
                 else
                 {
-                    /* TODO: Set port to next command using XOR for 
-                             transition */
-
+                    /* Toggle bits in port for next transition */
+                    GPIO_Write(GPIOB, data ^ prev_data);
+                    prev_data = data;
                 } 
             }
         }

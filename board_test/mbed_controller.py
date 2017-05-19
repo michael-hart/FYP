@@ -14,7 +14,10 @@ MBED_ID = "MBED"
 COMMANDS = {
     "get_id": "id  ",
     "get_spinn": "gspn",
-    # TODO
+    "wait": "wait",
+    "trigger": "trig",
+    "sim": "sim ",
+    "reset": "rset",
 }
 
 class MBEDController(object):
@@ -115,10 +118,41 @@ class MBEDController(object):
         # Package bytes into SpiNNPackets
         packets = []
         while len(raw) >= SPINN_PACKET_SHORT:
-            packets += SpiNNPacket(raw[:SPINN_PACKET_SHORT])
+            raw_pkt = [ord(x) for x in raw[:SPINN_PACKET_SHORT]]
+            packets += [SpiNNPacket(raw_pkt)]
             raw = raw[SPINN_PACKET_SHORT:]
 
         return (duration, packets)
+
+    def wait(self):
+        """Tells MBED to wait for trigger"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["wait"])
+
+    def trigger(self):
+        """Tells MBED to begin recording"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["trigger"])
+
+    def send_sim(self, pkt):
+        """Sends the given SpiNNPacket as a simulated input"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        tx_msg = COMMANDS["sim"] + "".join(chr(x) for x in pkt.data)
+        self._write(tx_msg)
+
+    def reset(self):
+        """Requests the MBED do a soft reset"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["reset"])
 
     def __enter__(self):
         return self

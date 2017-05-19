@@ -67,7 +67,6 @@ def spinn_2_to_7(pkt, mode):
 
     buf = []
     data = 0xF000 + ((pkt.pol & 0x1) << 14)
-    print(mode)
 
     # Switch which mode is used
     if mode == SpiNNMode.SPINN_MODE_128:

@@ -42,4 +42,7 @@ def mbed(log):
         responding = con.get_responding()
         con.open(responding[0])
         yield con
+        con.reset()
+        # Allow board time to reset
+        time.sleep(0.1)
         

@@ -26,3 +26,6 @@ edvs_receiver/Common/*
 # Ignore html files from test run
 *.html
 *.css
+
+# Ignore tags files
+*.tags*

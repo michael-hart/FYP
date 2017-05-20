@@ -75,6 +75,7 @@ uint8_t prev_data = 0x00;
  * Private Function Declarations (static)
  ******************************************************************************/
 static void hal_init(void);
+static void irq_init(void);
 static void tasks_init(void);
 
 static void spinn_reset_fwd_flag(TimerHandle_t timer);
@@ -87,6 +88,7 @@ static void spinn_tx_task(void *pvParameters);
 void spinn_config(void)
 {
     hal_init();
+    irq_init();
     tasks_init();
 }
 
@@ -192,6 +194,14 @@ void spinn_set_mode(spin_mode_t mode)
     spin_mode = mode;
 }
 
+/* Interrupt service routine definition */
+void EXTI0_IRQHandler(void)
+{
+    BaseType_t higher_task_woken;
+    /* ISR triggered on both rising and falling edge */
+    xSemaphoreGiveFromISR(xTxSemaphore, &higher_task_woken);
+}
+
 /*******************************************************************************
  * Private Function Definitions (static)
  ******************************************************************************/
@@ -217,7 +227,7 @@ static void hal_init(void)
     /* Configure pins with given properties */
     port_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | 
                          GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
-    port_init.GPIO_Mode = GPIO_Mode_OUT; /* Output - PushPull */
+    port_init.GPIO_Mode = GPIO_Mode_OUT; /* Output Mode */
     port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed pins */
     port_init.GPIO_OType = GPIO_OType_PP;   /* Output type push pull */
     port_init.GPIO_PuPd = GPIO_PuPd_UP;     /* Pull up */
@@ -225,6 +235,57 @@ static void hal_init(void)
 
     /* Ensure bits are all reset */
     GPIO_Write(GPIOB, 0);
+
+    /* Set up B7 as an input */
+    port_init.GPIO_Pin = GPIO_Pin_7;
+    port_init.GPIO_Mode = GPIO_Mode_IN; /* Input mode */
+    port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed */
+    /* Other parameters remain the same */
+    GPIO_Init(GPIOB, &port_init);
+}
+
+/**
+ * DESCRIPTION
+ * Configure ISRs for SpiNNaker connection
+ * 
+ * INPUTS
+ * None
+ *
+ * RETURNS
+ * Nothing
+ */
+static void irq_init(void)
+{
+
+//     1. Configure the I/O in input mode using GPIO_Init()
+// 2. Select the input source pin for the EXTI line using SYSCFG_EXTILineConfig()
+// 3. Select the mode(interrupt, event) and configure the trigger selection (Rising, falling or
+// both) using EXTI_Init()
+// 4. Configure NVIC IRQ channel mapped to the EXTI line using NVIC_Init()
+// SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
+// registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,
+// ENABLE); 
+    EXTI_InitTypeDef exti;
+    NVIC_InitTypeDef nvic;
+
+    /* Configure external interrupt */
+    exti.EXTI_Line = EXTI_Line0;
+    exti.EXTI_Mode = EXTI_Mode_Interrupt;
+    /* Acknowledge signal is transition, so rising or falling edge */
+    exti.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    exti.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&exti);
+
+    /* Ensure peripheral clock is configured */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE); 
+
+    /* Configure interrupt register */
+    nvic.NVIC_IRQChannel = EXTI0_1_IRQn;
+    nvic.NVIC_IRQChannelPriority = 4;
+    nvic.NVIC_IRQChannelCmd = ENABLE;
+
+    NVIC_Init(&nvic);
+
 }
 
 /**

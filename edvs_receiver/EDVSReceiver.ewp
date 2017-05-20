@@ -1085,6 +1085,9 @@
         <group>
             <name>StdPeriph_Driver</name>
             <file>
+                <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_exti.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\Libraries\STM32F0xx_StdPeriph_Driver\src\stm32f0xx_gpio.c</name>
             </file>
             <file>

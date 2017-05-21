@@ -79,8 +79,6 @@ def spinn_2_to_7(pkt, mode):
     elif mode == SpiNNMode.SPINN_MODE_16:
         data += ((pkt.y & 0x78) << 1) + ((pkt.x & 0x78) >> 3)
 
-    print(bin(data)[2:].zfill(16))
-        
     # Calculate parity
     xor_all = (CHIP_ADDRESS[0] ^ CHIP_ADDRESS[1] ^ CHIP_ADDRESS[2] ^
                CHIP_ADDRESS[3] ^ ((data & 0xFF00) >> 8) ^ (data & 0xFF))

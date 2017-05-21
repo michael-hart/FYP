@@ -29,6 +29,12 @@ def board(log):
             time.sleep(WAIT_TIME)
             responding = con.get_responding()
 
+        # If still not responding, log and exit
+        if not responding:
+            log.error("No responding COM ports found")
+            yield None
+            return
+
         con.open(responding[0])
         yield con
         con.reset()
@@ -40,6 +46,10 @@ def mbed(log):
     """Returns an open controller connection to the MBED"""
     with MBEDController() as con:
         responding = con.get_responding()
+        if not responding:
+            log.error("No responding COM ports found")
+            yield None
+            return
         con.open(responding[0])
         yield con
         con.reset()

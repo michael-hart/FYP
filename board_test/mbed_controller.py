@@ -33,13 +33,16 @@ class MBEDController(object):
         """Checks all connected Windows COM ports for responsing devices"""
         responding = []
         for port in list_ports.comports()[1:]:
-            self.open(port.device)
+            try:
+                self.open(port.device)
 
-            if self.get_id() == MBED_ID:
-                responding += [port.device]
-                self.log.debug("Responding device found on port " + port.device)
+                if self.get_id() == MBED_ID:
+                    responding += [port.device]
+                    self.log.debug("Responding device found on port " + port.device)
 
-            self.ser.close()
+                self.ser.close()
+            except serial.SerialException as ser_exc:
+                self.log.info("Failed to open device: %s", ser_exc)
             self.ser = None
 
         return responding

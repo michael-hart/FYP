@@ -48,13 +48,16 @@ class Controller(object):
         """Checks all connected Windows COM ports for responding device"""
         responding = []
         for port in list_ports.comports()[1:]:
-            self.open(port.device)
+            try:
+                self.open(port.device)
 
-            if self.get_id() == BOARD_ID:
-                responding += [port.device]
-                self.log.debug("Responding device found on port " + port.device)
+                if self.get_id() == BOARD_ID:
+                    responding += [port.device]
+                    self.log.debug("Responding device found on port " + port.device)
 
-            self.ser.close()
+                self.ser.close()
+            except serial.SerialException as ser_exc:
+                self.log.info("Failed to open device: %s", ser_exc)
             self.ser = None
 
         return responding
@@ -92,7 +95,7 @@ class Controller(object):
         if self.ser != None:
             while char != '\r':
                 raw = self.ser.read(1)
-                if len(raw) > 0:
+                if raw:
                     char = chr(struct.unpack("<B", raw)[0])
                 else:
                     # If string is empty, we timed out, so return
@@ -112,7 +115,7 @@ class Controller(object):
             log_buf = bytes([ord(x) for x in buf])
             self.log.debug(">>> %s : %s", hexlify(log_buf), log_buf)
 
-            if len(buf) > 0:
+            if buf:
                 return buf[:-1]
         return ""
 

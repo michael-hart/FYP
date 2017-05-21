@@ -54,11 +54,8 @@ xSemaphoreHandle xTxSemaphore = NULL;
 /* Symbol encoding table for 2-of-7 format */
 uint8_t symbol_table[] = 
 {
-  0x11, 0x12, 0x14, 0x18,
-  0x21, 0x22, 0x24, 0x28,
-  0x41, 0x42, 0x44, 0x48,
-  0x01, 0x02, 0x04, 0x08,
-  0x30
+    0x11, 0x12, 0x14, 0x18, 0x21, 0x22, 0x24, 0x28,
+    0x41, 0x42, 0x44, 0x48, 0x03, 0x06, 0x0C, 0x09, 0x60
 };
 
 /* Current mode of sending data */
@@ -66,7 +63,8 @@ spin_mode_t spin_mode = SPIN_MODE_128;
 
 /* Virtual chip address symbols to queue */
 /* TODO assign actual address instead of guessing it */
-uint8_t virtual_chip_address[] = {0x44, 0x42, 0x41, 0x28};
+uint8_t virtual_chip_address[] = {0x00, 0x02, 0x00, 0x00};
+uint8_t virtual_chip_symbols[] = {0x11, 0x14, 0x11, 0x11};
 
 /* Previous data byte for XORing due to lack of ToggleBits function */
 uint8_t prev_data = 0x00;
@@ -134,7 +132,7 @@ void spinn_send_dvs(dvs_data_t data)
     uint8_t xor_all = 0;
 
     uint8_t tmp_byte = 0;
-    uint16_t mapped_event = 0xF000 + ((data.polarity & 0x1) << 14);
+    uint16_t mapped_event = 0x8000 + ((data.polarity & 0x1) << 14);
 
     switch (spin_mode)
     {
@@ -173,17 +171,17 @@ void spinn_send_dvs(dvs_data_t data)
     /* Add data to queue */
     tmp_byte =  (mapped_event & 0x000F);
     xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
-    tmp_byte = ((mapped_event & 0x00F0) >> 8);
+    tmp_byte = ((mapped_event & 0x00F0) >> 4);
     xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
-    tmp_byte = ((mapped_event & 0x0F00) >> 16);
+    tmp_byte = ((mapped_event & 0x0F00) >> 8);
     xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
-    tmp_byte = ((mapped_event & 0xF000) >> 24);
+    tmp_byte = ((mapped_event & 0xF000) >> 12);
     xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
 
     /* Fill the remaining queue space with chip address and EOP */
     for (int8_t i = 3; i >= 0; i--)
     {
-        xQueueSendToBack(spinn_txq, &virtual_chip_address[i], portMAX_DELAY);
+        xQueueSendToBack(spinn_txq, &virtual_chip_symbols[i], portMAX_DELAY);
     }
     xQueueSendToBack(spinn_txq, &symbol_table[EOP_IDX], portMAX_DELAY);
 
@@ -257,14 +255,6 @@ static void hal_init(void)
 static void irq_init(void)
 {
 
-//     1. Configure the I/O in input mode using GPIO_Init()
-// 2. Select the input source pin for the EXTI line using SYSCFG_EXTILineConfig()
-// 3. Select the mode(interrupt, event) and configure the trigger selection (Rising, falling or
-// both) using EXTI_Init()
-// 4. Configure NVIC IRQ channel mapped to the EXTI line using NVIC_Init()
-// SYSCFG APB clock must be enabled to get write access to SYSCFG_EXTICRx
-// registers using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,
-// ENABLE); 
     EXTI_InitTypeDef exti;
     NVIC_InitTypeDef nvic;
 
@@ -313,6 +303,9 @@ static void tasks_init(void)
 
     /* Create semaphore for transmission and give to transmit first symbol */
     xTxSemaphore = xSemaphoreCreateBinary();
+    /* First give so that we wait on the queue, not the semaphore, as the
+       semaphore will only be given once the first symbol is acknowledged */
+    xSemaphoreGive(xTxSemaphore);
 
     /* Create task for acting upon queued data */
     xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, 
@@ -392,7 +385,7 @@ static void spinn_tx_task(void *pvParameters)
                     /* Toggle bits in port for next transition */
                     GPIO_Write(GPIOB, data ^ prev_data);
                     prev_data = data;
-                } 
+                }
             }
         }
     }

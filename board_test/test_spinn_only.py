@@ -46,7 +46,6 @@ def test_spinn_set_mode_incorrect(board, mode):
     board_assert_equal(board.set_mode_spinn(mode), RESPONSES["bad_param"])
 
 @pytest.mark.parametrize("mode", [mode for mode in SpiNNMode])
-# @pytest.mark.parametrize("mode", [SpiNNMode.SPINN_MODE_16])
 @pytest.mark.parametrize("dvs_pkt", [
     DVSPacket(10, 20, 1), # Normal data
     DVSPacket(10, 20, 0), # Another polarity

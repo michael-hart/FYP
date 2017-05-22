@@ -1068,10 +1068,16 @@
             <name>$PROJ_DIR$\include\FreeRTOSConfig.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\include\main_receiver.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\include\pc_usart.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\include\spinn_channel.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\include\stm32f0xx_it.h</name>
         </file>
     </group>
     <group>
@@ -1126,6 +1132,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\src\startup_stm32f0xx.s</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\stm32f0xx_it.c</name>
         </file>
     </group>
     <group>

@@ -49,7 +49,7 @@ uint8_t spinn_fwd_pc_flag = false;
 TimerHandle_t spinn_reset_timer = NULL;
 
 /* Semaphore for transmitting next symbol */
-xSemaphoreHandle xTxSemaphore = NULL;
+xSemaphoreHandle xSpinnTxSemaphore = NULL;
 
 /* Symbol encoding table for 2-of-7 format */
 uint8_t symbol_table[] = 
@@ -109,7 +109,7 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
         }
 
         /* Give semaphore such that task knows to continue */
-        xSemaphoreGive(xTxSemaphore);
+        xSemaphoreGive(xSpinnTxSemaphore);
     }
     else
     {
@@ -121,7 +121,7 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
         spinn_reset_fwd_flag(NULL);
         /* Take semaphore such that task waits for interrupt */
         /* Only wait 100ms in case semaphore has not previously been given */
-        xSemaphoreTake(xTxSemaphore, 100);
+        xSemaphoreTake(xSpinnTxSemaphore, 100);
     }
 }
 
@@ -192,17 +192,6 @@ void spinn_set_mode(spin_mode_t mode)
     spin_mode = mode;
 }
 
-/* Interrupt service routine definition */
-void EXTI9_5_IRQHandler(void)
-{
-    long lHigherPriorityTaskWoken = pdFALSE;
-    if (EXTI_GetITStatus(EXTI_Line7) != RESET)
-    {
-        xSemaphoreGiveFromISR( xTxSemaphore, &lHigherPriorityTaskWoken );
-        EXTI_ClearITPendingBit(EXTI_Line7);
-        portEND_SWITCHING_ISR( lHigherPriorityTaskWoken );
-    }
-}
 
 /*******************************************************************************
  * Private Function Definitions (static)
@@ -276,13 +265,13 @@ static void irq_init(void)
     /* Acknowledge signal is transition, so rising or falling edge */
     exti.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     exti.EXTI_LineCmd = ENABLE;
-    // EXTI_Init(&exti);
+    EXTI_Init(&exti);
 
     /* Configure interrupt register */
     nvic.NVIC_IRQChannel = EXTI4_15_IRQn;
-    nvic.NVIC_IRQChannelPriority = 4;
+    nvic.NVIC_IRQChannelPriority = 5;
     nvic.NVIC_IRQChannelCmd = ENABLE;
-    // NVIC_Init(&nvic);
+    NVIC_Init(&nvic);
 
 }
 
@@ -310,10 +299,10 @@ static void tasks_init(void)
     xSemaphoreGive(spinFwdSemaphore);
 
     /* Create semaphore for transmission and give to transmit first symbol */
-    xTxSemaphore = xSemaphoreCreateBinary();
+    xSpinnTxSemaphore = xSemaphoreCreateBinary();
     /* First give so that we wait on the queue, not the semaphore, as the
        semaphore will only be given once the first symbol is acknowledged */
-    xSemaphoreGive(xTxSemaphore);
+    xSemaphoreGive(xSpinnTxSemaphore);
 
     /* Create task for acting upon queued data */
     xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, 
@@ -367,7 +356,7 @@ static void spinn_tx_task(void *pvParameters)
         {
         
             /* Wait for interrupt on pin to transmit next symbol */
-            if (xSemaphoreTake(xTxSemaphore, portMAX_DELAY) == pdTRUE)
+            if (xSemaphoreTake(xSpinnTxSemaphore, portMAX_DELAY) == pdTRUE)
             {
 
                 if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
@@ -388,26 +377,13 @@ static void spinn_tx_task(void *pvParameters)
                         sent_bytes = 0;
                     }
                     /* If forwarding to PC, do not wait for interrupt */
-                    xSemaphoreGive(xTxSemaphore);
+                    xSemaphoreGive(xSpinnTxSemaphore);
                 }
                 else
                 {
-                    uint8_t state = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
                     /* Toggle bits in port for next transition */
                     GPIO_Write(GPIOB, data ^ prev_data);
-                    // Allow 1000 attempts to read the port, or 1s
-                    for (int i = 0; i < 1000; i++)
-                    {
-                        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7) != state)
-                        {
-                            break;
-                        }
-                        vTaskDelay(1);
-                    }
                     prev_data = data ^ prev_data;
-                    // Semaphore given from interrupt currently broken, so
-                    // give and instead read the pin manually
-                    xSemaphoreGive(xTxSemaphore);
                 }
             }
         }

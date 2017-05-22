@@ -19,6 +19,7 @@
 #include "pc_usart.h"
 #include "dvs_usart.h"
 #include "spinn_channel.h"
+#include "stm32f0xx_it.h"
 
 /*******************************************************************************
  * Local Definitions

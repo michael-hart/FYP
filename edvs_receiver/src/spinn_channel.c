@@ -193,11 +193,15 @@ void spinn_set_mode(spin_mode_t mode)
 }
 
 /* Interrupt service routine definition */
-void EXTI0_IRQHandler(void)
+void EXTI9_5_IRQHandler(void)
 {
-    BaseType_t higher_task_woken;
-    /* ISR triggered on both rising and falling edge */
-    xSemaphoreGiveFromISR(xTxSemaphore, &higher_task_woken);
+    long lHigherPriorityTaskWoken = pdFALSE;
+    if (EXTI_GetITStatus(EXTI_Line7) != RESET)
+    {
+        xSemaphoreGiveFromISR( xTxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line7);
+        portEND_SWITCHING_ISR( lHigherPriorityTaskWoken );
+    }
 }
 
 /*******************************************************************************
@@ -231,15 +235,16 @@ static void hal_init(void)
     port_init.GPIO_PuPd = GPIO_PuPd_UP;     /* Pull up */
     GPIO_Init( GPIOB, &port_init );
 
-    /* Ensure bits are all reset */
-    GPIO_Write(GPIOB, 0);
-
     /* Set up B7 as an input */
     port_init.GPIO_Pin = GPIO_Pin_7;
     port_init.GPIO_Mode = GPIO_Mode_IN; /* Input mode */
     port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed */
     /* Other parameters remain the same */
     GPIO_Init(GPIOB, &port_init);
+
+    /* Ensure bits are all reset */
+    GPIO_Write(GPIOB, 0);
+
 }
 
 /**
@@ -259,22 +264,25 @@ static void irq_init(void)
     NVIC_InitTypeDef nvic;
 
     /* Configure external interrupt */
-    exti.EXTI_Line = EXTI_Line0;
-    exti.EXTI_Mode = EXTI_Mode_Interrupt;
-    /* Acknowledge signal is transition, so rising or falling edge */
-    exti.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-    exti.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&exti);
 
     /* Ensure peripheral clock is configured */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE); 
 
+    /* Map pin 7 into interrupt */
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource7);
+
+    exti.EXTI_Line = EXTI_Line7;
+    exti.EXTI_Mode = EXTI_Mode_Interrupt;
+    /* Acknowledge signal is transition, so rising or falling edge */
+    exti.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    exti.EXTI_LineCmd = ENABLE;
+    // EXTI_Init(&exti);
+
     /* Configure interrupt register */
-    nvic.NVIC_IRQChannel = EXTI0_1_IRQn;
+    nvic.NVIC_IRQChannel = EXTI4_15_IRQn;
     nvic.NVIC_IRQChannelPriority = 4;
     nvic.NVIC_IRQChannelCmd = ENABLE;
-
-    NVIC_Init(&nvic);
+    // NVIC_Init(&nvic);
 
 }
 
@@ -313,6 +321,7 @@ static void tasks_init(void)
 
     /* Create queue for SpiNN packet data */
     spinn_txq = xQueueCreate(BUFFER_LENGTH * SPINN_SHORT_SYMS, sizeof(uint8_t));
+
 }
 
 /**
@@ -352,12 +361,13 @@ static void spinn_tx_task(void *pvParameters)
 
     for (;;)
     {
-        /* Wait for interrupt on pin to transmit next symbol */
-        if (xSemaphoreTake(xTxSemaphore, portMAX_DELAY) == pdTRUE)
-        {
 
-            /* Wait for data in the queue to transmit */
-            if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY))
+        /* Wait for data in the queue to transmit */
+        if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY))
+        {
+        
+            /* Wait for interrupt on pin to transmit next symbol */
+            if (xSemaphoreTake(xTxSemaphore, portMAX_DELAY) == pdTRUE)
             {
 
                 if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
@@ -382,9 +392,22 @@ static void spinn_tx_task(void *pvParameters)
                 }
                 else
                 {
+                    uint8_t state = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7);
                     /* Toggle bits in port for next transition */
                     GPIO_Write(GPIOB, data ^ prev_data);
-                    prev_data = data;
+                    // Allow 1000 attempts to read the port, or 1s
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7) != state)
+                        {
+                            break;
+                        }
+                        vTaskDelay(1);
+                    }
+                    prev_data = data ^ prev_data;
+                    // Semaphore given from interrupt currently broken, so
+                    // give and instead read the pin manually
+                    xSemaphoreGive(xTxSemaphore);
                 }
             }
         }

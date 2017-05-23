@@ -36,38 +36,42 @@
 /* None */
 
 /*******************************************************************************
- * Local Variable Declarations
+ * Global Variable Declarations
  ******************************************************************************/
-/* Queue for channel packets */
-xQueueHandle spinn_txq;
-
-/* Flag/semaphore for PC forwarding */
-xSemaphoreHandle spinFwdSemaphore = NULL;
-uint8_t spinn_fwd_pc_flag = false;
-
-/* Timer for resetting forwarding after timeout */
-TimerHandle_t spinn_reset_timer = NULL;
-
 /* Semaphore for transmitting next symbol */
 xSemaphoreHandle xSpinnTxSemaphore = NULL;
 
+
+/*******************************************************************************
+ * Local Variable Declarations
+ ******************************************************************************/
+/* Queue for channel packets */
+static xQueueHandle spinn_txq;
+
+/* Flag/semaphore for PC forwarding */
+static xSemaphoreHandle spinFwdSemaphore = NULL;
+static uint8_t spinn_fwd_pc_flag = false;
+
+/* Timer for resetting forwarding after timeout */
+static TimerHandle_t spinn_reset_timer = NULL;
+
 /* Symbol encoding table for 2-of-7 format */
-uint8_t symbol_table[] = 
+static uint8_t symbol_table[] = 
 {
     0x11, 0x12, 0x14, 0x18, 0x21, 0x22, 0x24, 0x28,
     0x41, 0x42, 0x44, 0x48, 0x03, 0x06, 0x0C, 0x09, 0x60
 };
 
 /* Current mode of sending data */
-spin_mode_t spin_mode = SPIN_MODE_128;
+static spin_mode_t spin_mode = SPIN_MODE_128;
 
 /* Virtual chip address symbols to queue */
 /* TODO assign actual address instead of guessing it */
-uint8_t virtual_chip_address[] = {0x00, 0x02, 0x00, 0x00};
-uint8_t virtual_chip_symbols[] = {0x11, 0x14, 0x11, 0x11};
+static uint8_t virtual_chip_address[] = {0x00, 0x02, 0x00, 0x00};
+static uint8_t virtual_chip_symbols[] = {0x11, 0x14, 0x11, 0x11};
 
 /* Previous data byte for XORing due to lack of ToggleBits function */
-uint8_t prev_data = 0x00;
+static uint8_t prev_data = 0x00;
 
 /*******************************************************************************
  * Private Function Declarations (static)

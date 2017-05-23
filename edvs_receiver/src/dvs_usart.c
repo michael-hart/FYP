@@ -39,11 +39,11 @@
 /*******************************************************************************
  * Local Variable Declarations
  ******************************************************************************/
-xQueueHandle dvs_rxq;
-xQueueHandle dvs_dataq;
-xSemaphoreHandle xFwdSemaphore = NULL;
-TimerHandle_t reset_timer = NULL;
-uint8_t forward_pc_flag = false;
+static xQueueHandle dvs_rxq;
+static xQueueHandle dvs_dataq;
+static xSemaphoreHandle xFwdSemaphore = NULL;
+static TimerHandle_t reset_timer = NULL;
+static uint8_t forward_pc_flag = false;
 
 /*******************************************************************************
  * Private Function Declarations (static)

@@ -372,12 +372,12 @@ static void spinn_tx_task(void *pvParameters)
 
                 if (check_flag)
                 {
-                    PC_SendByte(data);
+                    pc_send_byte(data);
                     prev_data = data;
                     /* Send carriage return to signify EOP */ 
-                    if (++sent_bytes == SPINN_SHORT_SYMS + 1)
+                    if (++sent_bytes == SPINN_SHORT_SYMS)
                     {
-                        PC_SendString(PC_EOL);
+                        pc_send_string(PC_EOL);
                         sent_bytes = 0;
                     }
                     /* If forwarding to PC, do not wait for interrupt */

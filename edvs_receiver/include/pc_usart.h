@@ -41,7 +41,7 @@
  * RETURNS
  * Nothing
  */
-void PC_Config(void);
+void pc_config(void);
 
 /**
  * DESCRIPTION
@@ -53,7 +53,7 @@ void PC_Config(void);
  * RETURNS
  * Nothing
  */
-void PC_SendByte(uint8_t data);
+void pc_send_byte(uint8_t data);
 
 /**
  * DESCRIPTION
@@ -65,7 +65,7 @@ void PC_SendByte(uint8_t data);
  * RETURNS
  * Nothing
  */
-void PC_SendString(char * str);
+void pc_send_string(char * str);
 
 #endif /* _PC_USART_H */
 

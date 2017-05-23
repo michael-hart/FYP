@@ -62,8 +62,8 @@ void main_receiver(void)
     }
 
     /* Set up USART tasks */
-    PC_Config();
-    DVS_Config();
+    pc_config();
+    dvs_config();
     
     /* Set up SpiNNaker tasks */
     spinn_config();

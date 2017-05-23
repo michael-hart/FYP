@@ -48,7 +48,7 @@ typedef struct dvs_data_s {
  * RETURNS
  * Nothing
  */
-void DVS_Config(void);
+void dvs_config(void);
 
 /**
  * DESCRIPTION
@@ -63,7 +63,7 @@ void DVS_Config(void);
  * RETURNS
  * Nothing
  */
-void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms);
+void dvs_forward_pc(uint8_t forward, uint16_t timeout_ms);
 
 /**
  * DESCRIPTION
@@ -75,7 +75,7 @@ void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms);
  * RETURNS
  * Nothing
  */
-void DVS_put_sim(dvs_data_t data);
+void dvs_put_sim(dvs_data_t data);
 
 
 #endif /* _DVS_USART_H */

@@ -60,14 +60,14 @@ static void reset_fwd_flag(TimerHandle_t timer);
 /*******************************************************************************
  * Public Function Definitions 
  ******************************************************************************/
-void DVS_Config(void)
+void dvs_config(void)
 {
     hal_init();
     irq_init();
     tasks_init();
 }
 
-void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms)
+void dvs_forward_pc(uint8_t forward, uint16_t timeout_ms)
 {
     if (forward == true)
     {
@@ -95,7 +95,7 @@ void DVS_forward_pc(uint8_t forward, uint16_t timeout_ms)
     }
 }
 
-void DVS_put_sim(dvs_data_t data)
+void dvs_put_sim(dvs_data_t data)
 {
     uint8_t first, second;
     first = 0x80 + data.y;
@@ -298,10 +298,10 @@ static void decoded_tx_task(void *pvParameters)
             {
                 if (forward_pc_flag)
                 {
-                    PC_SendByte(data.x);
-                    PC_SendByte(data.y);
-                    PC_SendByte(data.polarity);
-                    PC_SendString(PC_EOL);
+                    pc_send_byte(data.x);
+                    pc_send_byte(data.y);
+                    pc_send_byte(data.polarity);
+                    pc_send_string(PC_EOL);
                 }
                 xSemaphoreGive(xFwdSemaphore);
             }

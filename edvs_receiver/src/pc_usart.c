@@ -70,7 +70,7 @@ static void usart_rx_task(void *pvParameters);
 /*******************************************************************************
  * Public Function Definitions 
  ******************************************************************************/
-void PC_Config(void)
+void pc_config(void)
 {
     hal_init();
     irq_init();
@@ -78,15 +78,15 @@ void PC_Config(void)
 
 }
 
-void PC_SendByte(uint8_t data)
+void pc_send_byte(uint8_t data)
 {
     xQueueSend(pc_txq, &data, portMAX_DELAY);
 }
 
-void PC_SendString(char * str)
+void pc_send_string(char * str)
 {
     while(* str) {
-        PC_SendByte(*str);
+        pc_send_byte(*str);
         str++;
     }
 }
@@ -188,8 +188,10 @@ static void tasks_init(void)
     pc_txq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
     pc_rxq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
 
-    xTaskCreate(usart_tx_task, (char const *)"PC_T", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(usart_rx_task, (char const *)"PC_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(usart_tx_task, (char const *)"PC_Tx", configMINIMAL_STACK_SIZE,
+                (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(usart_rx_task, (char const *)"PC_Rx", configMINIMAL_STACK_SIZE,
+                (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
 }
 
 /**
@@ -238,7 +240,7 @@ static void usart_rx_task(void *pvParameters)
         if (pdPASS == xQueueReceive(pc_rxq, &data_buf[i++], portMAX_DELAY)) {
 
 #ifdef USART_ECHO
-            PC_SendByte(data_buf[i-1]);
+            pc_send_byte(data_buf[i-1]);
 #endif
 
             if (data_buf[i-1] == '\r')
@@ -250,9 +252,9 @@ static void usart_rx_task(void *pvParameters)
                 /* Switch based on the command */
                 if (strcmp(cmd_buf, PC_CMD_ID) == 0)
                 {
-                    PC_SendString(PC_RESP_OK);
-                    PC_SendString(PC_IDENTIFIER);
-                    PC_SendString(PC_EOL);
+                    pc_send_string(PC_RESP_OK);
+                    pc_send_string(PC_IDENTIFIER);
+                    pc_send_string(PC_EOL);
                 }
                 else if (strcmp(cmd_buf, PC_CMD_ECHO) == 0)
                 {
@@ -260,9 +262,9 @@ static void usart_rx_task(void *pvParameters)
                     uint8_t expected = data_buf[4];
                     if (expected + 6 == i)
                     {
-                        PC_SendString(PC_RESP_OK);
+                        pc_send_string(PC_RESP_OK);
                         data_buf[expected + 6] = 0;
-                        PC_SendString(&data_buf[5]);
+                        pc_send_string(&data_buf[5]);
                         /* \r included as part of echo command */
                     }
                     else if (expected + 6 > i)
@@ -272,7 +274,7 @@ static void usart_rx_task(void *pvParameters)
                     }
                     else
                     {
-                        PC_SendString(PC_RESP_BAD_LEN);
+                        pc_send_string(PC_RESP_BAD_LEN);
                     }
                 }
                 else if (strcmp(cmd_buf, PC_CMD_RESET) == 0)
@@ -286,17 +288,17 @@ static void usart_rx_task(void *pvParameters)
                     /* 7 bytes is 4 command, 2 data, 1 \r */
                     if (i == 7)
                     {
-                        PC_SendString(PC_RESP_OK);
+                        pc_send_string(PC_RESP_OK);
                         /* Find out time to forward DVS for */
                         uint16_t fwd_time = data_buf[4] << 8;
                         fwd_time += data_buf[5];
                         /* Enable forwarding - 0 for permanent, else time in 
                            ms */
-                        DVS_forward_pc(true, fwd_time);
+                        dvs_forward_pc(true, fwd_time);
                     }
                     else if (i > 7)
                     {
-                        PC_SendString(PC_RESP_BAD_LEN);
+                        pc_send_string(PC_RESP_BAD_LEN);
                     }
                     else
                     {
@@ -306,9 +308,9 @@ static void usart_rx_task(void *pvParameters)
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_RESET) == 0)
                 {
-                    PC_SendString(PC_RESP_OK);
+                    pc_send_string(PC_RESP_OK);
                     /* Reset the forwarding of DVS packets */
-                    DVS_forward_pc(false, 0);
+                    dvs_forward_pc(false, 0);
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_USE) == 0)
                 {
@@ -316,7 +318,7 @@ static void usart_rx_task(void *pvParameters)
                     /* 8 bytes is 4 command, 3 data, 1 \r */
                     if (i == 8)
                     {
-                        PC_SendString(PC_RESP_OK);
+                        pc_send_string(PC_RESP_OK);
 
                         /* Unpack received data into dvs_data */
                         dvs_data.x = data_buf[4];
@@ -324,11 +326,11 @@ static void usart_rx_task(void *pvParameters)
                         dvs_data.polarity = data_buf[6];
 
                         /* Use as DVS packet */
-                        DVS_put_sim(dvs_data);
+                        dvs_put_sim(dvs_data);
                     }
                     else if (i > 8)
                     {
-                        PC_SendString(PC_RESP_BAD_LEN);
+                        pc_send_string(PC_RESP_BAD_LEN);
                     }
                     else
                     {
@@ -342,7 +344,7 @@ static void usart_rx_task(void *pvParameters)
                     /* 7 bytes is 4 command, 2 data, 1 \r */
                     if (i == 7)
                     {
-                        PC_SendString(PC_RESP_OK);
+                        pc_send_string(PC_RESP_OK);
                         /* Find out time to forward SpiNN for */
                         uint16_t fwd_time = data_buf[4] << 8;
                         fwd_time += data_buf[5];
@@ -352,7 +354,7 @@ static void usart_rx_task(void *pvParameters)
                     }
                     else if (i > 7)
                     {
-                        PC_SendString(PC_RESP_BAD_LEN);
+                        pc_send_string(PC_RESP_BAD_LEN);
                     }
                     else
                     {
@@ -362,7 +364,7 @@ static void usart_rx_task(void *pvParameters)
                 }
                 else if (strcmp(cmd_buf, PC_CMD_SPN_RESET) == 0)
                 {
-                    PC_SendString(PC_RESP_OK);
+                    pc_send_string(PC_RESP_OK);
                     /* Reset the forwarding of SpiNN packets */
                     spinn_forward_pc(false, 0);
                 }
@@ -375,17 +377,17 @@ static void usart_rx_task(void *pvParameters)
                         uint8_t req_mode = data_buf[4];
                         if (req_mode < SPIN_NUM_MODES)
                         {
-                            PC_SendString(PC_RESP_OK);
+                            pc_send_string(PC_RESP_OK);
                             spinn_set_mode((spin_mode_t) req_mode);
                         }
                         else
                         {
-                            PC_SendString(PC_RESP_BAD_PARAM);
+                            pc_send_string(PC_RESP_BAD_PARAM);
                         }
                     }
                     else if (i > 6)
                     {
-                        PC_SendString(PC_RESP_BAD_LEN);
+                        pc_send_string(PC_RESP_BAD_LEN);
                     }
                     else
                     {
@@ -396,7 +398,7 @@ static void usart_rx_task(void *pvParameters)
                 else
                 {
                     /* If command is not recognised, say so */
-                    PC_SendString(PC_RESP_BAD_CMD);
+                    pc_send_string(PC_RESP_BAD_CMD);
                 }
 
                 /* Having consumed a command, reset buffer */

@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Local Definitions
  ******************************************************************************/
-#define SPINN_SHORT_SYMS (10)
-#define SPINN_LONG_SYMS  (18)
+#define SPINN_SHORT_SYMS (11)
+#define SPINN_LONG_SYMS  (19)
 #define BUFFER_LENGTH    (20)
 #define EOP_IDX          (16)
 
 #define SPINN_TIMER_NAME "rst_spinn"
 
-#define SPINN_TX_PRIORITY (3)
+#define SPINN_TX_PRIORITY (1)
 
 /*******************************************************************************
  * Local Type and Enum definitions
@@ -125,33 +125,33 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
     }
 }
 
-void spinn_send_dvs(dvs_data_t data)
+void spinn_send_dvs(dvs_data_t* p_data)
 {
     /* Queue each item in order of sending */
     uint8_t odd_parity = 0;
     uint8_t xor_all = 0;
 
     uint8_t tmp_byte = 0;
-    uint16_t mapped_event = 0x8000 + ((data.polarity & 0x1) << 14);
+    uint16_t mapped_event = 0x8000 + ((p_data->polarity & 0x1) << 14);
 
     switch (spin_mode)
     {
         case SPIN_MODE_64:
-            mapped_event += ((data.y & 0x7E) << 5);
-            mapped_event += ((data.x & 0x7E) >> 1);
+            mapped_event += ((p_data->y & 0x7E) << 5);
+            mapped_event += ((p_data->x & 0x7E) >> 1);
             break;
         case SPIN_MODE_32:
-            mapped_event += ((data.y & 0x7C) << 3);
-            mapped_event += ((data.x & 0x7C) >> 2);
+            mapped_event += ((p_data->y & 0x7C) << 3);
+            mapped_event += ((p_data->x & 0x7C) >> 2);
             break;
         case SPIN_MODE_16:
-            mapped_event += ((data.y & 0x78) << 1);
-            mapped_event += ((data.x & 0x78) >> 3);
+            mapped_event += ((p_data->y & 0x78) << 1);
+            mapped_event += ((p_data->x & 0x78) >> 3);
             break;
         case SPIN_MODE_128:
         default:
-            mapped_event += ((data.y & 0x7F) << 7);
-            mapped_event +=  (data.x & 0x7F);
+            mapped_event += ((p_data->y & 0x7F) << 7);
+            mapped_event +=  (p_data->x & 0x7F);
             break;
     }
 

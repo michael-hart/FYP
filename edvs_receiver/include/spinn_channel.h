@@ -69,12 +69,12 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms);
  * Queues DVS packet to be sent to the SpiNNaker
  * 
  * INPUTS
- * data (dvs_data_t) : Struct containing data to be sent
+ * p_data (dvs_data_t*) : Pointer to struct containing data to be sent
  *
  * RETURNS
  * Nothing
  */
-void spinn_send_dvs(dvs_data_t data);
+void spinn_send_dvs(dvs_data_t* p_data);
 
 /**
  * DESCRIPTION

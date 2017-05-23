@@ -23,8 +23,9 @@ def test_empty_spinn(mbed):
     # Note that test is flawed as no bytes returned gives the same result
     # as only a carriage return returned. This merely checks that there is
     # nothing in the buffer waiting to be sent
-    (duration, packets) = mbed.get_spinn()
+    (duration, count, packets) = mbed.get_spinn()
     assert duration == 0
+    assert count == 0
     assert not packets
 
 def test_wait(mbed):
@@ -35,7 +36,7 @@ def test_wait(mbed):
     mbed.send_sim(spinn_2_to_7(DVSPacket(10, 20, 1), SpiNNMode.SPINN_MODE_128))
 
     # Check that nothing is recorded
-    (_, packets) = mbed.get_spinn()
+    (_, _, packets) = mbed.get_spinn()
     assert not packets
 
 def test_trigger(mbed):
@@ -46,7 +47,7 @@ def test_trigger(mbed):
     mbed.send_sim(spinn_2_to_7(DVSPacket(10, 20, 1), SpiNNMode.SPINN_MODE_128))
 
     # Check that packet is returned
-    (_, packet) = mbed.get_spinn()
+    (_, _, packet) = mbed.get_spinn()
     assert packet
 
 
@@ -60,7 +61,7 @@ def test_wait_trigger(mbed):
     mbed.send_sim(spinn_2_to_7(DVSPacket(10, 20, 1), SpiNNMode.SPINN_MODE_128))
 
     # Check that nothing is recorded
-    (_, packets) = mbed.get_spinn()
+    (_, _, packets) = mbed.get_spinn()
     assert not packets
 
     # Trigger recording again
@@ -70,7 +71,7 @@ def test_wait_trigger(mbed):
     mbed.send_sim(spinn_2_to_7(DVSPacket(10, 20, 1), SpiNNMode.SPINN_MODE_128))
 
     # Check that packet is returned
-    (_, packet) = mbed.get_spinn()
+    (_, _, packet) = mbed.get_spinn()
     assert packet
 
 def test_read_clears(mbed):
@@ -82,11 +83,11 @@ def test_read_clears(mbed):
     mbed.send_sim(spinn_2_to_7(DVSPacket(10, 20, 1), SpiNNMode.SPINN_MODE_128))
 
     # Check that there is a returned value
-    (_, packets) = mbed.get_spinn()
+    (_, _, packets) = mbed.get_spinn()
     assert packets
 
     # Read again and check that there is nothing
-    (_, packets) = mbed.get_spinn()
+    (_, _, packets) = mbed.get_spinn()
     assert not packets    
 
 
@@ -103,7 +104,7 @@ def test_sim_spinn(mbed, log):
     mbed.send_sim(pkt)
 
     # Retrieve packet and check
-    (_, rx_pkt) = mbed.get_spinn()
+    (_, _, rx_pkt) = mbed.get_spinn()
     assert rx_pkt
     log.info("Got packet %s", rx_pkt[0].data)
     log.info("Expected   %s", pkt.data)
@@ -124,7 +125,7 @@ def test_sim_duration(mbed):
     mbed.send_sim(pkt)
 
     # Retrieve packet and check
-    (duration, _) = mbed.get_spinn()
+    (duration, _, _) = mbed.get_spinn()
     assert duration
     # Check duration is +/- 40ms
     assert 60000 <= duration <= 140000
@@ -148,7 +149,7 @@ def test_sim_many_packets(mbed):
         time.sleep(0.01)
 
     # Retrieve all packets and check their contents and total duration
-    (duration, rx_pkts) = mbed.get_spinn()
+    (duration, _, rx_pkts) = mbed.get_spinn()
 
     assert duration
     # Check duration is +/- 40ms

@@ -1,5 +1,6 @@
 """Module to test that MBED and board simulate SpiNNaker"""
 
+import pytest
 import time
 from fixtures import mbed, board, log
 from common import (board_assert_equal, spinn_2_to_7, SpiNNMode, 
@@ -23,17 +24,11 @@ def test_single_packet(mbed, board, log):
     board_assert_equal(board.use_dvs(dvs_pkt), RESPONSES["success"])
     pkt = spinn_2_to_7(dvs_pkt, SpiNNMode.SPINN_MODE_128)
 
-    # TODO: remove this, it is purely for debugging
-    log.info("Packet contents expected as follows:")
-    for byte in pkt.data:
-        log.info(bin(byte)[2:].zfill(8))
-
     # Give a brief period of time to forward to the MBED
     time.sleep(0.1)
-    # time.sleep(100)
 
     # Retrieve packets from MBED
-    (_, rx_pkt) = mbed.get_spinn()
+    (_, _, rx_pkt) = mbed.get_spinn()
 
     # Check results are identical
     assert rx_pkt
@@ -42,3 +37,52 @@ def test_single_packet(mbed, board, log):
     log.info("Got packet data: {}".format([hex(x) for x in rx_pkt[0].data]))
     log.info("Calculated data: {}".format([hex(x) for x in pkt.data]))
     board_assert_equal(pkt.data, rx_pkt[0].data)
+
+
+@pytest.mark.parametrize("packets", [2, 3, 10, 15, 20])
+def test_many_packets(mbed, board, log, packets):
+    """Tests the time taken for many packets to be sent is small"""
+
+    # Clear the MBED and tell it to wait
+    mbed.get_spinn()
+    mbed.wait()
+
+    # Work out x limits for 20 packets
+    x_min = 12
+    x_step = 6
+    x_max = 100 + (packets) * x_step
+
+    y_max = 90
+    y_step = 3
+    y_min = y_max - (packets) * y_step
+
+    # Form list of test packets and expected results
+    dvs_data = [DVSPacket(x, y, y%2) for x, y in zip(
+        range(x_min, x_max, x_step),
+        range(y_max, y_min, -y_step))]
+    exp_data = [spinn_2_to_7(x, SpiNNMode.SPINN_MODE_128) for x in dvs_data]
+
+    for dvs_pkt in dvs_data:
+        board_assert_equal(board.use_dvs(dvs_pkt), RESPONSES["success"])
+
+    # Trigger the MBED to start the speed test
+    mbed.trigger()
+
+    # Give period of time to forward to the MBED
+    time.sleep(packets * 0.05)
+
+    # Retrieve packets
+    (duration, count, rx_data) = mbed.get_spinn()
+
+    # Check results are identical
+    assert rx_data
+    assert len(rx_data) == len(exp_data)
+    assert len(rx_data) == count
+    for exp, rxp in zip(rx_data, exp_data):
+        assert exp.data == rxp.data
+
+    # Check duration is reasonable - packets times 15ms
+    assert duration < len(exp_data) * 15000
+
+    log.info("Test for %d packets took %lfs with %lfs per packet"
+             % (len(exp_data), duration/1000000.0, duration/(1000000.0*packets)))

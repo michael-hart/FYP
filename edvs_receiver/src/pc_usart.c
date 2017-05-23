@@ -264,7 +264,6 @@ static void usart_rx_task(void *pvParameters)
                         data_buf[expected + 6] = 0;
                         PC_SendString(&data_buf[5]);
                         /* \r included as part of echo command */
-                        PC_SendByte('\n');
                     }
                     else if (expected + 6 > i)
                     {

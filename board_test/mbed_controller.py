@@ -118,6 +118,12 @@ class MBEDController(object):
         duration = struct.unpack(">I", raw_duration)[0]
         raw = raw[4:]
 
+        # Remove next byte as number of packets received
+        raw_count = bytes([ord(raw[0])])
+        count = struct.unpack(">B", raw_count)[0]
+        raw = raw[1:]
+        self.log.info("%d packets received", count/11)
+
         # Package bytes into SpiNNPackets
         packets = []
         while len(raw) >= SPINN_PACKET_SHORT:
@@ -125,7 +131,7 @@ class MBEDController(object):
             packets += [SpiNNPacket(raw_pkt)]
             raw = raw[SPINN_PACKET_SHORT:]
 
-        return (duration, packets)
+        return (duration, count/SPINN_PACKET_SHORT, packets)
 
     def wait(self):
         """Tells MBED to wait for trigger"""

@@ -26,7 +26,7 @@
 #define USART_GPIO GPIOA
 #define BUFFER_LENGTH 40    //length of TX, RX and command buffers
 #define USART_BAUD_RATE 4000000
-#define DATA_LENGTH 20
+#define DATA_LENGTH 5
 
 #define RESET_TIMER_NAME "rst_dvs"
 
@@ -203,8 +203,12 @@ static void tasks_init(void)
     xSemaphoreGive(xFwdSemaphore);
     dvs_rxq = xQueueCreate(BUFFER_LENGTH, sizeof(uint8_t));
     dvs_dataq = xQueueCreate(DATA_LENGTH, sizeof(dvs_data_t));
-    xTaskCreate(usart_rx_task, (char const *)"DVS_R", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(decoded_tx_task, (char const *)"DVS_T", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(usart_rx_task, (char const *)"DVS_Rx", 
+                configMINIMAL_STACK_SIZE, (void *)NULL, 
+                tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(decoded_tx_task, (char const *)"DVS_Tx", 
+                configMINIMAL_STACK_SIZE, (void *)NULL, 
+                tskIDLE_PRIORITY + 1, NULL);
     reset_timer = xTimerCreate(RESET_TIMER_NAME,  /* timer name */
                                100,               /* timer period */
                                pdFALSE,           /* auto-reload */
@@ -285,20 +289,23 @@ static void decoded_tx_task(void *pvParameters)
     for (;;)
     {
         /* Wait on queue */
-        if (pdPASS == xQueueReceive(dvs_dataq, &data, portMAX_DELAY)) {
+        // xQueueReceive(dvs_dataq, &data, portMAX_DELAY);
+       if (pdPASS == xQueueReceive(dvs_dataq, &data, portMAX_DELAY)) {
             /* Send decoded data to SpiNNaker */
-            spinn_send_dvs(data);
+            spinn_send_dvs(&data);
 
-            if (xSemaphoreTake(xFwdSemaphore, portMAX_DELAY) == pdTRUE
-                && forward_pc_flag == true)
+            if (xSemaphoreTake(xFwdSemaphore, portMAX_DELAY) == pdTRUE)
             {
-                PC_SendByte(data.x);
-                PC_SendByte(data.y);
-                PC_SendByte(data.polarity);
-                PC_SendString(PC_EOL);
+                if (forward_pc_flag)
+                {
+                    PC_SendByte(data.x);
+                    PC_SendByte(data.y);
+                    PC_SendByte(data.polarity);
+                    PC_SendString(PC_EOL);
+                }
                 xSemaphoreGive(xFwdSemaphore);
             }
-        }
+       }
     }
 }
 

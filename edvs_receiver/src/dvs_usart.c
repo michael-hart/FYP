@@ -43,10 +43,15 @@
 /* Each y value is multiplied by 32 to get array index */
 #define DVS_BYTES_PER_ROW   (32)
 
+#define DVS_BUFFER_LENGTH   (500)
+
 /*******************************************************************************
  * Local Type and Enum definitions
  ******************************************************************************/
-/* None */
+typedef struct dvs_buf_s {
+    bool filled;
+    dvs_data_t data;
+} dvs_buf_t;
 
 /*******************************************************************************
  * Local Variable Declarations
@@ -61,7 +66,8 @@ static uint8_t forward_pc_flag = false;
 static dvs_res_t dvs_res;
 
 /* Static array to act as storage for DVS events */
-static uint8_t dvs_events[DVS_EVENT_BUF_SIZE];
+static dvs_buf_t dvs_events[DVS_BUFFER_LENGTH];
+static int dvs_max_idx = -1;
 
 /*******************************************************************************
  * Private Function Declarations (static)
@@ -128,7 +134,7 @@ void dvs_set_mode(dvs_res_t res)
 {
     dvs_res = res;
     /* Clear array to start new mode of operation */
-    memset(dvs_events, POL_NONE, DVS_TOTAL_PIXELS);
+    memset(dvs_events, 0, DVS_BUFFER_LENGTH * sizeof(dvs_buf_t));
     spinn_set_mode(res);
 }
 
@@ -235,7 +241,7 @@ static void tasks_init(void)
                 configMINIMAL_STACK_SIZE, (void *)NULL, 
                 tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(decoded_tx_task, (char const *)"DVS_Tx", 
-                configMINIMAL_STACK_SIZE, (void *)NULL, 
+                configMINIMAL_STACK_SIZE + 40, (void *)NULL, 
                 tskIDLE_PRIORITY + 1, NULL);
     reset_timer = xTimerCreate(RESET_TIMER_NAME,  /* timer name */
                                100,               /* timer period */
@@ -321,8 +327,8 @@ static void decoded_tx_task(void *pvParameters)
 
             /* Update stored events and only submit event if required */
             /* Note that by passing in same struct, less copying is required */
-            // if (update_events(&data, &data))
-            // {
+            if (update_events(&data, &data) == true)
+            {
                 /* Send decoded data to SpiNNaker */
                 spinn_send_dvs(&data);
 
@@ -337,7 +343,7 @@ static void decoded_tx_task(void *pvParameters)
                     }
                     xSemaphoreGive(xFwdSemaphore);
                 }
-            // }
+            }
        }
     }
 }
@@ -379,13 +385,15 @@ static void reset_fwd_flag(TimerHandle_t timer)
 static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data)
 {
 
-    uint16_t pos_count, neg_count, none_count;
-    uint8_t base_x, base_y;
-    uint8_t width_x, width_y;
-    uint32_t idx;
-    uint8_t shift;
+    uint16_t pos_count = 0, neg_count = 0;
+    uint8_t width;
     bool event_detected = false;
-    dvs_polarity_t current_pol;
+    int free_idx = -1;
+    int min_x, min_y, max_x, max_y;
+    /* Max indices per block is size of largest block */
+    int16_t relevant[DVS_WIDTH_16*DVS_WIDTH_16];
+    uint8_t relevant_idx = 0;
+    dvs_data_t* p_current_event;
 
     /* Copy data and return true immediately if at full resolution */
     if (dvs_res == DVS_RES_128)
@@ -397,94 +405,86 @@ static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data)
         return true;
     }
 
-    /* Otherwise, log event in bit-packed array */
-    idx = (p_in_data->y * DVS_BYTES_PER_ROW) + 
-          (p_in_data->x / DVS_PIXELS_PER_BYTE);
-    if (idx < DVS_EVENT_BUF_SIZE)
+    /* Log event in the buffer in the first free slot */
+    for (int i = 0; i < DVS_BUFFER_LENGTH; i++)
     {
-        /* Left shift as each byte contains 4 polarities */
-        shift = (3 - (p_in_data->x % DVS_PIXELS_PER_BYTE));
-        switch (p_in_data->polarity)
+        /* Check if slot is filled */
+        if (dvs_events[i].filled == false)
         {
-            /* OR bits of of interest with 0b11 to SET, then AND with new
-               value to set to required */
-            case 1:
-                dvs_events[idx] = (dvs_events[idx] | (0x3 << shift)) &
-                                  (POL_POS << shift);
-                break;
-            case 0:
-            default:
-                dvs_events[idx] = (dvs_events[idx] | (0x3 << shift)) &
-                                  (POL_NEG << shift);
-                break;
+            free_idx = i;
+            break;
         }
     }
 
-    /* Check to see if a new event must be sent */
+    /* Check free_idx is valid - still -1 if no free elements */
+    if (free_idx < 0)
+    {
+        /* Dump event by immediately returning false */
+        return false;
+    }
+
+    /* Copy data in */
+    memcpy(&dvs_events[free_idx].data, p_in_data, sizeof(dvs_data_t));
+    dvs_events[free_idx].filled = true;
+
+    /* Update max filled slot if necessary */
+    if (free_idx > dvs_max_idx)
+    {
+        dvs_max_idx = free_idx;
+    }
 
     /* Work out the block size from the current mode */
     switch (dvs_res)
     {
         case DVS_RES_64:
-            width_x = DVS_WIDTH_64;
-            width_y = DVS_WIDTH_64;
+            width = DVS_WIDTH_64;
             break;
         case DVS_RES_32:
-            width_x = DVS_WIDTH_32;
-            width_y = DVS_WIDTH_32;
+            width = DVS_WIDTH_32;
             break;
         case DVS_RES_16:
-            width_x = DVS_WIDTH_16;
-            width_y = DVS_WIDTH_16;
+            width = DVS_WIDTH_16;
             break;
         default:
             /* Unheard of mode, so return false */
             return false;
     }
 
-    /* Work out the top left corner of the current block */
-    base_x = p_in_data->x - (p_in_data->x % width_x);
-    base_y = p_in_data->y - (p_in_data->y % width_y);
+    /* Work out the min, max x, y */
+    min_x = p_in_data->x - (p_in_data->x % width);
+    min_y = p_in_data->y - (p_in_data->y % width);
+    max_x = min_x + width - 1;
+    max_y = min_y + width - 1;
 
-    /* Iterate over pixels inside block */
-    for (uint8_t y = base_y; y < base_y + width_y; y++)
+    /* Iterate over events inside buffer and store relevant indices */
+    memset(relevant, -1, DVS_WIDTH_16*DVS_WIDTH_16);
+    for (int i = 0; i <= dvs_max_idx; i++)
     {
-        for (uint8_t x = base_x; x < base_x + width_x; x++)
+        if (dvs_events[i].filled == true)
         {
-            idx = (y * DVS_BYTES_PER_ROW) + (x / DVS_PIXELS_PER_BYTE);
-
-            /* Sanity check the index outcome */
-            if (idx >= DVS_EVENT_BUF_SIZE)
+            p_current_event = &dvs_events[i].data;
+            if (p_current_event->x <= max_x && p_current_event->x >= min_x &&
+                p_current_event->y <= max_y && p_current_event->y >= min_y)
             {
-                continue;
-            }
+                /* Save that pixel is relevant to current operation */
+                relevant[relevant_idx++] = i;
 
-            /* Get the polarity from the byte at idx */
-            shift = (3 - (x % DVS_PIXELS_PER_BYTE));
-            current_pol = (dvs_polarity_t) 
-                          ((dvs_events[idx] & (0x3 << shift)) >> shift);
-
-            /* Count each type of polarity discovered */
-            switch(current_pol)
-            {
-                case POL_NONE:
-                    none_count++;
-                    break;
-                case POL_POS:
+                if (p_current_event->polarity == 1)
+                {
                     pos_count++;
-                    break;
-                case POL_NEG:
+                }
+                else
+                {
                     neg_count++;
-                    break;
-                default:
-                    none_count++;
-                    break;
+                }
             }
         }
     }
 
+    /* Check to see if a new event must be sent */
+
     /* Compare the counts and decide if event must be sent */
-    if (pos_count + neg_count > none_count)
+    if ((pos_count + neg_count) >= ((width*width) >> 1))
     {
         if (pos_count > neg_count)
         {
@@ -499,49 +499,32 @@ static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data)
         /* Otherwise, they are equal, and output is zero */
     }
 
-    /* To prevent multiple block events from the pixels, reset the block to NONE
-       if event is detected */
+    /* If event is detected, delete relevant entries from buffer */
     if (event_detected)
     {
-        for (uint8_t y = base_y; y < base_y + width_y; y++)
+        /* Delete data in buffer */
+        for (int16_t idx = 0; idx < relevant_idx; idx++)
         {
-            idx = (y * DVS_BYTES_PER_ROW) +
-                  (base_x / DVS_PIXELS_PER_BYTE);
-            /* If we are wiping entire bytes */
-            if (width_x / DVS_PIXELS_PER_BYTE > 0)
+            dvs_events[relevant[idx]].filled = false;
+        }
+
+        /* Update maximum index */
+        for (int16_t idx = dvs_max_idx; idx >= 0; idx--)
+        {
+            if (dvs_events[idx].filled == true)
             {
-                if (idx + width_x/DVS_PIXELS_PER_BYTE <= DVS_EVENT_BUF_SIZE)
-                {
-                    memset(&dvs_events[idx], 
-                           (POL_NONE << 6) + (POL_NONE << 4) +
-                           (POL_NONE << 2) + POL_NONE, 
-                           width_x / DVS_PIXELS_PER_BYTE);
-                }
-            }
-            else
-            {
-                /* Wipe half byte corresponding to 64x64 polarities */
-                if (base_x & 1 > 0)
-                {
-                    dvs_events[idx] = (dvs_events[idx] & 0xF0) | 
-                                      (POL_NONE << 2) | POL_NONE;
-                }
-                else
-                {
-                    dvs_events[idx] = (dvs_events[idx] & 0x0F) | 
-                                      (POL_NONE << 6) | (POL_NONE << 4);
-                }
+                dvs_max_idx = idx;
+                break;
             }
         }
+
+        /* If event is to be submitted, fill in the struct with information */
+        p_out_data->x = min_x;
+        p_out_data->y = min_y;
+        /* Polarity set during mode check */
     }
 
-    /* If event is to be submitted, fill in the struct with information */
-    p_out_data->x = base_x;
-    p_out_data->y = base_y;
-    /* Polarity set during mode check */
-
     return event_detected;
-
 }
 
 /*******************************************************************************

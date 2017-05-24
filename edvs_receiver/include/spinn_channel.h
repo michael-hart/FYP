@@ -21,12 +21,7 @@
 /*******************************************************************************
  * Enum and Type definitions
  ******************************************************************************/
-typedef enum spin_mode_e {
-    SPIN_MODE_128 = 0,
-    SPIN_MODE_64 = 1,
-    SPIN_MODE_32 = 2,
-    SPIN_MODE_16 = 3,
-} spin_mode_t;
+/* None */
 
 /*******************************************************************************
  * External Variable Definitions
@@ -81,12 +76,12 @@ void spinn_send_dvs(dvs_data_t* p_data);
  * Sets SpiNNaker forwarding mode resolution
  * 
  * INPUTS
- * mode (spin_mode_t) : Enum value to convert
+ * res (dvs_res_t) : Enum value to convert
  *
  * RETURNS
  * Nothing
  */
-void spinn_set_mode(spin_mode_t mode);
+void spinn_set_mode(dvs_res_t res);
 
 
 /* TODO: spinn_encode, spinn_decode functions */

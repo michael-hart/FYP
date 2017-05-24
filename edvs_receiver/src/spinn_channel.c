@@ -23,7 +23,7 @@
  ******************************************************************************/
 #define SPINN_SHORT_SYMS (11)
 #define SPINN_LONG_SYMS  (19)
-#define BUFFER_LENGTH    (20)
+#define BUFFER_LENGTH    (5)
 #define EOP_IDX          (16)
 
 #define SPINN_TIMER_NAME "rst_spinn"
@@ -63,7 +63,7 @@ static uint8_t symbol_table[] =
 };
 
 /* Current mode of sending data */
-static spin_mode_t spin_mode = SPIN_MODE_128;
+static dvs_res_t dvs_res = DVS_RES_128;
 
 /* Virtual chip address symbols to queue */
 /* TODO assign actual address instead of guessing it */
@@ -138,21 +138,21 @@ void spinn_send_dvs(dvs_data_t* p_data)
     uint8_t tmp_byte = 0;
     uint16_t mapped_event = 0x8000 + ((p_data->polarity & 0x1) << 14);
 
-    switch (spin_mode)
+    switch (dvs_res)
     {
-        case SPIN_MODE_64:
+        case DVS_RES_64:
             mapped_event += ((p_data->y & 0x7E) << 5);
             mapped_event += ((p_data->x & 0x7E) >> 1);
             break;
-        case SPIN_MODE_32:
+        case DVS_RES_32:
             mapped_event += ((p_data->y & 0x7C) << 3);
             mapped_event += ((p_data->x & 0x7C) >> 2);
             break;
-        case SPIN_MODE_16:
+        case DVS_RES_16:
             mapped_event += ((p_data->y & 0x78) << 1);
             mapped_event += ((p_data->x & 0x78) >> 3);
             break;
-        case SPIN_MODE_128:
+        case DVS_RES_128:
         default:
             mapped_event += ((p_data->y & 0x7F) << 7);
             mapped_event +=  (p_data->x & 0x7F);
@@ -191,9 +191,9 @@ void spinn_send_dvs(dvs_data_t* p_data)
 
 }
 
-void spinn_set_mode(spin_mode_t mode)
+void spinn_set_mode(dvs_res_t mode)
 {
-    spin_mode = mode;
+    dvs_res = mode;
 }
 
 

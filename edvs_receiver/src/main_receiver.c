@@ -64,10 +64,10 @@ void main_receiver(void)
     /* Set up USART tasks */
     pc_config();
     dvs_config();
-    
+
     /* Set up SpiNNaker tasks */
     spinn_config();
-    
+
     /* Set up Watchdog Timer */
     iwdg_init();
 

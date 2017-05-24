@@ -378,7 +378,7 @@ static void usart_rx_task(void *pvParameters)
                         if (req_mode < SPIN_NUM_MODES)
                         {
                             pc_send_string(PC_RESP_OK);
-                            spinn_set_mode((spin_mode_t) req_mode);
+                            dvs_set_mode((dvs_res_t) req_mode);
                         }
                         else
                         {

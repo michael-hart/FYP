@@ -29,6 +29,20 @@ typedef struct dvs_data_s {
     uint8_t polarity;
 } dvs_data_t;
 
+/* Polarity enum for storing events from DVS */
+typedef enum dvs_polarity_e {
+    POL_NONE,
+    POL_POS,
+    POL_NEG,
+} dvs_polarity_t;
+
+typedef enum dvs_res_e {
+    DVS_RES_128 = 0,
+    DVS_RES_64 = 1,
+    DVS_RES_32 = 2,
+    DVS_RES_16 = 3,
+} dvs_res_t;
+
 /*******************************************************************************
  * External Variable Definitions
  ******************************************************************************/
@@ -76,6 +90,18 @@ void dvs_forward_pc(uint8_t forward, uint16_t timeout_ms);
  * Nothing
  */
 void dvs_put_sim(dvs_data_t data);
+
+/**
+ * DESCRIPTION
+ * Sets DVS resolution for downscaling
+ * 
+ * INPUTS
+ * res (dvs_res_t) : Enum value to convert
+ *
+ * RETURNS
+ * Nothing
+ */
+void dvs_set_mode(dvs_res_t res);
 
 
 #endif /* _DVS_USART_H */

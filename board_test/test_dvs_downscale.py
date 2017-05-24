@@ -6,6 +6,24 @@ from fixtures import board
 from dvs_packet import DVSPacket
 from controller import RESPONSES
 
+# Generate the test arrays for 32x32, 16x16, as 64x64 can be inlined
+JUST_ENOUGH_32 = [DVSPacket(0, 0, 1), DVSPacket(3, 0, 1), DVSPacket(1, 1, 1),
+                  DVSPacket(2, 1, 1), DVSPacket(1, 2, 1), DVSPacket(2, 2, 1),
+                  DVSPacket(3, 0, 1), DVSPacket(3, 3, 1)]
+
+TOO_FEW_32 = [DVSPacket(1, 0, 0), DVSPacket(2, 0, 1), DVSPacket(0, 1, 1),
+              DVSPacket(2, 2, 0), DVSPacket(3, 2, 1), DVSPacket(1, 3, 0)]
+
+EQUAL_32 = [DVSPacket(idx % 4, idx // 4, (idx & 0x1)) for idx in range(16)]
+ALL_NEG_32 = [DVSPacket(idx % 4, idx // 4, 0) for idx in range(16)]
+MANY_NEG_32 = ALL_NEG_32[1:7] + ALL_NEG_32[9:12] + ALL_NEG_32[13:15]
+
+def offset(pkt_list, x, y, _mod):
+    base_x = x - (x % _mod)
+    base_y = y - (y % _mod)
+    return [DVSPacket(pkt.x + base_x, pkt.y + base_y, pkt.pol)
+            for pkt in pkt_list]
+
 def helper_check_downscale(board, pkt_list, exp):
     """Helper method to be used by remaining tests"""
     # Request one more than expected to be sure that there aren't extras
@@ -15,7 +33,7 @@ def helper_check_downscale(board, pkt_list, exp):
 
     # As we are expecting to time out on reads a lot, set the timeout lower
     tmp_timeout = board.ser.timeout
-    board.ser.timeout = 0.05
+    board.ser.timeout = 0.2
 
     # Forward all packets to PC
     board_assert_equal(board.forward_dvs(0), RESPONSES["success"])
@@ -36,6 +54,8 @@ def helper_check_downscale(board, pkt_list, exp):
         assert rx_pkt_list == []
     else:
         assert rx_pkt_list
+        for rx_pkt in rx_pkt_list:
+            print("{}, {}, {}".format(rx_pkt.x, rx_pkt.y, rx_pkt.pol))
         assert len(rx_pkt_list) == len(exp)
         for pkt, rx_pkt in zip(exp, rx_pkt_list):
             board_assert_isinstance(rx_pkt, DVSPacket)
@@ -99,7 +119,17 @@ def test_res_64(board, pkt_list, exp):
     helper_check_downscale(board, pkt_list, exp)
 
 
-@pytest.mark.parametrize("pkt_list,exp", [])
+@pytest.mark.parametrize("pkt_list,exp", [
+    (TOO_FEW_32, None),
+    (JUST_ENOUGH_32, [DVSPacket(0, 0, 1)]),
+    (EQUAL_32, [DVSPacket(0, 0, 0)]),
+    (MANY_NEG_32, [DVSPacket(0, 0, 0)]),
+
+    (offset(TOO_FEW_32, 47, 93, 4), None),
+    (offset(JUST_ENOUGH_32, 47, 93, 4), offset([DVSPacket(0, 0, 1)], 47, 93, 4)),
+    (offset(EQUAL_32, 47, 93, 4), offset([DVSPacket(0, 0, 0)], 47, 93, 4)),
+    (offset(MANY_NEG_32, 47, 93, 4), offset([DVSPacket(0, 0, 0)], 47, 93, 4)),
+    ])
 def test_res_32(board, pkt_list, exp):
     """Tests that resolution 32x32 only outputs packets in specific cases"""
     board_assert_equal(board.set_mode_spinn(SpiNNMode.SPINN_MODE_32.value),

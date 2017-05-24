@@ -484,20 +484,20 @@ static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data)
     /* Check to see if a new event must be sent */
 
     /* Compare the counts and decide if event must be sent */
-    if ((pos_count + neg_count) >= ((width*width) >> 1))
+
+    if ((pos_count > neg_count) && 
+        (pos_count > (((width*width) - neg_count) >> 1) - 1))
     {
-        if (pos_count > neg_count)
-        {
-            event_detected = true;
-            p_out_data->polarity = 1;
-        }
-        else if (neg_count > pos_count)
-        {
-            event_detected = true;
-            p_out_data->polarity = 0;
-        }
-        /* Otherwise, they are equal, and output is zero */
+        event_detected = true;
+        p_out_data->polarity = 1;
     }
+    else if ((neg_count > pos_count) &&
+             (neg_count > (((width*width) - pos_count) >> 1) - 1))
+    {
+        event_detected = true;
+        p_out_data->polarity = 0;
+    }
+    /* Otherwise, neither are the mode, and output is zero */
 
     /* If event is detected, delete relevant entries from buffer */
     if (event_detected)

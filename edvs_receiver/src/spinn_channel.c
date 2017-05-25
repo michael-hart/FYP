@@ -23,7 +23,7 @@
  ******************************************************************************/
 #define SPINN_SHORT_SYMS (11)
 #define SPINN_LONG_SYMS  (19)
-#define BUFFER_LENGTH    (5)
+#define BUFFER_LENGTH    (20)
 #define EOP_IDX          (16)
 
 #define SPINN_TIMER_NAME "rst_spinn"

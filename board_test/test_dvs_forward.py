@@ -1,5 +1,6 @@
 """Tests forwarding of DVS packets to PC"""
 
+import time
 import pytest
 from fixtures import board, log
 from common import (board_assert_equal, board_assert_ge, board_assert_le,
@@ -40,6 +41,47 @@ def test_dvs_packets_received(board):
     board_assert_le(pkt.x, 127)
     board_assert_le(pkt.y, 127)
     board_assert_le(pkt.pol, 1)
+
+    # Reset timeout to previous
+    board.ser.timeout = tmp_timeout
+
+@pytest.mark.dev("edvs")
+def test_dvs_packets_manykinds(board, log):
+    """Tests that board receives DVS packets with various values"""
+
+    # Set new timeout to allow time for actual DVS to supply packets
+    tmp_timeout = board.ser.timeout
+    board.ser.timeout = 1
+
+    x_rx = set()
+    y_rx = set()
+    p_rx = set()
+
+    board_assert_equal(board.forward_dvs(0), RESPONSES["success"])
+
+    # Receive 500ms worth of packets
+    start_time = time.time()
+    while time.time() - start_time < 2:
+        # Retrieve and check packet
+        pkt = board.get_dvs()
+        if not isinstance(pkt, DVSPacket):
+            continue
+
+        board_assert_le(pkt.x, 127)
+        board_assert_le(pkt.y, 127)
+        board_assert_le(pkt.pol, 1)
+
+        # Add values to sets
+        x_rx.add(pkt.x)
+        y_rx.add(pkt.y)
+        p_rx.add(pkt.pol)
+
+    # Check that various results are received
+    log.info("DVS packets have counts: x=%d, y=%d, pol=%d",
+             len(x_rx), len(y_rx), len(p_rx))
+    assert len(x_rx) >= 10
+    assert len(y_rx) >= 10
+    assert len(p_rx) == 2
 
     # Reset timeout to previous
     board.ser.timeout = tmp_timeout

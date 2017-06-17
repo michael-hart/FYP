@@ -1,4 +1,4 @@
 # Default configuration for EDVS
-baud: 115200
+baud: 500000
 echo: 0
 event_bytes: 0

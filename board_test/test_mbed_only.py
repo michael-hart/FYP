@@ -1,7 +1,8 @@
 """File used to test if simple PC->MBED commands are working"""
 
-from serial.tools import list_ports
 import time
+import pytest
+from serial.tools import list_ports
 from fixtures import mbed, log
 from mbed_controller import MBED_ID
 from dvs_packet import DVSPacket
@@ -9,14 +10,17 @@ from spinn_packet import SpiNNPacket
 from common import spinn_2_to_7, SpiNNMode
 
 
+@pytest.mark.dev("mbed")
 def test_comports():
     """Tests if there are open COM ports available"""
     assert [x.device for x in list_ports.comports()]
 
+@pytest.mark.dev("mbed")
 def test_id(mbed):
     """Tests if open MBED controller responds to ID request"""
     assert mbed.get_id() == MBED_ID
 
+@pytest.mark.dev("mbed")
 def test_empty_spinn(mbed):
     """Tests that no DVS packets sent to board means no SpiNNaker results"""
 
@@ -28,6 +32,7 @@ def test_empty_spinn(mbed):
     assert count == 0
     assert not packets
 
+@pytest.mark.dev("mbed")
 def test_wait(mbed):
     """Tests that telling the MBED to wait doesn't log values"""
     mbed.wait()
@@ -39,6 +44,7 @@ def test_wait(mbed):
     (_, _, packets) = mbed.get_spinn()
     assert not packets
 
+@pytest.mark.dev("mbed")
 def test_trigger(mbed):
     """Tests that triggering the MBED allows values to be captured"""
     mbed.trigger()
@@ -50,7 +56,7 @@ def test_trigger(mbed):
     (_, _, packet) = mbed.get_spinn()
     assert packet
 
-
+@pytest.mark.dev("mbed")
 def test_wait_trigger(mbed):
     """Tests that triggering after a wait allows capture"""
 
@@ -74,6 +80,7 @@ def test_wait_trigger(mbed):
     (_, _, packet) = mbed.get_spinn()
     assert packet
 
+@pytest.mark.dev("mbed")
 def test_read_clears(mbed):
     """Tests that reading a packet from the MBED then resetting works"""
     # Ensure MBED is empty
@@ -90,7 +97,7 @@ def test_read_clears(mbed):
     (_, _, packets) = mbed.get_spinn()
     assert not packets    
 
-
+@pytest.mark.dev("mbed")
 def test_sim_spinn(mbed, log):
     """Tests that a single SpiNNaker packet is sent back correctly"""
 
@@ -110,6 +117,7 @@ def test_sim_spinn(mbed, log):
     log.info("Expected   %s", pkt.data)
     assert rx_pkt[0].data == pkt.data
 
+@pytest.mark.dev("mbed")
 def test_sim_duration(mbed):
     """Tests that sending two packets roughly 100ms apart gives a duration"""
     
@@ -130,6 +138,7 @@ def test_sim_duration(mbed):
     # Check duration is +/- 40ms
     assert 60000 <= duration <= 140000
 
+@pytest.mark.dev("mbed")
 def test_sim_many_packets(mbed):
     """Tests that sending many packets, each 10ms apart, gives a duration"""
 

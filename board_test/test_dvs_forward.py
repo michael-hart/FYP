@@ -15,6 +15,7 @@ def test_dvs_fwd_reset(board):
     """Tests that resetting the forwarding works"""
     board_assert_equal(board.reset_dvs(), RESPONSES["success"])
 
+@pytest.mark.dev("not edvs")
 def test_dvs_fwd_on_reset(board):
     """Tests that turning on and then resetting forwarding works"""
     board_assert_equal(board.forward_dvs(0), RESPONSES["success"])
@@ -24,8 +25,7 @@ def test_dvs_fwd_temp(board):
     """Tests that setting temporary forwarding is accepted"""
     board_assert_equal(board.forward_dvs(1000), RESPONSES["success"])
 
-# Marked as xfail as the eDVS is currently not connected
-@pytest.mark.xfail
+@pytest.mark.dev("edvs")
 def test_dvs_packets_received(board):
     """Tests that board receives actual DVS packets"""
 
@@ -44,6 +44,7 @@ def test_dvs_packets_received(board):
     # Reset timeout to previous
     board.ser.timeout = tmp_timeout
 
+@pytest.mark.dev("not edvs")
 def test_dvs_use_pkt(board):
     """Tests that sending simulated packet is sent back"""
 

@@ -9,6 +9,7 @@ from controller import RESPONSES
 from dvs_packet import DVSPacket
 from spinn_packet import SpiNNPacket
 
+@pytest.mark.dev("mbed")
 def test_single_packet(mbed, board, log):
     """Test that DVS packet sent to board is sent to MBED correctly"""
 
@@ -39,6 +40,7 @@ def test_single_packet(mbed, board, log):
     board_assert_equal(pkt.data, rx_pkt[0].data)
 
 
+@pytest.mark.dev("mbed")
 @pytest.mark.parametrize("packets", [2, 3, 10, 15, 20])
 def test_many_packets(mbed, board, log, packets):
     """Tests the time taken for many packets to be sent is small"""

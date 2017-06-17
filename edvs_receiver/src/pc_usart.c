@@ -128,15 +128,15 @@ static void hal_init(void)
     
     port_init.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
     port_init.GPIO_Mode = GPIO_Mode_AF;
-    port_init.GPIO_Speed = GPIO_Speed_2MHz;
+    port_init.GPIO_Speed = GPIO_Speed_50MHz;
     port_init.GPIO_OType = GPIO_OType_PP;
     port_init.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init( GPIOA, &port_init );
-    GPIO_PinAFConfig(GPIOA,  GPIO_PinSource3, GPIO_AF_1);
     GPIO_PinAFConfig(GPIOA,  GPIO_PinSource2, GPIO_AF_1);
+    GPIO_PinAFConfig(GPIOA,  GPIO_PinSource3, GPIO_AF_1);
 
 
-    //USART init: USART2 500K 8n1
+    //USART init: USART1 500K 8n1
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
     usart_init.USART_BaudRate = USART_BAUD_RATE;
     usart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;

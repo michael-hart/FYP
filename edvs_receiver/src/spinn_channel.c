@@ -131,12 +131,22 @@ void spinn_forward_pc(uint8_t forward, uint16_t timeout_ms)
 
 void spinn_send_dvs(dvs_data_t* p_data)
 {
+    uint8_t pkt_buf[SPINN_SHORT_SYMS];
+    uint8_t* pkt_buf_p = pkt_buf;
+
     /* Queue each item in order of sending */
     uint8_t odd_parity = 0;
     uint8_t xor_all = 0;
-
     uint8_t tmp_byte = 0;
-    uint16_t mapped_event = 0x8000 + ((p_data->polarity & 0x1) << 14);
+    uint16_t mapped_event;
+
+    /* If queue is not empty, delete earliest entry */
+    if (uxQueueSpacesAvailable(spinn_txq) == 0)
+    {
+        xQueueReceive(spinn_txq, pkt_buf, portMAX_DELAY);
+    }
+
+    mapped_event = 0x8000 + ((p_data->polarity & 0x1) << 14);
 
     switch (dvs_res)
     {
@@ -168,26 +178,38 @@ void spinn_send_dvs(dvs_data_t* p_data)
                      ((xor_all & 0x08) >> 3) ^ ((xor_all & 0x04) >> 2) ^
                      ((xor_all & 0x02) >> 1) ^ (xor_all & 0x01);
 
-    /* Add header to queue */
-    xQueueSendToBack(spinn_txq, &symbol_table[odd_parity], portMAX_DELAY);
-    xQueueSendToBack(spinn_txq, &symbol_table[0], portMAX_DELAY);
+    /* Add header to buffer */
+    *pkt_buf_p = symbol_table[odd_parity];
+    pkt_buf_p++;
+    *pkt_buf_p = symbol_table[0];
+    pkt_buf_p++;
 
-    /* Add data to queue */
+    /* Add data to buffer */
     tmp_byte =  (mapped_event & 0x000F);
-    xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
+    *pkt_buf_p = symbol_table[tmp_byte];
+    pkt_buf_p++;
     tmp_byte = ((mapped_event & 0x00F0) >> 4);
-    xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
+    *pkt_buf_p = symbol_table[tmp_byte];
+    pkt_buf_p++;
     tmp_byte = ((mapped_event & 0x0F00) >> 8);
-    xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
+    *pkt_buf_p = symbol_table[tmp_byte];
+    pkt_buf_p++;
     tmp_byte = ((mapped_event & 0xF000) >> 12);
-    xQueueSendToBack(spinn_txq, &symbol_table[tmp_byte], portMAX_DELAY);
+    *pkt_buf_p = symbol_table[tmp_byte];
+    pkt_buf_p++;
 
-    /* Fill the remaining queue space with chip address and EOP */
+    /* Fill the remaining buffer space with chip address and EOP */
     for (int8_t i = 3; i >= 0; i--)
     {
-        xQueueSendToBack(spinn_txq, &virtual_chip_symbols[i], portMAX_DELAY);
+        *pkt_buf_p = virtual_chip_symbols[i];
+        pkt_buf_p++;
     }
-    xQueueSendToBack(spinn_txq, &symbol_table[EOP_IDX], portMAX_DELAY);
+
+    *pkt_buf_p = symbol_table[EOP_IDX];
+    pkt_buf_p++;
+
+    /* Add entire buffer to queue as a packet */
+    xQueueSendToBack(spinn_txq, pkt_buf, portMAX_DELAY);
 
 }
 
@@ -313,7 +335,7 @@ static void tasks_init(void)
                 (void *)NULL, tskIDLE_PRIORITY + SPINN_TX_PRIORITY, NULL);
 
     /* Create queue for SpiNN packet data */
-    spinn_txq = xQueueCreate(BUFFER_LENGTH * SPINN_SHORT_SYMS, sizeof(uint8_t));
+    spinn_txq = xQueueCreate(BUFFER_LENGTH, SPINN_SHORT_SYMS * sizeof(uint8_t));
 
 }
 
@@ -351,43 +373,49 @@ static void spinn_tx_task(void *pvParameters)
     uint8_t data = 0;
     uint8_t check_flag = false;
     uint8_t sent_bytes = 0;
+    uint8_t pkt_buf[SPINN_SHORT_SYMS];
+    uint8_t idx = 0;
 
     for (;;)
     {
 
         /* Wait for data in the queue to transmit */
-        if (pdPASS == xQueueReceive(spinn_txq, &data, portMAX_DELAY))
+        idx = 0;
+        if (pdPASS == xQueueReceive(spinn_txq, pkt_buf, portMAX_DELAY))
         {
-        
-            /* Wait for interrupt on pin to transmit next symbol */
-            if (xSemaphoreTake(xSpinnTxSemaphore, portMAX_DELAY) == pdTRUE)
+            while (idx < SPINN_SHORT_SYMS)
             {
-
-                if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
+                data = pkt_buf[idx++];
+                /* Wait for interrupt on pin to transmit next symbol */
+                if (xSemaphoreTake(xSpinnTxSemaphore, portMAX_DELAY) == pdTRUE)
                 {
-                    /* Copy to prevent holding while doing large task */
-                    check_flag = spinn_fwd_pc_flag;
-                    xSemaphoreGive(spinFwdSemaphore);
-                }
 
-                if (check_flag)
-                {
-                    pc_send_byte(data);
-                    prev_data = data;
-                    /* Send carriage return to signify EOP */ 
-                    if (++sent_bytes == SPINN_SHORT_SYMS)
+                    if (xSemaphoreTake(spinFwdSemaphore, portMAX_DELAY) == pdTRUE)
                     {
-                        pc_send_string(PC_EOL);
-                        sent_bytes = 0;
+                        /* Copy to prevent holding while doing large task */
+                        check_flag = spinn_fwd_pc_flag;
+                        xSemaphoreGive(spinFwdSemaphore);
                     }
-                    /* If forwarding to PC, do not wait for interrupt */
-                    xSemaphoreGive(xSpinnTxSemaphore);
-                }
-                else
-                {
-                    /* Toggle bits in port for next transition */
-                    GPIO_Write(GPIOB, data ^ prev_data);
-                    prev_data = data ^ prev_data;
+
+                    if (check_flag)
+                    {
+                        pc_send_byte(data);
+                        prev_data = data;
+                        /* Send carriage return to signify EOP */ 
+                        if (++sent_bytes == SPINN_SHORT_SYMS)
+                        {
+                            pc_send_string(PC_EOL);
+                            sent_bytes = 0;
+                        }
+                        /* If forwarding to PC, do not wait for interrupt */
+                        xSemaphoreGive(xSpinnTxSemaphore);
+                    }
+                    else
+                    {
+                        /* Toggle bits in port for next transition */
+                        GPIO_Write(GPIOB, data ^ prev_data);
+                        prev_data = data ^ prev_data;
+                    }
                 }
             }
         }

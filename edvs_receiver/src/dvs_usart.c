@@ -24,8 +24,8 @@
  * Local Definitions
  ******************************************************************************/
 #define USART_GPIO GPIOA
-#define BUFFER_LENGTH 8    //length of TX, RX and command buffers
-#define USART_BAUD_RATE 4000000
+#define BUFFER_LENGTH 20    //length of TX, RX and command buffers
+#define DVS_BAUD_RATE 500000
 #define DATA_LENGTH 3
 
 #define RESET_TIMER_NAME "rst_dvs"
@@ -82,6 +82,8 @@ static void decoded_tx_task(void *pvParameters);
 static void reset_fwd_flag(TimerHandle_t timer);
 
 static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data);
+
+static void dvs_send_string(char * str);
 
 /*******************************************************************************
  * Public Function Definitions 
@@ -173,23 +175,27 @@ static void hal_init(void)
     //GPIO init: USART1 PA10 as IN, no OUT
     RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOA, ENABLE );
     
-    port_init.GPIO_Pin = GPIO_Pin_10;
+    port_init.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
     port_init.GPIO_Mode = GPIO_Mode_AF;
-    port_init.GPIO_Speed = GPIO_Speed_2MHz;
+    port_init.GPIO_Speed = GPIO_Speed_50MHz;
     port_init.GPIO_OType = GPIO_OType_PP;
     port_init.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init( GPIOA, &port_init );
-    GPIO_PinAFConfig(GPIOA,  GPIO_PinSource10, GPIO_AF_1);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_1);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_1);
 
-
-    //USART init: USART1 500K 8n1
+    //USART init: USART2 500K 8n1
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-    usart_init.USART_BaudRate = USART_BAUD_RATE;
+
+    /* Due to high baud rate, set oversampling to 8-bit */
+    USART_OverSampling8Cmd(USART1, ENABLE);
+
+    usart_init.USART_BaudRate = DVS_BAUD_RATE;
     usart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     usart_init.USART_Parity = USART_Parity_No;
     usart_init.USART_StopBits = USART_StopBits_1;
     usart_init.USART_WordLength = USART_WordLength_8b;
-    usart_init.USART_Mode = USART_Mode_Rx;
+    usart_init.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 
     USART_Init(USART1, (USART_InitTypeDef*) &usart_init);
     USART_Cmd(USART1, ENABLE);
@@ -218,6 +224,7 @@ static void irq_init(void)
     NVIC_Init(&nvic);
 
     USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+
 }
 
 
@@ -240,7 +247,7 @@ static void tasks_init(void)
     xTaskCreate(usart_rx_task, (char const *)"DVS_Rx", 
                 configMINIMAL_STACK_SIZE, (void *)NULL, 
                 tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(decoded_tx_task, (char const *)"DVS_Tx", 
+    xTaskCreate(decoded_tx_task, (char const *)"Decoded_Tx", 
                 configMINIMAL_STACK_SIZE + 40, (void *)NULL, 
                 tskIDLE_PRIORITY + 1, NULL);
     reset_timer = xTimerCreate(RESET_TIMER_NAME,  /* timer name */
@@ -265,19 +272,27 @@ static void usart_rx_task(void *pvParameters)
 {
     uint8_t i = 0;
     char data_buf[BUFFER_LENGTH];
-    char coord_buf[2];
     dvs_data_t tmp_data;
+
+    /* Make sure that there is no echo */
+    dvs_send_string("!U0\n");
+
+    /* Set event format to 2-byte */
+    dvs_send_string("!E0\n");
+
+    /* Enable event streaming */
+    dvs_send_string("E+\n");
+
+    /* Enable interrupt for receiving */
+    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 
     for (;;) {
         if (pdPASS == xQueueReceive(dvs_rxq, &data_buf[i++], portMAX_DELAY)) {
-
             if (i >= 2)
             {
-                /* Copy out the data bytes */
-                memcpy(coord_buf, data_buf, 2);
 
                 /* Check that the byte pair is valid by checking for 0 in first byte */
-                if ((coord_buf[0] & 0x80) == 0)
+                if ((data_buf[0] & 0x80) == 0)
                 {
                     /* Copy byte in data buffer and decrement i */
                     data_buf[0] = data_buf[1];
@@ -285,9 +300,9 @@ static void usart_rx_task(void *pvParameters)
                 }
                 else
                 {
-                    tmp_data.x = coord_buf[1] & 0x7F;
-                    tmp_data.y = coord_buf[0] & 0x7F;
-                    tmp_data.polarity = (coord_buf[1] & 0x80) > 0 ? 1 : 0;
+                    tmp_data.x = data_buf[1] & 0x7F;
+                    tmp_data.y = data_buf[0] & 0x7F;
+                    tmp_data.polarity = (data_buf[1] & 0x80) > 0 ? 1 : 0;
                     i = 0;
 
                     /* Place new struct into queue */
@@ -304,7 +319,6 @@ static void usart_rx_task(void *pvParameters)
         }
     }
 }
-
 
 /**
  * DESCRIPTION
@@ -329,9 +343,6 @@ static void decoded_tx_task(void *pvParameters)
             /* Note that by passing in same struct, less copying is required */
             if (update_events(&data, &data) == true)
             {
-                /* Send decoded data to SpiNNaker */
-                spinn_send_dvs(&data);
-
                 if (xSemaphoreTake(xFwdSemaphore, portMAX_DELAY) == pdTRUE)
                 {
                     if (forward_pc_flag)
@@ -340,6 +351,11 @@ static void decoded_tx_task(void *pvParameters)
                         pc_send_byte(data.y);
                         pc_send_byte(data.polarity);
                         pc_send_string(PC_EOL);
+                    }
+                    else
+                    {
+                        /* Send decoded data to SpiNNaker */
+                        spinn_send_dvs(&data);
                     }
                     xSemaphoreGive(xFwdSemaphore);
                 }
@@ -525,6 +541,29 @@ static bool update_events(dvs_data_t* p_in_data, dvs_data_t* p_out_data)
     }
 
     return event_detected;
+}
+
+/**
+ * DESCRIPTION
+ * Transmit null-terminated string to eDVS
+ * 
+ * INPUTS
+ * str (char *) : Null-terminated string to transmit
+ *
+ * RETURNS
+ * Nothing
+ */
+static void dvs_send_string(char * str)
+{
+    while (*str)
+    {
+        if (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
+            vTaskDelay(1);
+        } else {
+            USART_SendData(USART1, (uint8_t) *str);
+            str++;
+        }
+    }
 }
 
 /*******************************************************************************

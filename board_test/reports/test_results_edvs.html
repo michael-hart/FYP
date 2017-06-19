@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 19-Jun-2017 at 22:16:06 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pluggy&apos;: &apos;0.4.0&apos;, &apos;py&apos;: &apos;1.4.33&apos;, &apos;pytest&apos;: &apos;3.0.7&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.15063-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;html&apos;: &apos;1.14.2&apos;, &apos;metadata&apos;: &apos;1.5.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.5.3</td></tr></table>
+    <h2>Summary</h2>
+    <p>2 tests ran in 6.63 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">2 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_dvs_forward.py::test_dvs_packets_received</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-19 22:16:00,272::Test Logging commences
+DEBUG::2017-06-19 22:16:00,287::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,288::Controller Opened serial port COM9
+DEBUG::2017-06-19 22:16:00,288::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:00,301::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:16:00,401::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,502::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,615::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,616::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:16:00,616::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:00,719::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,820::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:00,921::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:02,558::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:02,559::Controller Opened serial port COM9
+DEBUG::2017-06-19 22:16:02,560::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:02,572::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:16:02,673::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:02,774::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:02,886::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:02,888::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:16:02,888::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:02,900::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:16:02,901::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:16:02,901::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:16:02,916::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:16:02,916::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:16:03,047::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,049::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:16:03,051::Controller &lt;&lt;&lt; b&#x27;6664767303e80d&#x27; : &#x27;fdvsè&#x27;
+DEBUG::2017-06-19 22:16:03,060::Controller &gt;&gt;&gt; b&#x27;6664767303e80d&#x27; : b&#x27;fdvs\x03\xe8\r&#x27;
+DEBUG::2017-06-19 22:16:03,076::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:16:03,076::Controller Response received: 000 Success
+INFO::2017-06-19 22:16:03,077::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,077::Controller &gt;&gt;&gt; b&#x27;107b010d&#x27; : b&#x27;\x10{\x01\r&#x27;
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_dvs_forward.py::test_dvs_packets_manykinds</td>
+          <td class="col-duration">2.26</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:16:03,326::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,327::Controller Opened serial port COM9
+DEBUG::2017-06-19 22:16:03,327::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:03,340::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:16:03,441::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,542::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,668::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,670::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:16:03,671::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:16:03,681::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:16:03,683::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:16:03,683::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:16:03,697::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:16:03,698::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:16:03,828::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:16:03,829::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:16:03,832::Controller &lt;&lt;&lt; b&#x27;6664767300000d&#x27; : &#x27;fdvs  &#x27;
+DEBUG::2017-06-19 22:16:03,842::Controller &gt;&gt;&gt; b&#x27;6664767300000d&#x27; : b&#x27;fdvs\x00\x00\r&#x27;
+DEBUG::2017-06-19 22:16:03,857::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:16:03,858::Controller Response received: 000 Success
+INFO::2017-06-19 22:16:03,858::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,859::Controller &gt;&gt;&gt; b&#x27;3619000d&#x27; : b&#x27;6\x19\x00\r&#x27;
+INFO::2017-06-19 22:16:03,859::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,860::Controller &gt;&gt;&gt; b&#x27;0739000d&#x27; : b&#x27;\x079\x00\r&#x27;
+INFO::2017-06-19 22:16:03,860::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,861::Controller &gt;&gt;&gt; b&#x27;1b02000d&#x27; : b&#x27;\x1b\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:03,861::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,862::Controller &gt;&gt;&gt; b&#x27;083c000d&#x27; : b&#x27;\x08&lt;\x00\r&#x27;
+INFO::2017-06-19 22:16:03,862::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,863::Controller &gt;&gt;&gt; b&#x27;7771000d&#x27; : b&#x27;wq\x00\r&#x27;
+INFO::2017-06-19 22:16:03,863::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,889::Controller &gt;&gt;&gt; b&#x27;360d&#x27; : b&#x27;6\r&#x27;
+INFO::2017-06-19 22:16:03,890::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,890::Controller &gt;&gt;&gt; b&#x27;000d&#x27; : b&#x27;\x00\r&#x27;
+INFO::2017-06-19 22:16:03,891::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,891::Controller &gt;&gt;&gt; b&#x27;1704000d&#x27; : b&#x27;\x17\x04\x00\r&#x27;
+INFO::2017-06-19 22:16:03,892::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,892::Controller &gt;&gt;&gt; b&#x27;7300000d&#x27; : b&#x27;s\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,893::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,893::Controller &gt;&gt;&gt; b&#x27;1705000d&#x27; : b&#x27;\x17\x05\x00\r&#x27;
+INFO::2017-06-19 22:16:03,894::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,905::Controller &gt;&gt;&gt; b&#x27;216e010d&#x27; : b&#x27;!n\x01\r&#x27;
+INFO::2017-06-19 22:16:03,906::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,907::Controller &gt;&gt;&gt; b&#x27;2073010d&#x27; : b&#x27; s\x01\r&#x27;
+INFO::2017-06-19 22:16:03,907::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,908::Controller &gt;&gt;&gt; b&#x27;0018000d&#x27; : b&#x27;\x00\x18\x00\r&#x27;
+INFO::2017-06-19 22:16:03,908::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,909::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
+INFO::2017-06-19 22:16:03,909::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,910::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
+INFO::2017-06-19 22:16:03,910::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,910::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
+INFO::2017-06-19 22:16:03,911::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,911::Controller &gt;&gt;&gt; b&#x27;262b000d&#x27; : b&#x27;&amp;+\x00\r&#x27;
+INFO::2017-06-19 22:16:03,912::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,912::Controller &gt;&gt;&gt; b&#x27;2411000d&#x27; : b&#x27;$\x11\x00\r&#x27;
+INFO::2017-06-19 22:16:03,913::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,921::Controller &gt;&gt;&gt; b&#x27;6d1a000d&#x27; : b&#x27;m\x1a\x00\r&#x27;
+INFO::2017-06-19 22:16:03,922::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,922::Controller &gt;&gt;&gt; b&#x27;6d1b000d&#x27; : b&#x27;m\x1b\x00\r&#x27;
+INFO::2017-06-19 22:16:03,922::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,923::Controller &gt;&gt;&gt; b&#x27;721c000d&#x27; : b&#x27;r\x1c\x00\r&#x27;
+INFO::2017-06-19 22:16:03,923::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,923::Controller &gt;&gt;&gt; b&#x27;2c00000d&#x27; : b&#x27;,\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,924::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,924::Controller &gt;&gt;&gt; b&#x27;2759010d&#x27; : b&quot;&#x27;Y\x01\r&quot;
+INFO::2017-06-19 22:16:03,924::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,924::Controller &gt;&gt;&gt; b&#x27;2759010d&#x27; : b&quot;&#x27;Y\x01\r&quot;
+INFO::2017-06-19 22:16:03,925::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,925::Controller &gt;&gt;&gt; b&#x27;0017000d&#x27; : b&#x27;\x00\x17\x00\r&#x27;
+INFO::2017-06-19 22:16:03,925::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,926::Controller &gt;&gt;&gt; b&#x27;1c0e000d&#x27; : b&#x27;\x1c\x0e\x00\r&#x27;
+INFO::2017-06-19 22:16:03,926::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,937::Controller &gt;&gt;&gt; b&#x27;532d000d&#x27; : b&#x27;S-\x00\r&#x27;
+INFO::2017-06-19 22:16:03,937::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,938::Controller &gt;&gt;&gt; b&#x27;3f0e000d&#x27; : b&#x27;?\x0e\x00\r&#x27;
+INFO::2017-06-19 22:16:03,938::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,938::Controller &gt;&gt;&gt; b&#x27;0348000d&#x27; : b&#x27;\x03H\x00\r&#x27;
+INFO::2017-06-19 22:16:03,939::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,939::Controller &gt;&gt;&gt; b&#x27;2001000d&#x27; : b&#x27; \x01\x00\r&#x27;
+INFO::2017-06-19 22:16:03,939::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,940::Controller &gt;&gt;&gt; b&#x27;1806000d&#x27; : b&#x27;\x18\x06\x00\r&#x27;
+INFO::2017-06-19 22:16:03,940::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,940::Controller &gt;&gt;&gt; b&#x27;4771010d&#x27; : b&#x27;Gq\x01\r&#x27;
+INFO::2017-06-19 22:16:03,940::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,941::Controller &gt;&gt;&gt; b&#x27;4771010d&#x27; : b&#x27;Gq\x01\r&#x27;
+INFO::2017-06-19 22:16:03,941::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,941::Controller &gt;&gt;&gt; b&#x27;7600000d&#x27; : b&#x27;v\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,942::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,953::Controller &gt;&gt;&gt; b&#x27;2302000d&#x27; : b&#x27;#\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:03,953::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,954::Controller &gt;&gt;&gt; b&#x27;1e01000d&#x27; : b&#x27;\x1e\x01\x00\r&#x27;
+INFO::2017-06-19 22:16:03,954::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,955::Controller &gt;&gt;&gt; b&#x27;4500000d&#x27; : b&#x27;E\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,955::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,955::Controller &gt;&gt;&gt; b&#x27;001c000d&#x27; : b&#x27;\x00\x1c\x00\r&#x27;
+INFO::2017-06-19 22:16:03,955::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,956::Controller &gt;&gt;&gt; b&#x27;1a0f000d&#x27; : b&#x27;\x1a\x0f\x00\r&#x27;
+INFO::2017-06-19 22:16:03,956::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,956::Controller &gt;&gt;&gt; b&#x27;7a0a000d&#x27; : b&#x27;z\n\x00\r&#x27;
+INFO::2017-06-19 22:16:03,957::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,957::Controller &gt;&gt;&gt; b&#x27;7602000d&#x27; : b&#x27;v\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:03,957::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,957::Controller &gt;&gt;&gt; b&#x27;1908000d&#x27; : b&#x27;\x19\x08\x00\r&#x27;
+INFO::2017-06-19 22:16:03,958::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,969::Controller &gt;&gt;&gt; b&#x27;011d000d&#x27; : b&#x27;\x01\x1d\x00\r&#x27;
+INFO::2017-06-19 22:16:03,969::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,970::Controller &gt;&gt;&gt; b&#x27;7538000d&#x27; : b&#x27;u8\x00\r&#x27;
+INFO::2017-06-19 22:16:03,970::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,970::Controller &gt;&gt;&gt; b&#x27;1e06000d&#x27; : b&#x27;\x1e\x06\x00\r&#x27;
+INFO::2017-06-19 22:16:03,971::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,971::Controller &gt;&gt;&gt; b&#x27;1b00000d&#x27; : b&#x27;\x1b\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,971::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,972::Controller &gt;&gt;&gt; b&#x27;2206000d&#x27; : b&#x27;&quot;\x06\x00\r&#x27;
+INFO::2017-06-19 22:16:03,972::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,972::Controller &gt;&gt;&gt; b&#x27;6c20000d&#x27; : b&#x27;l \x00\r&#x27;
+INFO::2017-06-19 22:16:03,972::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,973::Controller &gt;&gt;&gt; b&#x27;7700000d&#x27; : b&#x27;w\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:03,973::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,973::Controller &gt;&gt;&gt; b&#x27;6814000d&#x27; : b&#x27;h\x14\x00\r&#x27;
+INFO::2017-06-19 22:16:03,974::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,985::Controller &gt;&gt;&gt; b&#x27;2301000d&#x27; : b&#x27;#\x01\x00\r&#x27;
+INFO::2017-06-19 22:16:03,985::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,986::Controller &gt;&gt;&gt; b&#x27;7902000d&#x27; : b&#x27;y\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:03,986::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,986::Controller &gt;&gt;&gt; b&#x27;4204000d&#x27; : b&#x27;B\x04\x00\r&#x27;
+INFO::2017-06-19 22:16:03,987::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,987::Controller &gt;&gt;&gt; b&#x27;011f000d&#x27; : b&#x27;\x01\x1f\x00\r&#x27;
+INFO::2017-06-19 22:16:03,987::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,988::Controller &gt;&gt;&gt; b&#x27;3518000d&#x27; : b&#x27;5\x18\x00\r&#x27;
+INFO::2017-06-19 22:16:03,988::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,988::Controller &gt;&gt;&gt; b&#x27;2702000d&#x27; : b&quot;&#x27;\x02\x00\r&quot;
+INFO::2017-06-19 22:16:03,988::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,989::Controller &gt;&gt;&gt; b&#x27;2e19000d&#x27; : b&#x27;.\x19\x00\r&#x27;
+INFO::2017-06-19 22:16:03,989::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:03,989::Controller &gt;&gt;&gt; b&#x27;7f01000d&#x27; : b&#x27;\x7f\x01\x00\r&#x27;
+INFO::2017-06-19 22:16:03,990::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,001::Controller &gt;&gt;&gt; b&#x27;1f02000d&#x27; : b&#x27;\x1f\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:04,002::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,002::Controller &gt;&gt;&gt; b&#x27;4100000d&#x27; : b&#x27;A\x00\x00\r&#x27;
+INFO::2017-06-19 22:16:04,002::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,003::Controller &gt;&gt;&gt; b&#x27;2502000d&#x27; : b&#x27;%\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:04,003::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,003::Controller &gt;&gt;&gt; b&#x27;160b000d&#x27; : b&#x27;\x16\x0b\x00\r&#x27;
+INFO::2017-06-19 22:16:04,004::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,004::Controller &gt;&gt;&gt; b&#x27;1c6e010d&#x27; : b&#x27;\x1cn\x01\r&#x27;
+INFO::2017-06-19 22:16:04,004::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,004::Controller &gt;&gt;&gt; b&#x27;767a010d&#x27; : b&#x27;vz\x01\r&#x27;
+INFO::2017-06-19 22:16:04,005::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,005::Controller &gt;&gt;&gt; b&#x27;7f18000d&#x27; : b&#x27;\x7f\x18\x00\r&#x27;
+INFO::2017-06-19 22:16:04,005::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,006::Controller &gt;&gt;&gt; b&#x27;5e45000d&#x27; : b&#x27;^E\x00\r&#x27;
+INFO::2017-06-19 22:16:04,006::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,017::Controller &gt;&gt;&gt; b&#x27;7d1b000d&#x27; : b&#x27;}\x1b\x00\r&#x27;
+INFO::2017-06-19 22:16:04,018::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,018::Controller &gt;&gt;&gt; b&#x27;1f09000d&#x27; : b&#x27;\x1f\t\x00\r&#x27;
+INFO::2017-06-19 22:16:04,018::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,019::Controller &gt;&gt;&gt; b&#x27;6920000d&#x27; : b&#x27;i \x00\r&#x27;
+INFO::2017-06-19 22:16:04,019::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,019::Controller &gt;&gt;&gt; b&#x27;697a010d&#x27; : b&#x27;iz\x01\r&#x27;
+INFO::2017-06-19 22:16:04,019::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,020::Controller &gt;&gt;&gt; b&#x27;430c000d&#x27; : b&#x27;C\x0c\x00\r&#x27;
+INFO::2017-06-19 22:16:04,020::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,020::Controller &gt;&gt;&gt; b&#x27;3023000d&#x27; : b&#x27;0#\x00\r&#x27;
+INFO::2017-06-19 22:16:04,021::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,021::Controller &gt;&gt;&gt; b&#x27;7d20000d&#x27; : b&#x27;} \x00\r&#x27;
+INFO::2017-06-19 22:16:04,021::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,022::Controller &gt;&gt;&gt; b&#x27;6c78010d&#x27; : b&#x27;lx\x01\r&#x27;
+INFO::2017-06-19 22:16:04,022::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,033::Controller &gt;&gt;&gt; b&#x27;790e010d&#x27; : b&#x27;y\x0e\x01\r&#x27;
+INFO::2017-06-19 22:16:04,034::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,034::Controller &gt;&gt;&gt; b&#x27;095c010d&#x27; : b&#x27;\t\\\x01\r&#x27;
+INFO::2017-06-19 22:16:04,034::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,035::Controller &gt;&gt;&gt; b&#x27;041b000d&#x27; : b&#x27;\x04\x1b\x00\r&#x27;
+INFO::2017-06-19 22:16:04,035::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,035::Controller &gt;&gt;&gt; b&#x27;5f36000d&#x27; : b&#x27;_6\x00\r&#x27;
+INFO::2017-06-19 22:16:04,035::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,036::Controller &gt;&gt;&gt; b&#x27;7308000d&#x27; : b&#x27;s\x08\x00\r&#x27;
+INFO::2017-06-19 22:16:04,036::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,036::Controller &gt;&gt;&gt; b&#x27;296e010d&#x27; : b&#x27;)n\x01\r&#x27;
+INFO::2017-06-19 22:16:04,037::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,037::Controller &gt;&gt;&gt; b&#x27;6718000d&#x27; : b&#x27;g\x18\x00\r&#x27;
+INFO::2017-06-19 22:16:04,037::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,038::Controller &gt;&gt;&gt; b&#x27;7e02000d&#x27; : b&#x27;~\x02\x00\r&#x27;
+INFO::2017-06-19 22:16:04,038::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,049::Controller &gt;&gt;&gt; b&#x27;6e36010d&#x27; : b&#x27;n6\x01\r&#x27;
+INFO::2017-06-19 22:16:04,049::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,050::Controller &gt;&gt;&gt; b&#x27;1a37010d&#x27; : b&#x27;\x1a7\x01\r&#x27;
+INFO::2017-06-19 22:16:04,050::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,050::Controller &gt;&gt;&gt; b&#x27;6523000d&#x27; : b&#x27;e#\x00\r&#x27;
+INFO::2017-06-19 22:16:04,051::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,051::Controller &gt;&gt;&gt; b&#x27;7a33000d&#x27; : b&#x27;z3\x00\r&#x27;
+INFO::2017-06-19 22:16:04,051::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,052::Controller &gt;&gt;&gt; b&#x27;1800010d&#x27; : b&#x27;\x18\x00\x01\r&#x27;
+INFO::2017-06-19 22:16:04,052::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,052::Controller &gt;&gt;&gt; b&#x27;0005010d&#x27; : b&#x27;\x00\x05\x01\r&#x27;
+INFO::2017-06-19 22:16:04,052::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,053::Controller &gt;&gt;&gt; b&#x27;1b72010d&#x27; : b&#x27;\x1br\x01\r&#x27;
+INFO::2017-06-19 22:16:04,053::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,054::Controller &gt;&gt;&gt; b&#x27;371b000d&#x27; : b&#x27;7\x1b\x00\r&#x27;
+INFO::2017-06-19 22:16:04,054::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,065::Controller &gt;&gt;&gt; b&#x27;7816000d&#x27; : b&#x27;x\x16\x00\r&#x27;
+INFO::2017-06-19 22:16:04,065::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,066::Controller &gt;&gt;&gt; b&#x27;4a31000d&#x27; : b&#x27;J1\x00\r&#x27;
+INFO::2017-06-19 22:16:04,066::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,066::Controller &gt;&gt;&gt; b&#x27;0228010d&#x27; : b&#x27;\x02(\x01\r&#x27;
+INFO::2017-06-19 22:16:04,067::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,067::Controller &gt;&gt;&gt; b&#x27;6b0e000d&#x27; : b&#x27;k\x0e\x00\r&#x27;
+INFO::2017-06-19 22:16:04,067::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,068::Controller &gt;&gt;&gt; b&#x27;3377010d&#x27; : b&#x27;3w\x01\r&#x27;
+INFO::2017-06-19 22:16:04,068::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,068::Controller &gt;&gt;&gt; b&#x27;1910010d&#x27; : b&#x27;\x19\x10\x01\r&#x27;
+INFO::2017-06-19 22:16:04,068::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,069::Controller &gt;&gt;&gt; b&#x27;0b01010d&#x27; : b&#x27;\x0b\x01\x01\r&#x27;
+INFO::2017-06-19 22:16:04,069::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,069::Controller &gt;&gt;&gt; b&#x27;1768010d&#x27; : b&#x27;\x17h\x01\r&#x27;
+INFO::2017-06-19 22:16:04,070::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,081::Controller &gt;&gt;&gt; b&#x27;7712000d&#x27; : b&#x27;w\x12\x00\r&#x27;
+INFO::2017-06-19 22:16:04,081::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,082::Controller &gt;&gt;&gt; b&#x27;687f010d&#x27; : b&#x27;h\x7f\x01\r&#x27;
+INFO::2017-06-19 22:16:04,082::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,082::Controller &gt;&gt;&gt; b&#x27;2709000d&#x27; : b&quot;&#x27;\t\x00\r&quot;
+INFO::2017-06-19 22:16:04,083::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,083::Controller &gt;&gt;&gt; b&#x27;716c010d&#x27; : b&#x27;ql\x01\r&#x27;
+INFO::2017-06-19 22:16:04,083::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:04,083::Controller &gt;&gt;&gt; b&#x27;0874010d&#x27; : b&#x27;\x08t\x01\r&#x27;
+INFO::2017-06-19 22:16:04,084::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:05,085::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+INFO::2017-06-19 22:16:05,085::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-19 22:16:06,086::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+INFO::2017-06-19 22:16:06,086::Test DVS packets have counts: x=64, y=54, pol=2
+</div></td></tr></tbody></table></body></html>

@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (elem.innerHTML === 'Passed') {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <p>Report generated on 19-Jun-2017 at 22:13:42 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pytest&apos;: &apos;3.0.7&apos;, &apos;pluggy&apos;: &apos;0.4.0&apos;, &apos;py&apos;: &apos;1.4.33&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.15063-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;html&apos;: &apos;1.14.2&apos;, &apos;metadata&apos;: &apos;1.5.0&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.5.3</td></tr></table>
+    <h2>Summary</h2>
+    <p>17 tests ran in 15.86 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">17 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_comports</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-19 22:13:26,622::Test Logging commences
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_id</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:26,649::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:26,649::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:26,649::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:26,662::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:26,663::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:26,790::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:26,791::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:26,792::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:26,803::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:26,937::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:27,442::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:27,445::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:27,462::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_empty_spinn</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:27,705::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:27,707::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:27,707::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:27,718::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:27,718::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:27,845::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:27,846::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:27,846::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:27,859::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:27,991::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:27,992::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:27,992::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:28,005::MBED &gt;&gt;&gt; b&#x27;00000000000d&#x27; : b&#x27;\x00\x00\x00\x00\x00\r&#x27;
+INFO::2017-06-19 22:13:28,005::MBED 0 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_wait</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:28,232::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:28,233::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:28,233::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:28,245::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:28,246::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:28,373::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:28,374::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:28,375::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:28,387::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:28,520::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:28,521::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:28,523::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:28,524::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:28,525::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:28,533::MBED &gt;&gt;&gt; b&#x27;00000000000d&#x27; : b&#x27;\x00\x00\x00\x00\x00\r&#x27;
+INFO::2017-06-19 22:13:28,534::MBED 0 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_trigger</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:28,776::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:28,778::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:28,778::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:28,789::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:28,790::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:28,917::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:28,919::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:28,919::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:28,931::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:29,064::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,065::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:29,066::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:29,067::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:29,067::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:29,077::MBED &gt;&gt;&gt; b&#x27;000000080b11114411440311111411600d&#x27; : b&#x27;\x00\x00\x00\x08\x0b\x11\x11D\x11D\x03\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:29,078::MBED 1 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_wait_trigger</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:29,303::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,303::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:29,304::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:29,316::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:29,317::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:29,446::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,447::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:29,447::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:29,458::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:29,592::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,593::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:29,595::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:29,595::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:29,596::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:29,605::MBED &gt;&gt;&gt; b&#x27;00000000000d&#x27; : b&#x27;\x00\x00\x00\x00\x00\r&#x27;
+INFO::2017-06-19 22:13:29,605::MBED 0 packets received
+DEBUG::2017-06-19 22:13:29,606::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:29,607::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:29,607::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:29,621::MBED &gt;&gt;&gt; b&#x27;000000080b11114411440311111411600d&#x27; : b&#x27;\x00\x00\x00\x08\x0b\x11\x11D\x11D\x03\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:29,622::MBED 1 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_read_clears</td>
+          <td class="col-duration">0.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:29,846::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,847::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:29,847::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:29,860::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:29,860::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:29,989::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:29,991::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:29,991::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:30,003::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:30,135::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:30,136::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:30,138::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:30,148::MBED &gt;&gt;&gt; b&#x27;00000000000d&#x27; : b&#x27;\x00\x00\x00\x00\x00\r&#x27;
+INFO::2017-06-19 22:13:30,149::MBED 0 packets received
+DEBUG::2017-06-19 22:13:30,149::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:30,150::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:30,165::MBED &gt;&gt;&gt; b&#x27;000000080b11114411440311111411600d&#x27; : b&#x27;\x00\x00\x00\x08\x0b\x11\x11D\x11D\x03\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:30,165::MBED 1 packets received
+DEBUG::2017-06-19 22:13:30,166::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:30,180::MBED &gt;&gt;&gt; b&#x27;00000000000d&#x27; : b&#x27;\x00\x00\x00\x00\x00\r&#x27;
+INFO::2017-06-19 22:13:30,180::MBED 0 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_sim_spinn</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:30,406::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:30,407::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:30,407::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:30,419::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:30,420::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:30,549::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:30,550::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:30,550::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:30,562::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:30,695::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:30,697::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:30,698::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:30,699::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:30,700::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:30,709::MBED &gt;&gt;&gt; b&#x27;000000070b11114411440311111411600d&#x27; : b&#x27;\x00\x00\x00\x07\x0b\x11\x11D\x11D\x03\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:30,709::MBED 1 packets received
+INFO::2017-06-19 22:13:30,710::Test Got packet [17, 17, 68, 17, 68, 3, 17, 17, 20, 17, 96]
+INFO::2017-06-19 22:13:30,710::Test Expected   [17, 17, 68, 17, 68, 3, 17, 17, 20, 17, 96]
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_sim_duration</td>
+          <td class="col-duration">0.11</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:30,950::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:30,952::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:30,952::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:30,964::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:30,964::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:31,093::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:31,094::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:31,094::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:31,106::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:31,239::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:31,240::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:31,242::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:31,243::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:31,344::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:31,345::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:31,349::MBED &gt;&gt;&gt; b&#x27;00018a6916111144114403111114116011114411440311111411600d&#x27; : b&#x27;\x00\x01\x8ai\x16\x11\x11D\x11D\x03\x11\x11\x14\x11`\x11\x11D\x11D\x03\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:31,349::MBED 2 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_sim_many_packets</td>
+          <td class="col-duration">0.06</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:31,589::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:31,590::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:31,591::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:31,603::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:31,603::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:31,734::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:31,735::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:31,736::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:31,747::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:31,878::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:31,879::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:31,879::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:31,879::MBED &lt;&lt;&lt; b&#x27;73696d5f11114411440311111411600d&#x27; : &#x27;sim_DD`&#x27;
+DEBUG::2017-06-19 22:13:31,890::MBED &lt;&lt;&lt; b&#x27;73696d5f12114844420311111411600d&#x27; : &#x27;sim_HDB`&#x27;
+DEBUG::2017-06-19 22:13:31,900::MBED &lt;&lt;&lt; b&#x27;73696d5f11111811110311111411600d&#x27; : &#x27;sim_`&#x27;
+DEBUG::2017-06-19 22:13:31,911::MBED &lt;&lt;&lt; b&#x27;73696d5f12112206120c11111411600d&#x27; : &#x27;sim_&quot;`&#x27;
+DEBUG::2017-06-19 22:13:31,922::MBED &lt;&lt;&lt; b&#x27;73696d5f11110909090911111411600d&#x27; : &#x27;sim_				`&#x27;
+DEBUG::2017-06-19 22:13:31,933::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:31,941::MBED &gt;&gt;&gt; b&#x27;0000a6d83711114411440311111411601211484442031111141160111118111103111114116012112206120c111114116011110909090911111411600d&#x27; : b&#x27;\x00\x00\xa6\xd87\x11\x11D\x11D\x03\x11\x11\x14\x11`\x12\x11HDB\x03\x11\x11\x14\x11`\x11\x11\x18\x11\x11\x03\x11\x11\x14\x11`\x12\x11&quot;\x06\x12\x0c\x11\x11\x14\x11`\x11\x11\t\t\t\t\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:31,941::MBED 5 packets received
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mbed_only.py::test_sim_buffer_spinn</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:32,181::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,182::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:32,182::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,195::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:32,195::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:32,325::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,326::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:32,326::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,339::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:32,470::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,471::MBED Opened serial port COM9
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:32,472::MBED &lt;&lt;&lt; b&#x27;7573706e12112124111111111411600d&#x27; : &#x27;uspn!$`&#x27;
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_single_packet</td>
+          <td class="col-duration">0.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-19 22:13:32,684::Test Logging commences
+INFO::2017-06-19 22:13:32,684::Test Logging commences
+DEBUG::2017-06-19 22:13:32,709::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,709::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,711::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:32,711::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:32,711::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,711::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,723::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:32,723::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:32,724::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:32,724::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:32,854::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,854::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,854::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:32,854::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:32,854::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,854::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:32,867::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:32,867::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:32,998::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:32,998::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,000::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:33,000::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:33,007::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:33,007::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:33,013::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,013::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,015::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:33,015::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:33,015::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:33,015::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:33,027::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:33,027::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:33,027::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:33,027::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:33,027::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:33,027::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:33,043::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:33,043::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:33,043::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:33,043::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:33,173::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,173::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,175::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:33,175::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:33,177::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:33,177::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:33,178::Controller &lt;&lt;&lt; b&#x27;6d73706e000d&#x27; : &#x27;mspn &#x27;
+DEBUG::2017-06-19 22:13:33,178::Controller &lt;&lt;&lt; b&#x27;6d73706e000d&#x27; : &#x27;mspn &#x27;
+DEBUG::2017-06-19 22:13:33,186::Controller &gt;&gt;&gt; b&#x27;6d73706e000d&#x27; : b&#x27;mspn\x00\r&#x27;
+DEBUG::2017-06-19 22:13:33,186::Controller &gt;&gt;&gt; b&#x27;6d73706e000d&#x27; : b&#x27;mspn\x00\r&#x27;
+DEBUG::2017-06-19 22:13:33,203::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:33,203::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:33,203::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:33,203::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:33,204::Controller &lt;&lt;&lt; b&#x27;756476730a1e010d&#x27; : &#x27;udvs
+&#x27;
+DEBUG::2017-06-19 22:13:33,204::Controller &lt;&lt;&lt; b&#x27;756476730a1e010d&#x27; : &#x27;udvs
+&#x27;
+DEBUG::2017-06-19 22:13:33,219::Controller &gt;&gt;&gt; b&#x27;756476730a1e010d&#x27; : b&#x27;udvs\n\x1e\x01\r&#x27;
+DEBUG::2017-06-19 22:13:33,219::Controller &gt;&gt;&gt; b&#x27;756476730a1e010d&#x27; : b&#x27;udvs\n\x1e\x01\r&#x27;
+DEBUG::2017-06-19 22:13:33,220::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:33,220::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:33,220::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:33,220::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:33,321::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:33,321::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:33,330::MBED &gt;&gt;&gt; b&#x27;000027f80b11114411090311111411600d&#x27; : b&quot;\x00\x00&#x27;\xf8\x0b\x11\x11D\x11\t\x03\x11\x11\x14\x11`\r&quot;
+DEBUG::2017-06-19 22:13:33,330::MBED &gt;&gt;&gt; b&#x27;000027f80b11114411090311111411600d&#x27; : b&quot;\x00\x00&#x27;\xf8\x0b\x11\x11D\x11\t\x03\x11\x11\x14\x11`\r&quot;
+INFO::2017-06-19 22:13:33,331::MBED 1 packets received
+INFO::2017-06-19 22:13:33,331::MBED 1 packets received
+INFO::2017-06-19 22:13:33,331::Test Got packet data: [&#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x44&#x27;, &#x27;0x11&#x27;, &#x27;0x9&#x27;, &#x27;0x3&#x27;, &#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x14&#x27;, &#x27;0x11&#x27;, &#x27;0x60&#x27;]
+INFO::2017-06-19 22:13:33,331::Test Got packet data: [&#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x44&#x27;, &#x27;0x11&#x27;, &#x27;0x9&#x27;, &#x27;0x3&#x27;, &#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x14&#x27;, &#x27;0x11&#x27;, &#x27;0x60&#x27;]
+INFO::2017-06-19 22:13:33,331::Test Calculated data: [&#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x44&#x27;, &#x27;0x11&#x27;, &#x27;0x9&#x27;, &#x27;0x3&#x27;, &#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x14&#x27;, &#x27;0x11&#x27;, &#x27;0x60&#x27;]
+INFO::2017-06-19 22:13:33,331::Test Calculated data: [&#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x44&#x27;, &#x27;0x11&#x27;, &#x27;0x9&#x27;, &#x27;0x3&#x27;, &#x27;0x11&#x27;, &#x27;0x11&#x27;, &#x27;0x14&#x27;, &#x27;0x11&#x27;, &#x27;0x60&#x27;]
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_many_packets[2]</td>
+          <td class="col-duration">0.16</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:33,876::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,876::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:33,877::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:33,877::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:33,878::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:33,878::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:33,890::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:33,890::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:33,890::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:33,890::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:34,021::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,021::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,021::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:34,021::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:34,022::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:34,022::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:34,034::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:34,034::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:34,164::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,164::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,166::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:34,166::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:34,173::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:34,173::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:34,180::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,180::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,182::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:34,182::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:34,183::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:34,183::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:34,194::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:34,194::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:34,195::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:34,195::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:34,195::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:34,195::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:34,210::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:34,210::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:34,210::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:34,210::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:34,340::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,340::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:34,341::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:34,341::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:34,342::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:34,342::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:34,354::MBED &gt;&gt;&gt; b&#x27;00000008013a0d&#x27; : b&#x27;\x00\x00\x00\x08\x01:\r&#x27;
+DEBUG::2017-06-19 22:13:34,354::MBED &gt;&gt;&gt; b&#x27;00000008013a0d&#x27; : b&#x27;\x00\x00\x00\x08\x01:\r&#x27;
+INFO::2017-06-19 22:13:34,354::MBED 0 packets received
+INFO::2017-06-19 22:13:34,354::MBED 0 packets received
+DEBUG::2017-06-19 22:13:34,355::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:34,355::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:34,355::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:34,355::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:34,370::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:34,370::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:34,371::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:34,371::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:34,371::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:34,371::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:34,372::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:34,372::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:34,386::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:34,386::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:34,387::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:34,387::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:34,387::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:34,387::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:34,387::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:34,387::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:34,488::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:34,488::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:34,499::MBED &gt;&gt;&gt; b&#x27;000053e616121103110644111114116012111442480c11111411600d&#x27; : b&#x27;\x00\x00S\xe6\x16\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\r&#x27;
+DEBUG::2017-06-19 22:13:34,499::MBED &gt;&gt;&gt; b&#x27;000053e616121103110644111114116012111442480c11111411600d&#x27; : b&#x27;\x00\x00S\xe6\x16\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:34,500::MBED 2 packets received
+INFO::2017-06-19 22:13:34,500::MBED 2 packets received
+INFO::2017-06-19 22:13:34,501::Test Test for 2 packets took 0.021478s with 0.010739s per packet
+INFO::2017-06-19 22:13:34,501::Test Test for 2 packets took 0.021478s with 0.010739s per packet
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_many_packets[3]</td>
+          <td class="col-duration">0.22</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:35,060::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,060::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,062::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:35,062::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:35,062::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,062::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,074::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:35,074::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:35,074::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:35,074::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:35,204::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,204::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,204::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:35,204::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:35,204::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,204::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,218::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:35,218::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:35,348::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,348::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,350::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:35,350::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:35,358::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:35,358::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:35,364::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,364::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,365::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:35,365::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:35,366::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,366::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:35,378::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:35,378::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:35,379::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:35,379::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:35,380::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:35,380::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:35,394::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:35,394::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:35,395::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:35,395::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:35,524::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,524::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:35,528::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:35,528::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:35,529::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:35,529::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:35,537::MBED &gt;&gt;&gt; b&#x27;0000000801780d&#x27; : b&#x27;\x00\x00\x00\x08\x01x\r&#x27;
+DEBUG::2017-06-19 22:13:35,537::MBED &gt;&gt;&gt; b&#x27;0000000801780d&#x27; : b&#x27;\x00\x00\x00\x08\x01x\r&#x27;
+INFO::2017-06-19 22:13:35,538::MBED 0 packets received
+INFO::2017-06-19 22:13:35,538::MBED 0 packets received
+DEBUG::2017-06-19 22:13:35,538::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:35,538::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:35,539::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:35,539::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:35,554::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:35,554::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:35,556::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:35,556::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:35,556::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:35,556::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:35,557::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:35,557::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:35,570::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:35,570::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:35,572::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:35,572::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:35,572::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:35,572::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:35,573::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:35,573::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:35,586::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:35,586::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:35,587::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:35,587::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:35,588::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:35,588::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:35,589::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:35,589::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:35,741::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:35,741::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:35,747::MBED &gt;&gt;&gt; b&#x27;00007fd421121103110644111114116012111442480c111114116011114112444411111411600d&#x27; : b&#x27;\x00\x00\x7f\xd4!\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\r&#x27;
+DEBUG::2017-06-19 22:13:35,747::MBED &gt;&gt;&gt; b&#x27;00007fd421121103110644111114116012111442480c111114116011114112444411111411600d&#x27; : b&#x27;\x00\x00\x7f\xd4!\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:35,747::MBED 3 packets received
+INFO::2017-06-19 22:13:35,747::MBED 3 packets received
+INFO::2017-06-19 22:13:35,747::Test Test for 3 packets took 0.032724s with 0.010908s per packet
+INFO::2017-06-19 22:13:35,747::Test Test for 3 packets took 0.032724s with 0.010908s per packet
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_many_packets[10]</td>
+          <td class="col-duration">0.70</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:36,308::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,308::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,310::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:36,310::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:36,311::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,311::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,322::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:36,322::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:36,323::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:36,323::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:36,452::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,452::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,454::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:36,454::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:36,454::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,454::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,466::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:36,466::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:36,595::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,595::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,595::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:36,595::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:36,598::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:36,598::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:36,612::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,612::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,613::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:36,613::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:36,614::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,614::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:36,625::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:36,625::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:36,626::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,626::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,626::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,626::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,642::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:36,642::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:36,642::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:36,642::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:36,772::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,772::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:36,774::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:36,774::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:36,776::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:36,776::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:36,785::MBED &gt;&gt;&gt; b&#x27;00000008010c0d&#x27; : b&#x27;\x00\x00\x00\x08\x01\x0c\r&#x27;
+DEBUG::2017-06-19 22:13:36,785::MBED &gt;&gt;&gt; b&#x27;00000008010c0d&#x27; : b&#x27;\x00\x00\x00\x08\x01\x0c\r&#x27;
+INFO::2017-06-19 22:13:36,786::MBED 0 packets received
+INFO::2017-06-19 22:13:36,786::MBED 0 packets received
+DEBUG::2017-06-19 22:13:36,786::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:36,786::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:36,788::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:36,788::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:36,802::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,802::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,803::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,803::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,804::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,804::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,804::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:36,804::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:36,818::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,818::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,819::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,819::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,820::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,820::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,820::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:36,820::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:36,834::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,834::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,835::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,835::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,836::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,836::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,836::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:36,836::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:36,850::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,850::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,851::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,851::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,851::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,851::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,852::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:36,852::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:36,865::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,865::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,867::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,867::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,868::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,868::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,868::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:36,868::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:36,882::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,882::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,883::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,883::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,884::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,884::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,884::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:36,884::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:36,898::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,898::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,900::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,900::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,900::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,900::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,901::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:36,901::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:36,914::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,914::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,915::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,915::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,916::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,916::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,916::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:36,916::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:36,929::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,929::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:36,930::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,930::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,931::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,931::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,931::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:36,931::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:36,945::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,945::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:36,946::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:36,946::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:36,947::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:36,947::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:36,947::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:36,947::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:37,449::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:37,449::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:37,474::MBED &gt;&gt;&gt; b&#x27;0001b35b6e121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c1111141160121103181244111114116011111403090611111411600d&#x27; : b&#x27;\x00\x01\xb3[n\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\r&#x27;
+DEBUG::2017-06-19 22:13:37,474::MBED &gt;&gt;&gt; b&#x27;0001b35b6e121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c1111141160121103181244111114116011111403090611111411600d&#x27; : b&#x27;\x00\x01\xb3[n\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:37,475::MBED 10 packets received
+INFO::2017-06-19 22:13:37,475::MBED 10 packets received
+INFO::2017-06-19 22:13:37,476::Test Test for 10 packets took 0.111451s with 0.011145s per packet
+INFO::2017-06-19 22:13:37,476::Test Test for 10 packets took 0.111451s with 0.011145s per packet
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_many_packets[15]</td>
+          <td class="col-duration">1.04</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:38,029::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,029::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,031::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:38,031::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:38,031::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,031::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,043::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:38,043::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:38,043::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:38,043::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:38,164::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,164::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,166::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:38,166::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:38,166::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,166::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,177::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:38,177::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:38,301::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,301::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,302::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:38,302::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:38,311::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:38,311::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:38,323::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,323::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,325::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:38,325::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:38,326::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,326::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:38,337::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:38,337::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:38,338::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,338::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,339::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,339::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,353::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:38,353::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:38,354::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:38,354::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:38,484::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,484::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:38,485::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:38,485::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:38,488::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:38,488::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:38,491::MBED &gt;&gt;&gt; b&#x27;0000000801240d&#x27; : b&#x27;\x00\x00\x00\x08\x01$\r&#x27;
+DEBUG::2017-06-19 22:13:38,491::MBED &gt;&gt;&gt; b&#x27;0000000801240d&#x27; : b&#x27;\x00\x00\x00\x08\x01$\r&#x27;
+INFO::2017-06-19 22:13:38,492::MBED 0 packets received
+INFO::2017-06-19 22:13:38,492::MBED 0 packets received
+DEBUG::2017-06-19 22:13:38,492::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:38,492::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:38,494::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:38,494::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:38,513::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,513::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,515::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,515::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,515::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,515::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,516::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:38,516::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:38,530::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,530::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,531::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,531::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,532::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,532::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,532::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:38,532::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:38,545::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,545::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,547::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,547::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,548::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,548::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,548::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:38,548::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:38,561::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,561::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,563::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,563::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,564::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,564::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,564::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:38,564::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:38,577::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,577::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,579::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,579::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,579::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,579::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,580::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:38,580::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:38,593::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,593::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,595::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,595::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,595::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,595::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,596::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:38,596::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:38,609::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,609::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,611::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,611::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,611::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,611::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,612::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:38,612::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:38,625::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,625::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,627::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,627::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,627::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,627::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,628::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:38,628::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:38,641::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,641::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,643::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,643::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,643::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,643::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,644::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:38,644::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:38,657::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,657::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,659::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,659::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,659::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,659::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,660::Controller &lt;&lt;&lt; b&#x27;75647673483c000d&#x27; : &#x27;udvsH&lt; &#x27;
+DEBUG::2017-06-19 22:13:38,660::Controller &lt;&lt;&lt; b&#x27;75647673483c000d&#x27; : &#x27;udvsH&lt; &#x27;
+DEBUG::2017-06-19 22:13:38,673::Controller &gt;&gt;&gt; b&#x27;75647673483c000d&#x27; : b&#x27;udvsH&lt;\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,673::Controller &gt;&gt;&gt; b&#x27;75647673483c000d&#x27; : b&#x27;udvsH&lt;\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,675::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,675::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,675::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,675::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,676::Controller &lt;&lt;&lt; b&#x27;756476734e39010d&#x27; : &#x27;udvsN9&#x27;
+DEBUG::2017-06-19 22:13:38,676::Controller &lt;&lt;&lt; b&#x27;756476734e39010d&#x27; : &#x27;udvsN9&#x27;
+DEBUG::2017-06-19 22:13:38,689::Controller &gt;&gt;&gt; b&#x27;756476734e39010d&#x27; : b&#x27;udvsN9\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,689::Controller &gt;&gt;&gt; b&#x27;756476734e39010d&#x27; : b&#x27;udvsN9\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,691::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,691::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,691::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,691::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,692::Controller &lt;&lt;&lt; b&#x27;756476735436000d&#x27; : &#x27;udvsT6 &#x27;
+DEBUG::2017-06-19 22:13:38,692::Controller &lt;&lt;&lt; b&#x27;756476735436000d&#x27; : &#x27;udvsT6 &#x27;
+DEBUG::2017-06-19 22:13:38,705::Controller &gt;&gt;&gt; b&#x27;756476735436000d&#x27; : b&#x27;udvsT6\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,705::Controller &gt;&gt;&gt; b&#x27;756476735436000d&#x27; : b&#x27;udvsT6\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,707::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,707::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,707::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,707::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,708::Controller &lt;&lt;&lt; b&#x27;756476735a33010d&#x27; : &#x27;udvsZ3&#x27;
+DEBUG::2017-06-19 22:13:38,708::Controller &lt;&lt;&lt; b&#x27;756476735a33010d&#x27; : &#x27;udvsZ3&#x27;
+DEBUG::2017-06-19 22:13:38,721::Controller &gt;&gt;&gt; b&#x27;756476735a33010d&#x27; : b&#x27;udvsZ3\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,721::Controller &gt;&gt;&gt; b&#x27;756476735a33010d&#x27; : b&#x27;udvsZ3\x01\r&#x27;
+DEBUG::2017-06-19 22:13:38,724::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,724::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,724::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,724::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,725::Controller &lt;&lt;&lt; b&#x27;756476736030000d&#x27; : &#x27;udvs`0 &#x27;
+DEBUG::2017-06-19 22:13:38,725::Controller &lt;&lt;&lt; b&#x27;756476736030000d&#x27; : &#x27;udvs`0 &#x27;
+DEBUG::2017-06-19 22:13:38,738::Controller &gt;&gt;&gt; b&#x27;756476736030000d&#x27; : b&#x27;udvs`0\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,738::Controller &gt;&gt;&gt; b&#x27;756476736030000d&#x27; : b&#x27;udvs`0\x00\r&#x27;
+DEBUG::2017-06-19 22:13:38,739::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:38,739::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:38,740::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:38,740::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:38,741::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:38,741::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:39,492::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:39,492::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:39,521::MBED &gt;&gt;&gt; b&#x27;00028f05a5121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c111114116012110318124411111411601111140309061111141160121141210c42111114116011110c03030611111411601111212248421111141160111144064206111114116012111124414211111411600d&#x27; : b&#x27;\x00\x02\x8f\x05\xa5\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\x12\x11A!\x0cB\x11\x11\x14\x11`\x11\x11\x0c\x03\x03\x06\x11\x11\x14\x11`\x11\x11!&quot;HB\x11\x11\x14\x11`\x11\x11D\x06B\x06\x11\x11\x14\x11`\x12\x11\x11$AB\x11\x11\x14\x11`\r&#x27;
+DEBUG::2017-06-19 22:13:39,521::MBED &gt;&gt;&gt; b&#x27;00028f05a5121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c111114116012110318124411111411601111140309061111141160121141210c42111114116011110c03030611111411601111212248421111141160111144064206111114116012111124414211111411600d&#x27; : b&#x27;\x00\x02\x8f\x05\xa5\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\x12\x11A!\x0cB\x11\x11\x14\x11`\x11\x11\x0c\x03\x03\x06\x11\x11\x14\x11`\x11\x11!&quot;HB\x11\x11\x14\x11`\x11\x11D\x06B\x06\x11\x11\x14\x11`\x12\x11\x11$AB\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:39,523::MBED 15 packets received
+INFO::2017-06-19 22:13:39,523::MBED 15 packets received
+INFO::2017-06-19 22:13:39,523::Test Test for 15 packets took 0.167685s with 0.011179s per packet
+INFO::2017-06-19 22:13:39,523::Test Test for 15 packets took 0.167685s with 0.011179s per packet
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_board_mbed.py::test_many_packets[20]</td>
+          <td class="col-duration">1.38</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:13:40,073::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,073::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,074::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:40,074::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:40,074::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,074::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,086::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:40,086::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-19 22:13:40,087::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:40,087::MBED Responding device found on port COM9
+DEBUG::2017-06-19 22:13:40,211::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,211::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,213::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:40,213::MBED Opened serial port COM6
+DEBUG::2017-06-19 22:13:40,214::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,214::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,225::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:40,225::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:40,345::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,345::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,347::MBED Opened serial port COM9
+DEBUG::2017-06-19 22:13:40,347::MBED Opened serial port COM9
+INFO::2017-06-19 22:13:40,355::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+INFO::2017-06-19 22:13:40,355::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-19 22:13:40,371::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,371::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,372::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:40,372::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:40,373::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,373::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-19 22:13:40,384::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:40,384::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-19 22:13:40,385::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,385::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,386::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,386::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,400::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:40,400::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-19 22:13:40,401::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:40,401::Controller Responding device found on port COM6
+DEBUG::2017-06-19 22:13:40,531::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,531::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,533::Controller Opened serial port COM6
+DEBUG::2017-06-19 22:13:40,533::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:13:40,535::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:40,535::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:40,550::MBED &gt;&gt;&gt; b&#x27;0000000801740d&#x27; : b&#x27;\x00\x00\x00\x08\x01t\r&#x27;
+DEBUG::2017-06-19 22:13:40,550::MBED &gt;&gt;&gt; b&#x27;0000000801740d&#x27; : b&#x27;\x00\x00\x00\x08\x01t\r&#x27;
+INFO::2017-06-19 22:13:40,551::MBED 0 packets received
+INFO::2017-06-19 22:13:40,551::MBED 0 packets received
+DEBUG::2017-06-19 22:13:40,552::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:40,552::MBED &lt;&lt;&lt; b&#x27;776169740d&#x27; : &#x27;wait&#x27;
+DEBUG::2017-06-19 22:13:40,553::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:40,553::Controller &lt;&lt;&lt; b&#x27;756476730c5a000d&#x27; : &#x27;udvsZ &#x27;
+DEBUG::2017-06-19 22:13:40,561::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,561::Controller &gt;&gt;&gt; b&#x27;756476730c5a000d&#x27; : b&#x27;udvs\x0cZ\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,577::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,577::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,578::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,578::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,578::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:40,578::Controller &lt;&lt;&lt; b&#x27;756476731257010d&#x27; : &#x27;udvsW&#x27;
+DEBUG::2017-06-19 22:13:40,592::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,592::Controller &gt;&gt;&gt; b&#x27;756476731257010d&#x27; : b&#x27;udvs\x12W\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,593::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,593::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,594::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,594::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,594::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:40,594::Controller &lt;&lt;&lt; b&#x27;756476731854000d&#x27; : &#x27;udvsT &#x27;
+DEBUG::2017-06-19 22:13:40,608::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,608::Controller &gt;&gt;&gt; b&#x27;756476731854000d&#x27; : b&#x27;udvs\x18T\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,609::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,609::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,610::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,610::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,610::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:40,610::Controller &lt;&lt;&lt; b&#x27;756476731e51010d&#x27; : &#x27;udvsQ&#x27;
+DEBUG::2017-06-19 22:13:40,624::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,624::Controller &gt;&gt;&gt; b&#x27;756476731e51010d&#x27; : b&#x27;udvs\x1eQ\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,625::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,625::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,626::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,626::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,626::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:40,626::Controller &lt;&lt;&lt; b&#x27;75647673244e000d&#x27; : &#x27;udvs$N &#x27;
+DEBUG::2017-06-19 22:13:40,640::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,640::Controller &gt;&gt;&gt; b&#x27;75647673244e000d&#x27; : b&#x27;udvs$N\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,641::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,641::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,642::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,642::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,642::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:40,642::Controller &lt;&lt;&lt; b&#x27;756476732a4b010d&#x27; : &#x27;udvs*K&#x27;
+DEBUG::2017-06-19 22:13:40,656::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,656::Controller &gt;&gt;&gt; b&#x27;756476732a4b010d&#x27; : b&#x27;udvs*K\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,657::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,657::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,657::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,657::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,658::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:40,658::Controller &lt;&lt;&lt; b&#x27;756476733048000d&#x27; : &#x27;udvs0H &#x27;
+DEBUG::2017-06-19 22:13:40,672::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,672::Controller &gt;&gt;&gt; b&#x27;756476733048000d&#x27; : b&#x27;udvs0H\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,674::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,674::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,675::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,675::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,675::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:40,675::Controller &lt;&lt;&lt; b&#x27;756476733645010d&#x27; : &#x27;udvs6E&#x27;
+DEBUG::2017-06-19 22:13:40,688::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,688::Controller &gt;&gt;&gt; b&#x27;756476733645010d&#x27; : b&#x27;udvs6E\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,690::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,690::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,691::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,691::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,691::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:40,691::Controller &lt;&lt;&lt; b&#x27;756476733c42000d&#x27; : &#x27;udvs&lt;B &#x27;
+DEBUG::2017-06-19 22:13:40,705::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,705::Controller &gt;&gt;&gt; b&#x27;756476733c42000d&#x27; : b&#x27;udvs&lt;B\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,706::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,706::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,707::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,707::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,707::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:40,707::Controller &lt;&lt;&lt; b&#x27;75647673423f010d&#x27; : &#x27;udvsB?&#x27;
+DEBUG::2017-06-19 22:13:40,721::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,721::Controller &gt;&gt;&gt; b&#x27;75647673423f010d&#x27; : b&#x27;udvsB?\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,722::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,722::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,723::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,723::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,723::Controller &lt;&lt;&lt; b&#x27;75647673483c000d&#x27; : &#x27;udvsH&lt; &#x27;
+DEBUG::2017-06-19 22:13:40,723::Controller &lt;&lt;&lt; b&#x27;75647673483c000d&#x27; : &#x27;udvsH&lt; &#x27;
+DEBUG::2017-06-19 22:13:40,737::Controller &gt;&gt;&gt; b&#x27;75647673483c000d&#x27; : b&#x27;udvsH&lt;\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,737::Controller &gt;&gt;&gt; b&#x27;75647673483c000d&#x27; : b&#x27;udvsH&lt;\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,738::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,738::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,739::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,739::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,740::Controller &lt;&lt;&lt; b&#x27;756476734e39010d&#x27; : &#x27;udvsN9&#x27;
+DEBUG::2017-06-19 22:13:40,740::Controller &lt;&lt;&lt; b&#x27;756476734e39010d&#x27; : &#x27;udvsN9&#x27;
+DEBUG::2017-06-19 22:13:40,753::Controller &gt;&gt;&gt; b&#x27;756476734e39010d&#x27; : b&#x27;udvsN9\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,753::Controller &gt;&gt;&gt; b&#x27;756476734e39010d&#x27; : b&#x27;udvsN9\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,754::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,754::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,755::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,755::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,756::Controller &lt;&lt;&lt; b&#x27;756476735436000d&#x27; : &#x27;udvsT6 &#x27;
+DEBUG::2017-06-19 22:13:40,756::Controller &lt;&lt;&lt; b&#x27;756476735436000d&#x27; : &#x27;udvsT6 &#x27;
+DEBUG::2017-06-19 22:13:40,768::Controller &gt;&gt;&gt; b&#x27;756476735436000d&#x27; : b&#x27;udvsT6\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,768::Controller &gt;&gt;&gt; b&#x27;756476735436000d&#x27; : b&#x27;udvsT6\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,770::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,770::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,771::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,771::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,772::Controller &lt;&lt;&lt; b&#x27;756476735a33010d&#x27; : &#x27;udvsZ3&#x27;
+DEBUG::2017-06-19 22:13:40,772::Controller &lt;&lt;&lt; b&#x27;756476735a33010d&#x27; : &#x27;udvsZ3&#x27;
+DEBUG::2017-06-19 22:13:40,785::Controller &gt;&gt;&gt; b&#x27;756476735a33010d&#x27; : b&#x27;udvsZ3\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,785::Controller &gt;&gt;&gt; b&#x27;756476735a33010d&#x27; : b&#x27;udvsZ3\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,786::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,786::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,787::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,787::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,788::Controller &lt;&lt;&lt; b&#x27;756476736030000d&#x27; : &#x27;udvs`0 &#x27;
+DEBUG::2017-06-19 22:13:40,788::Controller &lt;&lt;&lt; b&#x27;756476736030000d&#x27; : &#x27;udvs`0 &#x27;
+DEBUG::2017-06-19 22:13:40,800::Controller &gt;&gt;&gt; b&#x27;756476736030000d&#x27; : b&#x27;udvs`0\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,800::Controller &gt;&gt;&gt; b&#x27;756476736030000d&#x27; : b&#x27;udvs`0\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,801::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,801::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,802::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,802::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,802::Controller &lt;&lt;&lt; b&#x27;75647673662d010d&#x27; : &#x27;udvsf-&#x27;
+DEBUG::2017-06-19 22:13:40,802::Controller &lt;&lt;&lt; b&#x27;75647673662d010d&#x27; : &#x27;udvsf-&#x27;
+DEBUG::2017-06-19 22:13:40,816::Controller &gt;&gt;&gt; b&#x27;75647673662d010d&#x27; : b&#x27;udvsf-\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,816::Controller &gt;&gt;&gt; b&#x27;75647673662d010d&#x27; : b&#x27;udvsf-\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,817::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,817::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,817::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,817::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,818::Controller &lt;&lt;&lt; b&#x27;756476736c2a000d&#x27; : &#x27;udvsl* &#x27;
+DEBUG::2017-06-19 22:13:40,818::Controller &lt;&lt;&lt; b&#x27;756476736c2a000d&#x27; : &#x27;udvsl* &#x27;
+DEBUG::2017-06-19 22:13:40,832::Controller &gt;&gt;&gt; b&#x27;756476736c2a000d&#x27; : b&#x27;udvsl*\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,832::Controller &gt;&gt;&gt; b&#x27;756476736c2a000d&#x27; : b&#x27;udvsl*\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,833::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,833::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,833::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,833::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,833::Controller &lt;&lt;&lt; b&#x27;756476737227010d&#x27; : &#x27;udvsr&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,833::Controller &lt;&lt;&lt; b&#x27;756476737227010d&#x27; : &#x27;udvsr&#x27;&#x27;
+DEBUG::2017-06-19 22:13:40,848::Controller &gt;&gt;&gt; b&#x27;756476737227010d&#x27; : b&quot;udvsr&#x27;\x01\r&quot;
+DEBUG::2017-06-19 22:13:40,848::Controller &gt;&gt;&gt; b&#x27;756476737227010d&#x27; : b&quot;udvsr&#x27;\x01\r&quot;
+DEBUG::2017-06-19 22:13:40,849::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,849::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,849::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,849::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,850::Controller &lt;&lt;&lt; b&#x27;756476737824000d&#x27; : &#x27;udvsx$ &#x27;
+DEBUG::2017-06-19 22:13:40,850::Controller &lt;&lt;&lt; b&#x27;756476737824000d&#x27; : &#x27;udvsx$ &#x27;
+DEBUG::2017-06-19 22:13:40,864::Controller &gt;&gt;&gt; b&#x27;756476737824000d&#x27; : b&#x27;udvsx$\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,864::Controller &gt;&gt;&gt; b&#x27;756476737824000d&#x27; : b&#x27;udvsx$\x00\r&#x27;
+DEBUG::2017-06-19 22:13:40,865::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,865::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,866::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,866::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,866::Controller &lt;&lt;&lt; b&#x27;756476737e21010d&#x27; : &#x27;udvs~!&#x27;
+DEBUG::2017-06-19 22:13:40,866::Controller &lt;&lt;&lt; b&#x27;756476737e21010d&#x27; : &#x27;udvs~!&#x27;
+DEBUG::2017-06-19 22:13:40,880::Controller &gt;&gt;&gt; b&#x27;756476737e21010d&#x27; : b&#x27;udvs~!\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,880::Controller &gt;&gt;&gt; b&#x27;756476737e21010d&#x27; : b&#x27;udvs~!\x01\r&#x27;
+DEBUG::2017-06-19 22:13:40,881::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+DEBUG::2017-06-19 22:13:40,881::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-19 22:13:40,882::Controller Response received: 000 Success
+INFO::2017-06-19 22:13:40,882::Controller Response received: 000 Success
+DEBUG::2017-06-19 22:13:40,882::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:40,882::MBED &lt;&lt;&lt; b&#x27;747269670d&#x27; : &#x27;trig&#x27;
+DEBUG::2017-06-19 22:13:41,882::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:41,882::MBED &lt;&lt;&lt; b&#x27;6773706e0d&#x27; : &#x27;gspn&#x27;
+DEBUG::2017-06-19 22:13:41,913::MBED &gt;&gt;&gt; b&#x27;00036ab3dc121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c111114116012110318124411111411601111140309061111141160121141210c42111114116011110c03030611111411601111212248421111141160111144064206111114116012111124414211111411601111240c2406111114116011110324224211111411601111140918061111141160121141281442111114116011110c09110611111411600d&#x27; : b&#x27;\x00\x03j\xb3\xdc\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\x12\x11A!\x0cB\x11\x11\x14\x11`\x11\x11\x0c\x03\x03\x06\x11\x11\x14\x11`\x11\x11!&quot;HB\x11\x11\x14\x11`\x11\x11D\x06B\x06\x11\x11\x14\x11`\x12\x11\x11$AB\x11\x11\x14\x11`\x11\x11$\x0c$\x06\x11\x11\x14\x11`\x11\x11\x03$&quot;B\x11\x11\x14\x11`\x11\x11\x14\t\x18\x06\x11\x11\x14\x11`\x12\x11A(\x14B\x11\x11\x14\x11`\x11\x11\x0c\t\x11\x06\x11\x11\x14\x11`\r&#x27;
+DEBUG::2017-06-19 22:13:41,913::MBED &gt;&gt;&gt; b&#x27;00036ab3dc121103110644111114116012111442480c1111141160111141124444111114116012110c42410c1111141160121121142844111114116012114444220c1111141160121111182144111114116012112448140c111114116012110318124411111411601111140309061111141160121141210c42111114116011110c03030611111411601111212248421111141160111144064206111114116012111124414211111411601111240c2406111114116011110324224211111411601111140918061111141160121141281442111114116011110c09110611111411600d&#x27; : b&#x27;\x00\x03j\xb3\xdc\x12\x11\x03\x11\x06D\x11\x11\x14\x11`\x12\x11\x14BH\x0c\x11\x11\x14\x11`\x11\x11A\x12DD\x11\x11\x14\x11`\x12\x11\x0cBA\x0c\x11\x11\x14\x11`\x12\x11!\x14(D\x11\x11\x14\x11`\x12\x11DD&quot;\x0c\x11\x11\x14\x11`\x12\x11\x11\x18!D\x11\x11\x14\x11`\x12\x11$H\x14\x0c\x11\x11\x14\x11`\x12\x11\x03\x18\x12D\x11\x11\x14\x11`\x11\x11\x14\x03\t\x06\x11\x11\x14\x11`\x12\x11A!\x0cB\x11\x11\x14\x11`\x11\x11\x0c\x03\x03\x06\x11\x11\x14\x11`\x11\x11!&quot;HB\x11\x11\x14\x11`\x11\x11D\x06B\x06\x11\x11\x14\x11`\x12\x11\x11$AB\x11\x11\x14\x11`\x11\x11$\x0c$\x06\x11\x11\x14\x11`\x11\x11\x03$&quot;B\x11\x11\x14\x11`\x11\x11\x14\t\x18\x06\x11\x11\x14\x11`\x12\x11A(\x14B\x11\x11\x14\x11`\x11\x11\x0c\t\x11\x06\x11\x11\x14\x11`\r&#x27;
+INFO::2017-06-19 22:13:41,914::MBED 20 packets received
+INFO::2017-06-19 22:13:41,914::MBED 20 packets received
+INFO::2017-06-19 22:13:41,915::Test Test for 20 packets took 0.223923s with 0.011196s per packet
+INFO::2017-06-19 22:13:41,915::Test Test for 20 packets took 0.223923s with 0.011196s per packet
+</div></td></tr></tbody></table></body></html>

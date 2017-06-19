@@ -15,7 +15,7 @@ BAUD_RATE = 500000
 DEST_BUF_SIZE = 40
 BOARD_ID = "Interface"
 COMMANDS = {
-    "get_id": "id  ",
+    "get_id": "id__",
     "echo": "echo",
     "reset": "rset",
     "dvs_forward": "fdvs",
@@ -24,6 +24,9 @@ COMMANDS = {
     "spinn_forward": "fspn",
     "spinn_reset": "rspn",
     "spinn_set_mode": "mspn",
+    "spinn_fwd_rx": "f_rx",
+    "spinn_rst_rx": "r_rx",
+    "spinn_use": "u_rx",
 }
 RESPONSES = {
     "success": "000 Success",
@@ -314,6 +317,69 @@ class Controller(object):
         else:
             return None
 
+    def set_spinn_rx_fwd(self, timeout_ms):
+        """Requests that unpacked data from SpiNN is forwarded to PC"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        tx_msg = COMMANDS["spinn_fwd_rx"]
+        tx_msg += chr((timeout_ms & 0xFF00) >> 8)
+        tx_msg += chr(timeout_ms & 0xFF)
+        self._write(tx_msg)
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def reset_spinn_rx_fwd(self):
+        """Cancels forwarding of unpacked data from SpiNN"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+        self._write(COMMANDS["spinn_rst_rx"])
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def use_spinn(self, pkt):
+        """Tells board to use the enclosed packet as if received on link"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        # Put packet data into buffer and send
+        str_buf = COMMANDS["spinn_use"] + ''.join([chr(x) for x in pkt.data])
+        self._write(str_buf)
+
+        # Log error code
+        resp_msg = self._read()
+        if resp_msg in RESPONSES.values():
+            self.log.info("Response received: " + resp_msg)
+
+        return resp_msg
+
+    def get_received_data(self):
+        """When board forwards SpiNNaker data, this method retrieves it"""
+
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        # Get data from link
+        raw = self._read()
+        raw_duration = bytes([ord(x) for x in raw])
+        print(raw_duration)
+        duration = struct.unpack(">H", raw_duration)[0]
+
+        return duration
 
     def __enter__(self):
         return self

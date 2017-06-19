@@ -27,7 +27,7 @@
 #define USART_BAUD_RATE 500000
 
 /* PC Command Definitions */
-#define PC_CMD_ID        "id  "
+#define PC_CMD_ID        "id__"
 #define PC_CMD_ECHO      "echo"
 #define PC_CMD_RESET     "rset"
 #define PC_CMD_DVS_FWD   "fdvs"
@@ -36,6 +36,9 @@
 #define PC_CMD_SPN_FWD   "fspn"
 #define PC_CMD_SPN_RESET "rspn"
 #define PC_CMD_SPN_MODE  "mspn"
+#define PC_CMD_RX_FWD    "f_rx"
+#define PC_CMD_RX_RST    "r_rx"
+#define PC_CMD_RX_USE    "u_rx"
 
 
 #define PC_RESP_OK        "000 Success\r"
@@ -281,7 +284,7 @@ static void usart_rx_task(void *pvParameters)
                 {
                     /* No point writing success here as board reset will clear
                        UART buffer before it can send */
-                    NVIC_SystemReset();
+                    // NVIC_SystemReset();
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_FWD) == 0)
                 {
@@ -386,6 +389,57 @@ static void usart_rx_task(void *pvParameters)
                         }
                     }
                     else if (i > 6)
+                    {
+                        pc_send_string(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
+                    }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_RX_FWD) == 0)
+                {
+                    /* Set board to forward any received SpiNNaker data */
+                    /* 7 bytes is 4 command, 2 data, 1 \r */
+                    if (i == 7)
+                    {
+                        pc_send_string(PC_RESP_OK);
+                        /* Find out time to forward DVS for */
+                        uint16_t fwd_time = data_buf[4] << 8;
+                        fwd_time += data_buf[5];
+                        /* Enable forwarding - 0 for permanent, else time in 
+                           ms */
+                        spinn_forward_rx_pc(true, fwd_time);
+                    }
+                    else if (i > 7)
+                    {
+                        pc_send_string(PC_RESP_BAD_LEN);
+                    }
+                    else
+                    {
+                        /* Continue to avoid buffer being cleared */
+                        continue;
+                    }
+                }
+                else if (strcmp(cmd_buf, PC_CMD_RX_RST) == 0)
+                {
+                    /* Reset board from forwarding received SpiNNaker data */
+                    pc_send_string(PC_RESP_OK);
+                    spinn_forward_rx_pc(false, 0);
+                }
+                else if (strcmp(cmd_buf, PC_CMD_RX_USE) == 0)
+                {
+                    /* Retrieve next 11 bytes and use as DVS packet */
+                    /* 16 bytes is 4 command, 11 data, 1 \r */
+                    if (i == 16)
+                    {
+                        pc_send_string(PC_RESP_OK);
+
+                        /* Use as SpiNNaker packet */
+                        spinn_use_data((uint8_t*) &data_buf[4]);
+                    }
+                    else if (i > 16)
                     {
                         pc_send_string(PC_RESP_BAD_LEN);
                     }

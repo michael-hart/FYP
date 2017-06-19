@@ -40,6 +40,8 @@
  ******************************************************************************/
 /* Semaphore for transmitting next symbol */
 xSemaphoreHandle xSpinnTxSemaphore = NULL;
+/* Semaphore for waiting until a symbol has been received */
+xSemaphoreHandle xSpinnRxSemaphore = NULL;
 
 
 /*******************************************************************************
@@ -52,8 +54,12 @@ static xQueueHandle spinn_txq;
 static xSemaphoreHandle spinFwdSemaphore = NULL;
 static uint8_t spinn_fwd_pc_flag = false;
 
+static xSemaphoreHandle spinFwdRxSemaphore = NULL;
+static uint8_t spinn_fwd_rx_pc_flag = false;
+
 /* Timer for resetting forwarding after timeout */
 static TimerHandle_t spinn_reset_timer = NULL;
+static TimerHandle_t spinn_rx_reset_timer = NULL;
 
 /* Symbol encoding table for 2-of-7 format */
 static uint8_t symbol_table[] = 
@@ -66,12 +72,13 @@ static uint8_t symbol_table[] =
 static dvs_res_t dvs_res = DVS_RES_128;
 
 /* Virtual chip address symbols to queue */
-/* TODO assign actual address instead of guessing it */
 static uint8_t virtual_chip_address[] = {0x00, 0x02, 0x00, 0x00};
 static uint8_t virtual_chip_symbols[] = {0x11, 0x14, 0x11, 0x11};
 
 /* Previous data byte for XORing due to lack of ToggleBits function */
 static uint8_t prev_data = 0x00;
+
+
 
 /*******************************************************************************
  * Private Function Declarations (static)
@@ -83,6 +90,10 @@ static void tasks_init(void);
 static void spinn_reset_fwd_flag(TimerHandle_t timer);
 
 static void spinn_tx_task(void *pvParameters);
+static void spinn_rx_task(void *pvParameters);
+
+static void spinn_reset_fwd_rx_flag(TimerHandle_t timer);
+static uint8_t spinn_lookup_sym(uint8_t sym);
 
 /*******************************************************************************
  * Public Function Definitions 
@@ -218,6 +229,76 @@ void spinn_set_mode(dvs_res_t mode)
     dvs_res = mode;
 }
 
+void spinn_forward_rx_pc(uint8_t forward, uint16_t timeout_ms)
+{
+    if (forward == true)
+    {
+        /* Set forwarding to true */
+        if (xSemaphoreTake(spinFwdRxSemaphore, portMAX_DELAY) == pdTRUE)
+        {
+            spinn_fwd_rx_pc_flag = true;
+            if (timeout_ms > 0)
+            {
+                /* Set up a timeout to cancel the forwarding */
+                xTimerChangePeriod(spinn_rx_reset_timer, timeout_ms, 
+                                   portMAX_DELAY);
+
+            }
+            xSemaphoreGive(spinFwdRxSemaphore);
+        }
+    }
+    else
+    {
+        /* Cancel reset timer and reset flag */
+        if (xTimerIsTimerActive(spinn_rx_reset_timer))
+        {
+            xTimerStop(spinn_rx_reset_timer, portMAX_DELAY);
+        }
+        spinn_reset_fwd_rx_flag(NULL);
+    }
+}
+
+void spinn_use_data(uint8_t *buf)
+{
+    uint16_t speed = 0;
+    uint8_t speed_syms[4];
+
+    /* Decode buffer and get motor data */
+    speed_syms[0] = spinn_lookup_sym(buf[2]);
+    speed_syms[1] = spinn_lookup_sym(buf[3]);
+    speed_syms[2] = spinn_lookup_sym(buf[4]);
+    speed_syms[3] = spinn_lookup_sym(buf[5]);
+    if (speed_syms[0] >= sizeof(symbol_table) || 
+        speed_syms[1] >= sizeof(symbol_table) || 
+        speed_syms[2] >= sizeof(symbol_table) || 
+        speed_syms[3] >= sizeof(symbol_table))
+    {
+        /* Received a symbol in error; return early */
+        return;
+    }
+    speed = speed_syms[0] +
+            (speed_syms[1] << 4) +
+            (speed_syms[2] << 8) +
+            (speed_syms[3] << 12);
+
+    /* Thread-safe check of whether to forward */
+    if (pdTRUE == xSemaphoreTake(spinFwdRxSemaphore, portMAX_DELAY))
+    {
+        /* If forwarding, send to PC */
+        if (spinn_fwd_rx_pc_flag)
+        {
+            pc_send_byte((speed & 0xFF00) >> 8);
+            pc_send_byte(speed & 0x00FF);
+            pc_send_byte('\r');
+        }
+        else
+        {
+            /* Currently no motor PWM signal set up, so ignore */
+        }
+        xSemaphoreGive(spinFwdRxSemaphore);
+    }
+}
+
 
 /*******************************************************************************
  * Private Function Definitions (static)
@@ -243,7 +324,7 @@ static void hal_init(void)
 
     /* Configure pins with given properties */
     port_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | 
-                         GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+                         GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_15;
     port_init.GPIO_Mode = GPIO_Mode_OUT; /* Output Mode */
     port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed pins */
     port_init.GPIO_OType = GPIO_OType_PP;   /* Output type push pull */
@@ -251,14 +332,15 @@ static void hal_init(void)
     GPIO_Init( GPIOB, &port_init );
 
     /* Set up B7 as an input */
-    port_init.GPIO_Pin = GPIO_Pin_7;
+    port_init.GPIO_Pin = GPIO_Pin_7  | GPIO_Pin_8  | GPIO_Pin_9  | GPIO_Pin_10 |
+                         GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
     port_init.GPIO_Mode = GPIO_Mode_IN; /* Input mode */
     port_init.GPIO_Speed = GPIO_Speed_50MHz; /* Highest speed */
     /* Other parameters remain the same */
     GPIO_Init(GPIOB, &port_init);
 
     /* Ensure bits are all reset */
-    GPIO_Write(GPIOB, 0);
+    GPIO_Write(GPIOB, 0xffff);
 
 }
 
@@ -283,12 +365,20 @@ static void irq_init(void)
     /* Ensure peripheral clock is configured */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE); 
 
-    /* Map pin 7 into interrupt */
+    /* Map all pins into interrupt */
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource7);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource8);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource9);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource10);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource11);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource12);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource13);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource14);
 
-    exti.EXTI_Line = EXTI_Line7;
+    exti.EXTI_Line = EXTI_Line7  | EXTI_Line8  | EXTI_Line9  | EXTI_Line10 | 
+                     EXTI_Line11 | EXTI_Line12 | EXTI_Line13 | EXTI_Line14;
     exti.EXTI_Mode = EXTI_Mode_Interrupt;
-    /* Acknowledge signal is transition, so rising or falling edge */
+    /* Signals are transitions, so rising or falling edge */
     exti.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     exti.EXTI_LineCmd = ENABLE;
     EXTI_Init(&exti);
@@ -319,10 +409,17 @@ static void tasks_init(void)
                                      pdFALSE,           /* auto-reload */
                                      (void*) 0,         /* no id specified */
                                      spinn_reset_fwd_flag);   /* callback function */
+    spinn_rx_reset_timer = xTimerCreate("spn_rx_timer",  /* timer name */
+                                     100,               /* timer period */
+                                     pdFALSE,           /* auto-reload */
+                                     (void*) 0,         /* no id specified */
+                                     spinn_reset_fwd_rx_flag);   /* callback function */
 
     /* Create semaphore for forwarding */
     spinFwdSemaphore = xSemaphoreCreateBinary();
     xSemaphoreGive(spinFwdSemaphore);
+    spinFwdRxSemaphore = xSemaphoreCreateBinary();
+    xSemaphoreGive(spinFwdRxSemaphore);
 
     /* Create semaphore for transmission and give to transmit first symbol */
     xSpinnTxSemaphore = xSemaphoreCreateBinary();
@@ -330,9 +427,16 @@ static void tasks_init(void)
        semaphore will only be given once the first symbol is acknowledged */
     xSemaphoreGive(xSpinnTxSemaphore);
 
+    /* Create semaphore to count transitions on the GPIO */
+    xSpinnRxSemaphore = xSemaphoreCreateCounting(8, 0);
+
     /* Create task for acting upon queued data */
     xTaskCreate(spinn_tx_task, (char const *)"txSpn", configMINIMAL_STACK_SIZE, 
                 (void *)NULL, tskIDLE_PRIORITY + SPINN_TX_PRIORITY, NULL);
+
+    /* Create a task to listen for new SpiNNaker data */
+    xTaskCreate(spinn_rx_task, (char const *)"rxSpn", configMINIMAL_STACK_SIZE, 
+                (void *)NULL, tskIDLE_PRIORITY, NULL);
 
     /* Create queue for SpiNN packet data */
     spinn_txq = xQueueCreate(BUFFER_LENGTH, SPINN_SHORT_SYMS * sizeof(uint8_t));
@@ -413,13 +517,123 @@ static void spinn_tx_task(void *pvParameters)
                     else
                     {
                         /* Toggle bits in port for next transition */
-                        GPIO_Write(GPIOB, data ^ prev_data);
+                        GPIO_Write(GPIOB, 
+                            (GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_15) << 14)
+                             || data ^ prev_data);
                         prev_data = data ^ prev_data;
                     }
                 }
             }
         }
     }
+}
+
+/**
+ * DESCRIPTION
+ * Task to wait for entire packet, then handle result somehow
+ * 
+ * INPUTS
+ * pvParameters (void*) : FreeRTOS struct with task information
+ *
+ * RETURNS
+ * Nothing
+ */
+static void spinn_rx_task(void *pvParameters)
+{
+    uint8_t rx_buf[SPINN_SHORT_SYMS*2];
+    uint8_t rx_buf_idx = 0;
+    uint8_t previous_data = 0, current_data = 0;
+
+    /* Reset previous data to ensure state is correct */
+    previous_data =  GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8 ) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_9 ) << 1) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) << 2) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) << 3) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12) << 4) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13) << 5) +
+                    (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) << 6);
+
+    for (;;)
+    {
+
+        while (rx_buf_idx < sizeof(rx_buf))
+        {
+            /* Get semaphore twice */
+            xSemaphoreTake(xSpinnRxSemaphore, portMAX_DELAY);
+            xSemaphoreTake(xSpinnRxSemaphore, portMAX_DELAY);
+            /* Read data into buffer */
+            current_data =  GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8 ) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_9 ) << 1) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) << 2) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) << 3) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12) << 4) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13) << 5) +
+                           (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) << 6);
+            rx_buf[rx_buf_idx] = current_data ^ previous_data;
+            previous_data = current_data;
+            /* Transmit acknowledge as transition */
+            if (GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_15) > 0)
+            {
+                GPIO_WriteBit(GPIOB, GPIO_Pin_15, Bit_RESET);
+            }
+            else
+            {
+                GPIO_WriteBit(GPIOB, GPIO_Pin_15, Bit_SET);
+            }
+            if (rx_buf[rx_buf_idx] == symbol_table[sizeof(symbol_table)-1])
+            {
+                break;
+            }
+            rx_buf_idx++;
+        }
+
+        /* Handle data using method */
+        spinn_use_data(&rx_buf[0]);
+
+        /* Reset buffer */
+        rx_buf_idx = 0;
+    }
+}
+
+/**
+ * DESCRIPTION
+ * Performs safe reset of received forwarding flag
+ * 
+ * INPUTS
+ * timer (TimerHandle_t) : Expired timer or NULL
+ *
+ * RETURNS
+ * Nothing
+ */
+static void spinn_reset_fwd_rx_flag(TimerHandle_t timer)
+{
+    if (xSemaphoreTake(spinFwdRxSemaphore, portMAX_DELAY) == pdTRUE)
+    {
+        spinn_fwd_rx_pc_flag = false;
+        xSemaphoreGive(spinFwdRxSemaphore);
+    }
+}
+
+/**
+ * DESCRIPTION
+ * Returns index of symbol from lookup table
+ * 
+ * INPUTS
+ * sym (uint8_t) : Symbol to look up
+ *
+ * RETURNS
+ * Index of symbol or 17 if symbol not found
+ */
+static uint8_t spinn_lookup_sym(uint8_t sym)
+{
+    for (uint8_t idx = 0; idx < sizeof(symbol_table); idx++)
+    {
+        if (symbol_table[idx] == sym)
+        {
+            return idx;
+        }
+    }
+    return sizeof(symbol_table);
 }
 
 /*******************************************************************************

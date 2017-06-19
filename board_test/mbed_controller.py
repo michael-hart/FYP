@@ -12,12 +12,14 @@ from spinn_packet import SpiNNPacket, SPINN_PACKET_SHORT
 BAUD_RATE = 500000
 MBED_ID = "MBED"
 COMMANDS = {
-    "get_id": "id  ",
+    "get_id": "id__",
     "get_spinn": "gspn",
     "wait": "wait",
     "trigger": "trig",
-    "sim": "sim ",
+    "sim": "sim_",
     "reset": "rset",
+    "tx_spn": "uspn",
+    "trig_spn": "tspn"
 }
 
 class MBEDController(object):
@@ -155,6 +157,38 @@ class MBEDController(object):
 
         tx_msg = COMMANDS["sim"] + "".join(chr(x) for x in pkt.data)
         self._write(tx_msg)
+
+    def send_spinn_tx_pkt(self, pkt):
+        """Sends the given SpiNNPacket to the MBED to be buffered"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        tx_msg = COMMANDS["tx_spn"] + "".join(chr(x) for x in pkt.data)
+        self._write(tx_msg)
+
+    def send_trigger_tx(self):
+        """Tells MBED to start sending buffered SpiNNaker data"""
+        if self.ser is None:
+            self.log.error("No serial device connected!")
+            return ""
+
+        # Set a longer timeout as this is a complex operation
+        tmp_to = self.ser.timeout
+        self.ser.timeout = 2
+
+        self._write(COMMANDS["trig_spn"])
+        raw = self._read()
+
+        # Decode duration as 4-byte number
+        raw_duration = bytes([ord(x) for x in raw[:4]])
+        duration = struct.unpack(">I", raw_duration)[0]
+
+        # Reset timeout
+        self.ser.timeout = tmp_to
+
+        return duration
+
 
     def reset(self):
         """Requests the MBED do a soft reset"""

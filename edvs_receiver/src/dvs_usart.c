@@ -43,7 +43,7 @@
 /* Each y value is multiplied by 32 to get array index */
 #define DVS_BYTES_PER_ROW   (32)
 
-#define DVS_BUFFER_LENGTH   (500)
+#define DVS_BUFFER_LENGTH   (350)
 
 /*******************************************************************************
  * Local Type and Enum definitions

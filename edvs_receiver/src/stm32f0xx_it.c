@@ -46,8 +46,51 @@ void EXTI4_15_IRQHandler(void)
     {
         xSemaphoreGiveFromISR( xSpinnTxSemaphore, &lHigherPriorityTaskWoken );
         EXTI_ClearITPendingBit(EXTI_Line7);
-        portEND_SWITCHING_ISR( lHigherPriorityTaskWoken );
     }
+
+    if (EXTI_GetITStatus(EXTI_Line8) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line8);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line9) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line9);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line10) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line10);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line11) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line11);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line12) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line12);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line13) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line13);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line14) != RESET)
+    {
+        xSemaphoreGiveFromISR( xSpinnRxSemaphore, &lHigherPriorityTaskWoken );
+        EXTI_ClearITPendingBit(EXTI_Line14);
+    }
+
+    portEND_SWITCHING_ISR( lHigherPriorityTaskWoken );
 }
 
 /*******************************************************************************

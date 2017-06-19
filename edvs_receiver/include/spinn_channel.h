@@ -27,6 +27,7 @@
  * External Variable Definitions
  ******************************************************************************/
 extern xSemaphoreHandle xSpinnTxSemaphore;
+extern xSemaphoreHandle xSpinnRxSemaphore;
 
 /*******************************************************************************
  * Public Function Declarations
@@ -83,8 +84,34 @@ void spinn_send_dvs(dvs_data_t* p_data);
  */
 void spinn_set_mode(dvs_res_t res);
 
+/**
+ * DESCRIPTION
+ * Request forwarding of received data from PC
+ * 
+ * INPUTS
+ * forward (uint8_t) : true or false of whether to forward. Resets any existing
+ *                     state
+ * timeout_ms (uint16_t) : timeout in ms of how long forward packets, or 0 to
+ *                         set state permanently
+ *
+ * RETURNS
+ * Nothing
+ */
+void spinn_forward_rx_pc(uint8_t forward, uint16_t timeout_ms);
 
-/* TODO: spinn_encode, spinn_decode functions */
+/**
+ * DESCRIPTION
+ * Given a pointer to a buffer containing a SpiNNaker packet, either forwards
+ * data over UART or sets motor PWM signal period
+ * 
+ * INPUTS
+ * buf (uint8_t*) : Buffer containing SpiNNaker packet data
+ *
+ * RETURNS
+ * Nothing
+ */
+void spinn_use_data(uint8_t *buf);
+
 
 #endif /* _SPINN_CHANNEL_H */
 

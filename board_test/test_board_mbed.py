@@ -1,10 +1,11 @@
 """Module to test that MBED and board simulate SpiNNaker"""
 
-import pytest
+import math
 import time
+import pytest
 from fixtures import mbed, board, log
 from common import (board_assert_equal, spinn_2_to_7, SpiNNMode, 
-                    board_assert_isinstance)
+                    board_assert_isinstance, motor_2_to_7)
 from controller import RESPONSES
 from dvs_packet import DVSPacket
 from spinn_packet import SpiNNPacket
@@ -88,3 +89,52 @@ def test_many_packets(mbed, board, log, packets):
 
     log.info("Test for %d packets took %lfs with %lfs per packet"
              % (len(exp_data), duration/1000000.0, duration/(1000000.0*packets)))
+
+
+@pytest.mark.dev("mbed")
+def test_sim_single_tx(mbed, board, log):
+    """Tests that a single packet is received by the STM"""
+
+    # Ensure that STM is forwarding received data
+    board_assert_equal(board.set_spinn_rx_fwd(0), RESPONSES["success"])
+
+    # Send data to the MBED ready to transmit to SpiNNaker
+    mbed.send_spinn_tx_pkt(motor_2_to_7(100))
+
+    # Trigger the transmission and check the result
+    duration = mbed.send_trigger_tx()
+    log.info("Test for single packet took %lfs with %lfs per symbol",
+             duration/1000000.0, duration/(1000000.0*11))
+    assert duration > 0
+
+    # Retrieve data from STM and check it is correct
+    speed = board.get_received_data()
+    assert speed > 0
+    assert speed == 100
+
+# Note that test will fail if board if not hard reset after single_tx test
+@pytest.mark.dev("mbed")
+def test_sim_many_tx(mbed, board, log):
+    """Tests that many packets are received by the STM"""
+
+    # Ensure that STM is forwarding received data
+    board_assert_equal(board.set_spinn_rx_fwd(0), RESPONSES["success"])
+
+    speed_max = 200
+    speed_step = math.floor(200/20)
+    speeds = list(range(0, speed_max, speed_step))
+
+    # Send data to the MBED ready to transmit to SpiNNaker
+    for speed in speeds:
+        mbed.send_spinn_tx_pkt(motor_2_to_7(speed))
+
+    # Trigger the transmission and check the result
+    duration = mbed.send_trigger_tx()
+    assert duration > 0
+    log.info("Test for %d packets took %lfs with %lfs per packet",
+             len(speeds), duration/1000000.0, duration/(1000000.0*packets))
+
+    # Retrieve data from STM and check it is correct
+    for speed in speeds:
+        assert board.get_received_data() == speed
+

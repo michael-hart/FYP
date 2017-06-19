@@ -7,7 +7,7 @@ from fixtures import mbed, log
 from mbed_controller import MBED_ID
 from dvs_packet import DVSPacket
 from spinn_packet import SpiNNPacket
-from common import spinn_2_to_7, SpiNNMode
+from common import spinn_2_to_7, SpiNNMode, motor_2_to_7
 
 
 @pytest.mark.dev("mbed")
@@ -167,3 +167,13 @@ def test_sim_many_packets(mbed):
     assert rx_pkts
     for true_pkt, rx_pkt in zip(pkts, rx_pkts):
         assert true_pkt.data == rx_pkt.data
+
+@pytest.mark.dev("mbed")
+def test_sim_buffer_spinn(mbed):
+    """Tests that MBED accepts buffered SpiNNaker data for transmit"""
+    mbed.send_spinn_tx_pkt(motor_2_to_7(100))
+
+@pytest.mark.dev("mbed")
+def test_sim_trigg_tx(mbed):
+    """Tests that triggering a transmit sends back a non-zero duration"""
+    assert mbed.send_trigger_tx() > 0

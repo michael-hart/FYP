@@ -29,3 +29,6 @@ edvs_receiver/Common/*
 
 # Ignore tags files
 *.tags*
+
+# Temporary exclude of SpyNNaker test code
+board_test/spynnaker/*

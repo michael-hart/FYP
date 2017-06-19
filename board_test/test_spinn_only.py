@@ -2,7 +2,8 @@
 
 import pytest
 from common import (board_assert_equal, board_assert_ge,
-                    board_assert_isinstance, SpiNNMode, spinn_2_to_7)
+                    board_assert_isinstance, SpiNNMode, spinn_2_to_7,
+                    motor_2_to_7)
 from fixtures import board
 from controller import RESPONSES
 from dvs_packet import DVSPacket
@@ -127,3 +128,33 @@ def test_spinn_nocrash(board):
     board_assert_equal(board.use_dvs(pkt), RESPONSES["success"])
     # Echo to check that the board replies
     board_assert_equal(board.echo("test"), "test")
+
+def test_spinn_fwd_rx_permanent_on(board):
+    """Tests that turning forwarding on permanently works"""
+    board_assert_equal(board.set_spinn_rx_fwd(0), RESPONSES["success"])
+
+def test_spinn_fwd_rx_reset(board):
+    """Tetss that resetting the forwarding works"""
+    board_assert_equal(board.reset_spinn_rx_fwd(), RESPONSES["success"])
+
+def test_spinn_fwd_rx_on_reset(board):
+    """Tests that turning on and then resetting forwarding works"""
+    board_assert_equal(board.set_spinn_rx_fwd(0), RESPONSES["success"])
+    board_assert_equal(board.reset_spinn_rx_fwd(), RESPONSES["success"])
+
+def test_spinn_fwd_rx_temp(board):
+    """Tests that setting temporary forwarding is accepted"""
+    board_assert_equal(board.set_spinn_rx_fwd(1000), RESPONSES["success"])
+
+def test_spinn_fwd_rx_received(board):
+    """Tests that sending a DVS packet and receiving some data works"""
+
+    # Turn on forwarding to check that any packet comes back
+    board_assert_equal(board.set_spinn_rx_fwd(0), RESPONSES["success"])
+    # Send a test packet
+    test_pkt = motor_2_to_7(100)
+    board_assert_equal(board.use_spinn(test_pkt), RESPONSES["success"])
+
+    speed = board.get_received_data()
+    assert speed > 0
+    assert speed == 100

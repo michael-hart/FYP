@@ -86,7 +86,7 @@ def spinn_2_to_7(pkt, mode):
                   ((xor_all & 0x20) >> 5) ^ ((xor_all & 0x10) >> 4) ^
                   ((xor_all & 0x08) >> 3) ^ ((xor_all & 0x04) >> 2) ^
                   ((xor_all & 0x02) >> 1) ^ (xor_all & 0x01))
-    
+
     # Header
     buf += [SYMBOL_TABLE[odd_parity], SYMBOL_TABLE[0]]
     # Data
@@ -94,6 +94,34 @@ def spinn_2_to_7(pkt, mode):
             SYMBOL_TABLE[(data & 0x00F0) >> 4],
             SYMBOL_TABLE[(data & 0x0F00) >> 8],
             SYMBOL_TABLE[(data & 0xF000) >> 12]]
+    # Chip Address
+    for addr in reversed(CHIP_SYMBOLS):
+        buf += [addr]
+    # EOP
+    buf += [SYMBOL_TABLE[-1]]
+
+    return SpiNNPacket(buf)
+
+def motor_2_to_7(speed):
+    """Converts motor packet data to SpiNN encoding"""
+
+    buf = []
+
+    # Calculate parity
+    xor_all = (CHIP_ADDRESS[0] ^ CHIP_ADDRESS[1] ^ CHIP_ADDRESS[2] ^
+               CHIP_ADDRESS[3] ^ ((speed & 0xFF00) >> 8) ^ (speed & 0xFF))
+    odd_parity = (1 ^ ((xor_all & 0x80) >> 7) ^ ((xor_all & 0x40) >> 6) ^
+                  ((xor_all & 0x20) >> 5) ^ ((xor_all & 0x10) >> 4) ^
+                  ((xor_all & 0x08) >> 3) ^ ((xor_all & 0x04) >> 2) ^
+                  ((xor_all & 0x02) >> 1) ^ (xor_all & 0x01))
+    
+    # Header
+    buf += [SYMBOL_TABLE[odd_parity], SYMBOL_TABLE[0]]
+    # Data
+    buf += [SYMBOL_TABLE[speed & 0x000F],
+            SYMBOL_TABLE[(speed & 0x00F0) >> 4],
+            SYMBOL_TABLE[(speed & 0x0F00) >> 8],
+            SYMBOL_TABLE[(speed & 0xF000) >> 12]]
     # Chip Address
     for addr in reversed(CHIP_SYMBOLS):
         buf += [addr]

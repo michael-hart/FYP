@@ -321,6 +321,7 @@ static void hal_init(void)
 
     /* Enable clock on GPIO pins */
     RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOB, ENABLE );
+    RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOC, ENABLE );
 
     /* Configure pins with given properties */
     port_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | 
@@ -339,8 +340,20 @@ static void hal_init(void)
     /* Other parameters remain the same */
     GPIO_Init(GPIOB, &port_init);
 
+    /* Set up PF0 and PF1 as outputs, already enabled, enable level shifters */
+    port_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
+    port_init.GPIO_Mode = GPIO_Mode_OUT;
+    port_init.GPIO_Speed = GPIO_Speed_2MHz;
+    port_init.GPIO_OType = GPIO_OType_PP;
+    port_init.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init( GPIOC, &port_init );
+
     /* Ensure bits are all reset */
     GPIO_Write(GPIOB, 0);
+
+    /* Ensure level shifters are enabled */
+    GPIO_WriteBit(GPIOC, GPIO_Pin_0, Bit_SET);
+    GPIO_WriteBit(GPIOC, GPIO_Pin_1, Bit_SET);
 
 }
 

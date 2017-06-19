@@ -132,7 +132,7 @@ def test_sim_many_tx(mbed, board, log):
     duration = mbed.send_trigger_tx()
     assert duration > 0
     log.info("Test for %d packets took %lfs with %lfs per packet",
-             len(speeds), duration/1000000.0, duration/(1000000.0*packets))
+             len(speeds), duration/1000000.0, duration/(1000000.0*20))
 
     # Retrieve data from STM and check it is correct
     for speed in speeds:

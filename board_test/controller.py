@@ -376,7 +376,6 @@ class Controller(object):
         # Get data from link
         raw = self._read()
         raw_duration = bytes([ord(x) for x in raw])
-        print(raw_duration)
         duration = struct.unpack(">H", raw_duration)[0]
 
         return duration

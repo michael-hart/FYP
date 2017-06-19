@@ -531,8 +531,8 @@ static void spinn_tx_task(void *pvParameters)
                     {
                         /* Toggle bits in port for next transition */
                         GPIO_Write(GPIOB, 
-                            (GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_15) << 14)
-                             || data ^ prev_data);
+                            (GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_15) << 15)
+                             | data ^ prev_data);
                         prev_data = data ^ prev_data;
                     }
                 }

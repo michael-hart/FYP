@@ -340,7 +340,7 @@ static void hal_init(void)
     GPIO_Init(GPIOB, &port_init);
 
     /* Ensure bits are all reset */
-    GPIO_Write(GPIOB, 0xffff);
+    GPIO_Write(GPIOB, 0);
 
 }
 

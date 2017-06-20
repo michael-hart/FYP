@@ -228,12 +228,12 @@ function filter_table(elem) {
     not_found_message.hidden = !all_rows_hidden;
 }
 </script>
-    <p>Report generated on 19-Jun-2017 at 22:16:14 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
+    <p>Report generated on 20-Jun-2017 at 12:31:34 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
         <td>Packages</td>
-        <td>{&apos;pluggy&apos;: &apos;0.4.0&apos;, &apos;py&apos;: &apos;1.4.33&apos;, &apos;pytest&apos;: &apos;3.0.7&apos;}</td></tr>
+        <td>{&apos;pytest&apos;: &apos;3.0.7&apos;, &apos;pluggy&apos;: &apos;0.4.0&apos;, &apos;py&apos;: &apos;1.4.33&apos;}</td></tr>
       <tr>
         <td>Platform</td>
         <td>Windows-10-10.0.15063-SP0</td></tr>
@@ -244,7 +244,7 @@ function filter_table(elem) {
         <td>Python</td>
         <td>3.5.3</td></tr></table>
     <h2>Summary</h2>
-    <p>1 tests ran in 1.44 seconds. </p>
+    <p>1 tests ran in 1.56 seconds. </p>
     <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">1 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
@@ -260,40 +260,40 @@ function filter_table(elem) {
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">test_board_mbed.py::test_sim_single_tx</td>
-          <td class="col-duration">0.03</td>
+          <td class="col-duration">0.05</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-19 22:16:13,949::Test Logging commences
-DEBUG::2017-06-19 22:16:13,965::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:13,965::MBED Opened serial port COM9
-DEBUG::2017-06-19 22:16:13,965::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:13,978::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
-DEBUG::2017-06-19 22:16:13,978::MBED Responding device found on port COM9
-DEBUG::2017-06-19 22:16:14,098::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:14,099::MBED Opened serial port COM6
-DEBUG::2017-06-19 22:16:14,099::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:14,112::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
-DEBUG::2017-06-19 22:16:14,237::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:14,241::MBED Opened serial port COM9
-INFO::2017-06-19 22:16:14,249::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
-DEBUG::2017-06-19 22:16:14,258::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:14,260::Controller Opened serial port COM6
-DEBUG::2017-06-19 22:16:14,260::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:14,272::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
-DEBUG::2017-06-19 22:16:14,273::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:14,274::Controller Response received: 000 Success
-DEBUG::2017-06-19 22:16:14,288::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
-DEBUG::2017-06-19 22:16:14,289::Controller Responding device found on port COM6
-DEBUG::2017-06-19 22:16:14,418::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:14,420::Controller Opened serial port COM6
------------------------------ Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:16:14,422::Controller &lt;&lt;&lt; b&#x27;665f727800000d&#x27; : &#x27;f_rx  &#x27;
-DEBUG::2017-06-19 22:16:14,432::Controller &gt;&gt;&gt; b&#x27;665f727800000d&#x27; : b&#x27;f_rx\x00\x00\r&#x27;
-DEBUG::2017-06-19 22:16:14,433::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:14,434::Controller Response received: 000 Success
-DEBUG::2017-06-19 22:16:14,434::MBED &lt;&lt;&lt; b&#x27;7573706e12112124111111111411600d&#x27; : &#x27;uspn!$`&#x27;
-DEBUG::2017-06-19 22:16:14,436::MBED &lt;&lt;&lt; b&#x27;7473706e0d&#x27; : &#x27;tspn&#x27;
-DEBUG::2017-06-19 22:16:14,442::MBED &gt;&gt;&gt; b&#x27;000003550d&#x27; : b&#x27;\x00\x00\x03U\r&#x27;
-INFO::2017-06-19 22:16:14,444::Test Test for single packet took 0.000853s with 0.000078s per symbol
-DEBUG::2017-06-19 22:16:14,448::Controller &gt;&gt;&gt; b&#x27;00640d&#x27; : b&#x27;\x00d\r&#x27;
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-20 12:31:33,227::Test Logging commences
+DEBUG::2017-06-20 12:31:33,244::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:33,244::MBED Opened serial port COM9
+DEBUG::2017-06-20 12:31:33,244::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:33,258::MBED &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-20 12:31:33,258::MBED Responding device found on port COM9
+DEBUG::2017-06-20 12:31:33,388::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:33,389::MBED Opened serial port COM6
+DEBUG::2017-06-20 12:31:33,389::MBED &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:33,402::MBED &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-20 12:31:33,532::MBED &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:33,538::MBED Opened serial port COM9
+INFO::2017-06-20 12:31:33,546::Controller Failed to open device: could not open port &#x27;COM9&#x27;: PermissionError(13, &#x27;Access is denied.&#x27;, None, 5)
+DEBUG::2017-06-20 12:31:33,565::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:33,566::Controller Opened serial port COM6
+DEBUG::2017-06-20 12:31:33,566::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:33,577::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-20 12:31:33,578::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:33,579::Controller Response received: 000 Success
+DEBUG::2017-06-20 12:31:33,593::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-20 12:31:33,594::Controller Responding device found on port COM6
+DEBUG::2017-06-20 12:31:33,725::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:33,726::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-20 12:31:33,728::Controller &lt;&lt;&lt; b&#x27;665f727800000d&#x27; : &#x27;f_rx  &#x27;
+DEBUG::2017-06-20 12:31:33,737::Controller &gt;&gt;&gt; b&#x27;665f727800000d&#x27; : b&#x27;f_rx\x00\x00\r&#x27;
+DEBUG::2017-06-20 12:31:33,753::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:33,754::Controller Response received: 000 Success
+DEBUG::2017-06-20 12:31:33,754::MBED &lt;&lt;&lt; b&#x27;7573706e12112124111111111411600d&#x27; : &#x27;uspn!$`&#x27;
+DEBUG::2017-06-20 12:31:33,756::MBED &lt;&lt;&lt; b&#x27;7473706e0d&#x27; : &#x27;tspn&#x27;
+DEBUG::2017-06-20 12:31:33,770::MBED &gt;&gt;&gt; b&#x27;000003180d&#x27; : b&#x27;\x00\x00\x03\x18\r&#x27;
+INFO::2017-06-20 12:31:33,771::Test Test for single packet took 0.000792s with 0.000072s per symbol
+DEBUG::2017-06-20 12:31:33,772::Controller &gt;&gt;&gt; b&#x27;00640d&#x27; : b&#x27;\x00d\r&#x27;
 </div></td></tr></tbody></table></body></html>

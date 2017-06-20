@@ -228,23 +228,23 @@ function filter_table(elem) {
     not_found_message.hidden = !all_rows_hidden;
 }
 </script>
-    <p>Report generated on 19-Jun-2017 at 22:16:06 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
+    <p>Report generated on 20-Jun-2017 at 12:31:05 by<a href="https://pypi.python.org/pypi/pytest-html"> pytest-html</a> v1.14.2</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
         <td>Packages</td>
-        <td>{&apos;pluggy&apos;: &apos;0.4.0&apos;, &apos;py&apos;: &apos;1.4.33&apos;, &apos;pytest&apos;: &apos;3.0.7&apos;}</td></tr>
+        <td>{&apos;pytest&apos;: &apos;3.0.7&apos;, &apos;py&apos;: &apos;1.4.33&apos;, &apos;pluggy&apos;: &apos;0.4.0&apos;}</td></tr>
       <tr>
         <td>Platform</td>
         <td>Windows-10-10.0.15063-SP0</td></tr>
       <tr>
         <td>Plugins</td>
-        <td>{&apos;html&apos;: &apos;1.14.2&apos;, &apos;metadata&apos;: &apos;1.5.0&apos;}</td></tr>
+        <td>{&apos;metadata&apos;: &apos;1.5.0&apos;, &apos;html&apos;: &apos;1.14.2&apos;}</td></tr>
       <tr>
         <td>Python</td>
         <td>3.5.3</td></tr></table>
     <h2>Summary</h2>
-    <p>2 tests ran in 6.63 seconds. </p>
+    <p>2 tests ran in 6.47 seconds. </p>
     <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">2 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
@@ -260,283 +260,1249 @@ function filter_table(elem) {
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">test_dvs_forward.py::test_dvs_packets_received</td>
-          <td class="col-duration">0.03</td>
+          <td class="col-duration">0.09</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-19 22:16:00,272::Test Logging commences
-DEBUG::2017-06-19 22:16:00,287::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,288::Controller Opened serial port COM9
-DEBUG::2017-06-19 22:16:00,288::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:00,301::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
-DEBUG::2017-06-19 22:16:00,401::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,502::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,615::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,616::Controller Opened serial port COM6
-DEBUG::2017-06-19 22:16:00,616::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:00,719::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,820::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:00,921::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:02,558::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:02,559::Controller Opened serial port COM9
-DEBUG::2017-06-19 22:16:02,560::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:02,572::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
-DEBUG::2017-06-19 22:16:02,673::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:02,774::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:02,886::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:02,888::Controller Opened serial port COM6
-DEBUG::2017-06-19 22:16:02,888::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:02,900::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
-DEBUG::2017-06-19 22:16:02,901::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:02,901::Controller Response received: 000 Success
-DEBUG::2017-06-19 22:16:02,916::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
-DEBUG::2017-06-19 22:16:02,916::Controller Responding device found on port COM6
-DEBUG::2017-06-19 22:16:03,047::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,049::Controller Opened serial port COM6
------------------------------ Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:16:03,051::Controller &lt;&lt;&lt; b&#x27;6664767303e80d&#x27; : &#x27;fdvsè&#x27;
-DEBUG::2017-06-19 22:16:03,060::Controller &gt;&gt;&gt; b&#x27;6664767303e80d&#x27; : b&#x27;fdvs\x03\xe8\r&#x27;
-DEBUG::2017-06-19 22:16:03,076::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:03,076::Controller Response received: 000 Success
-INFO::2017-06-19 22:16:03,077::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,077::Controller &gt;&gt;&gt; b&#x27;107b010d&#x27; : b&#x27;\x10{\x01\r&#x27;
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>INFO::2017-06-20 12:30:59,109::Test Logging commences
+DEBUG::2017-06-20 12:30:59,119::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,119::Controller Opened serial port COM9
+DEBUG::2017-06-20 12:30:59,119::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:30:59,134::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-20 12:30:59,235::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,336::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,461::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,462::Controller Opened serial port COM6
+DEBUG::2017-06-20 12:30:59,463::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:30:59,566::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,667::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:30:59,768::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,391::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,392::Controller Opened serial port COM9
+DEBUG::2017-06-20 12:31:01,392::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:01,405::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-20 12:31:01,505::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,606::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,731::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,732::Controller Opened serial port COM6
+DEBUG::2017-06-20 12:31:01,733::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:01,745::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-20 12:31:01,746::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:01,746::Controller Response received: 000 Success
+DEBUG::2017-06-20 12:31:01,762::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-20 12:31:01,762::Controller Responding device found on port COM6
+DEBUG::2017-06-20 12:31:01,892::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:01,893::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-20 12:31:01,896::Controller &lt;&lt;&lt; b&#x27;6664767303e80d&#x27; : &#x27;fdvsè&#x27;
+DEBUG::2017-06-20 12:31:01,905::Controller &gt;&gt;&gt; b&#x27;6664767303e80d&#x27; : b&#x27;fdvs\x03\xe8\r&#x27;
+DEBUG::2017-06-20 12:31:01,921::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:01,921::Controller Response received: 000 Success
+INFO::2017-06-20 12:31:01,921::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:01,985::Controller &gt;&gt;&gt; b&#x27;1e02010d&#x27; : b&#x27;\x1e\x02\x01\r&#x27;
 </div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">test_dvs_forward.py::test_dvs_packets_manykinds</td>
-          <td class="col-duration">2.26</td>
+          <td class="col-duration">2.04</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-19 22:16:03,326::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,327::Controller Opened serial port COM9
-DEBUG::2017-06-19 22:16:03,327::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:03,340::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
-DEBUG::2017-06-19 22:16:03,441::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,542::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,668::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,670::Controller Opened serial port COM6
-DEBUG::2017-06-19 22:16:03,671::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
-DEBUG::2017-06-19 22:16:03,681::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
-DEBUG::2017-06-19 22:16:03,683::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:03,683::Controller Response received: 000 Success
-DEBUG::2017-06-19 22:16:03,697::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
-DEBUG::2017-06-19 22:16:03,698::Controller Responding device found on port COM6
-DEBUG::2017-06-19 22:16:03,828::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-DEBUG::2017-06-19 22:16:03,829::Controller Opened serial port COM6
------------------------------ Captured stderr call -----------------------------<br/>DEBUG::2017-06-19 22:16:03,832::Controller &lt;&lt;&lt; b&#x27;6664767300000d&#x27; : &#x27;fdvs  &#x27;
-DEBUG::2017-06-19 22:16:03,842::Controller &gt;&gt;&gt; b&#x27;6664767300000d&#x27; : b&#x27;fdvs\x00\x00\r&#x27;
-DEBUG::2017-06-19 22:16:03,857::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
-INFO::2017-06-19 22:16:03,858::Controller Response received: 000 Success
-INFO::2017-06-19 22:16:03,858::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,859::Controller &gt;&gt;&gt; b&#x27;3619000d&#x27; : b&#x27;6\x19\x00\r&#x27;
-INFO::2017-06-19 22:16:03,859::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,860::Controller &gt;&gt;&gt; b&#x27;0739000d&#x27; : b&#x27;\x079\x00\r&#x27;
-INFO::2017-06-19 22:16:03,860::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,861::Controller &gt;&gt;&gt; b&#x27;1b02000d&#x27; : b&#x27;\x1b\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:03,861::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,862::Controller &gt;&gt;&gt; b&#x27;083c000d&#x27; : b&#x27;\x08&lt;\x00\r&#x27;
-INFO::2017-06-19 22:16:03,862::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,863::Controller &gt;&gt;&gt; b&#x27;7771000d&#x27; : b&#x27;wq\x00\r&#x27;
-INFO::2017-06-19 22:16:03,863::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,889::Controller &gt;&gt;&gt; b&#x27;360d&#x27; : b&#x27;6\r&#x27;
-INFO::2017-06-19 22:16:03,890::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,890::Controller &gt;&gt;&gt; b&#x27;000d&#x27; : b&#x27;\x00\r&#x27;
-INFO::2017-06-19 22:16:03,891::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,891::Controller &gt;&gt;&gt; b&#x27;1704000d&#x27; : b&#x27;\x17\x04\x00\r&#x27;
-INFO::2017-06-19 22:16:03,892::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,892::Controller &gt;&gt;&gt; b&#x27;7300000d&#x27; : b&#x27;s\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,893::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,893::Controller &gt;&gt;&gt; b&#x27;1705000d&#x27; : b&#x27;\x17\x05\x00\r&#x27;
-INFO::2017-06-19 22:16:03,894::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,905::Controller &gt;&gt;&gt; b&#x27;216e010d&#x27; : b&#x27;!n\x01\r&#x27;
-INFO::2017-06-19 22:16:03,906::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,907::Controller &gt;&gt;&gt; b&#x27;2073010d&#x27; : b&#x27; s\x01\r&#x27;
-INFO::2017-06-19 22:16:03,907::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,908::Controller &gt;&gt;&gt; b&#x27;0018000d&#x27; : b&#x27;\x00\x18\x00\r&#x27;
-INFO::2017-06-19 22:16:03,908::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,909::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
-INFO::2017-06-19 22:16:03,909::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,910::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
-INFO::2017-06-19 22:16:03,910::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,910::Controller &gt;&gt;&gt; b&#x27;7f61010d&#x27; : b&#x27;\x7fa\x01\r&#x27;
-INFO::2017-06-19 22:16:03,911::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,911::Controller &gt;&gt;&gt; b&#x27;262b000d&#x27; : b&#x27;&amp;+\x00\r&#x27;
-INFO::2017-06-19 22:16:03,912::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,912::Controller &gt;&gt;&gt; b&#x27;2411000d&#x27; : b&#x27;$\x11\x00\r&#x27;
-INFO::2017-06-19 22:16:03,913::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,921::Controller &gt;&gt;&gt; b&#x27;6d1a000d&#x27; : b&#x27;m\x1a\x00\r&#x27;
-INFO::2017-06-19 22:16:03,922::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,922::Controller &gt;&gt;&gt; b&#x27;6d1b000d&#x27; : b&#x27;m\x1b\x00\r&#x27;
-INFO::2017-06-19 22:16:03,922::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,923::Controller &gt;&gt;&gt; b&#x27;721c000d&#x27; : b&#x27;r\x1c\x00\r&#x27;
-INFO::2017-06-19 22:16:03,923::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,923::Controller &gt;&gt;&gt; b&#x27;2c00000d&#x27; : b&#x27;,\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,924::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,924::Controller &gt;&gt;&gt; b&#x27;2759010d&#x27; : b&quot;&#x27;Y\x01\r&quot;
-INFO::2017-06-19 22:16:03,924::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,924::Controller &gt;&gt;&gt; b&#x27;2759010d&#x27; : b&quot;&#x27;Y\x01\r&quot;
-INFO::2017-06-19 22:16:03,925::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,925::Controller &gt;&gt;&gt; b&#x27;0017000d&#x27; : b&#x27;\x00\x17\x00\r&#x27;
-INFO::2017-06-19 22:16:03,925::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,926::Controller &gt;&gt;&gt; b&#x27;1c0e000d&#x27; : b&#x27;\x1c\x0e\x00\r&#x27;
-INFO::2017-06-19 22:16:03,926::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,937::Controller &gt;&gt;&gt; b&#x27;532d000d&#x27; : b&#x27;S-\x00\r&#x27;
-INFO::2017-06-19 22:16:03,937::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,938::Controller &gt;&gt;&gt; b&#x27;3f0e000d&#x27; : b&#x27;?\x0e\x00\r&#x27;
-INFO::2017-06-19 22:16:03,938::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,938::Controller &gt;&gt;&gt; b&#x27;0348000d&#x27; : b&#x27;\x03H\x00\r&#x27;
-INFO::2017-06-19 22:16:03,939::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,939::Controller &gt;&gt;&gt; b&#x27;2001000d&#x27; : b&#x27; \x01\x00\r&#x27;
-INFO::2017-06-19 22:16:03,939::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,940::Controller &gt;&gt;&gt; b&#x27;1806000d&#x27; : b&#x27;\x18\x06\x00\r&#x27;
-INFO::2017-06-19 22:16:03,940::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,940::Controller &gt;&gt;&gt; b&#x27;4771010d&#x27; : b&#x27;Gq\x01\r&#x27;
-INFO::2017-06-19 22:16:03,940::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,941::Controller &gt;&gt;&gt; b&#x27;4771010d&#x27; : b&#x27;Gq\x01\r&#x27;
-INFO::2017-06-19 22:16:03,941::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,941::Controller &gt;&gt;&gt; b&#x27;7600000d&#x27; : b&#x27;v\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,942::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,953::Controller &gt;&gt;&gt; b&#x27;2302000d&#x27; : b&#x27;#\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:03,953::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,954::Controller &gt;&gt;&gt; b&#x27;1e01000d&#x27; : b&#x27;\x1e\x01\x00\r&#x27;
-INFO::2017-06-19 22:16:03,954::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,955::Controller &gt;&gt;&gt; b&#x27;4500000d&#x27; : b&#x27;E\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,955::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,955::Controller &gt;&gt;&gt; b&#x27;001c000d&#x27; : b&#x27;\x00\x1c\x00\r&#x27;
-INFO::2017-06-19 22:16:03,955::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,956::Controller &gt;&gt;&gt; b&#x27;1a0f000d&#x27; : b&#x27;\x1a\x0f\x00\r&#x27;
-INFO::2017-06-19 22:16:03,956::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,956::Controller &gt;&gt;&gt; b&#x27;7a0a000d&#x27; : b&#x27;z\n\x00\r&#x27;
-INFO::2017-06-19 22:16:03,957::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,957::Controller &gt;&gt;&gt; b&#x27;7602000d&#x27; : b&#x27;v\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:03,957::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,957::Controller &gt;&gt;&gt; b&#x27;1908000d&#x27; : b&#x27;\x19\x08\x00\r&#x27;
-INFO::2017-06-19 22:16:03,958::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,969::Controller &gt;&gt;&gt; b&#x27;011d000d&#x27; : b&#x27;\x01\x1d\x00\r&#x27;
-INFO::2017-06-19 22:16:03,969::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,970::Controller &gt;&gt;&gt; b&#x27;7538000d&#x27; : b&#x27;u8\x00\r&#x27;
-INFO::2017-06-19 22:16:03,970::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,970::Controller &gt;&gt;&gt; b&#x27;1e06000d&#x27; : b&#x27;\x1e\x06\x00\r&#x27;
-INFO::2017-06-19 22:16:03,971::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,971::Controller &gt;&gt;&gt; b&#x27;1b00000d&#x27; : b&#x27;\x1b\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,971::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,972::Controller &gt;&gt;&gt; b&#x27;2206000d&#x27; : b&#x27;&quot;\x06\x00\r&#x27;
-INFO::2017-06-19 22:16:03,972::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,972::Controller &gt;&gt;&gt; b&#x27;6c20000d&#x27; : b&#x27;l \x00\r&#x27;
-INFO::2017-06-19 22:16:03,972::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,973::Controller &gt;&gt;&gt; b&#x27;7700000d&#x27; : b&#x27;w\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:03,973::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,973::Controller &gt;&gt;&gt; b&#x27;6814000d&#x27; : b&#x27;h\x14\x00\r&#x27;
-INFO::2017-06-19 22:16:03,974::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,985::Controller &gt;&gt;&gt; b&#x27;2301000d&#x27; : b&#x27;#\x01\x00\r&#x27;
-INFO::2017-06-19 22:16:03,985::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,986::Controller &gt;&gt;&gt; b&#x27;7902000d&#x27; : b&#x27;y\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:03,986::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,986::Controller &gt;&gt;&gt; b&#x27;4204000d&#x27; : b&#x27;B\x04\x00\r&#x27;
-INFO::2017-06-19 22:16:03,987::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,987::Controller &gt;&gt;&gt; b&#x27;011f000d&#x27; : b&#x27;\x01\x1f\x00\r&#x27;
-INFO::2017-06-19 22:16:03,987::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,988::Controller &gt;&gt;&gt; b&#x27;3518000d&#x27; : b&#x27;5\x18\x00\r&#x27;
-INFO::2017-06-19 22:16:03,988::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,988::Controller &gt;&gt;&gt; b&#x27;2702000d&#x27; : b&quot;&#x27;\x02\x00\r&quot;
-INFO::2017-06-19 22:16:03,988::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,989::Controller &gt;&gt;&gt; b&#x27;2e19000d&#x27; : b&#x27;.\x19\x00\r&#x27;
-INFO::2017-06-19 22:16:03,989::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:03,989::Controller &gt;&gt;&gt; b&#x27;7f01000d&#x27; : b&#x27;\x7f\x01\x00\r&#x27;
-INFO::2017-06-19 22:16:03,990::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,001::Controller &gt;&gt;&gt; b&#x27;1f02000d&#x27; : b&#x27;\x1f\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:04,002::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,002::Controller &gt;&gt;&gt; b&#x27;4100000d&#x27; : b&#x27;A\x00\x00\r&#x27;
-INFO::2017-06-19 22:16:04,002::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,003::Controller &gt;&gt;&gt; b&#x27;2502000d&#x27; : b&#x27;%\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:04,003::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,003::Controller &gt;&gt;&gt; b&#x27;160b000d&#x27; : b&#x27;\x16\x0b\x00\r&#x27;
-INFO::2017-06-19 22:16:04,004::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,004::Controller &gt;&gt;&gt; b&#x27;1c6e010d&#x27; : b&#x27;\x1cn\x01\r&#x27;
-INFO::2017-06-19 22:16:04,004::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,004::Controller &gt;&gt;&gt; b&#x27;767a010d&#x27; : b&#x27;vz\x01\r&#x27;
-INFO::2017-06-19 22:16:04,005::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,005::Controller &gt;&gt;&gt; b&#x27;7f18000d&#x27; : b&#x27;\x7f\x18\x00\r&#x27;
-INFO::2017-06-19 22:16:04,005::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,006::Controller &gt;&gt;&gt; b&#x27;5e45000d&#x27; : b&#x27;^E\x00\r&#x27;
-INFO::2017-06-19 22:16:04,006::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,017::Controller &gt;&gt;&gt; b&#x27;7d1b000d&#x27; : b&#x27;}\x1b\x00\r&#x27;
-INFO::2017-06-19 22:16:04,018::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,018::Controller &gt;&gt;&gt; b&#x27;1f09000d&#x27; : b&#x27;\x1f\t\x00\r&#x27;
-INFO::2017-06-19 22:16:04,018::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,019::Controller &gt;&gt;&gt; b&#x27;6920000d&#x27; : b&#x27;i \x00\r&#x27;
-INFO::2017-06-19 22:16:04,019::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,019::Controller &gt;&gt;&gt; b&#x27;697a010d&#x27; : b&#x27;iz\x01\r&#x27;
-INFO::2017-06-19 22:16:04,019::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,020::Controller &gt;&gt;&gt; b&#x27;430c000d&#x27; : b&#x27;C\x0c\x00\r&#x27;
-INFO::2017-06-19 22:16:04,020::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,020::Controller &gt;&gt;&gt; b&#x27;3023000d&#x27; : b&#x27;0#\x00\r&#x27;
-INFO::2017-06-19 22:16:04,021::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,021::Controller &gt;&gt;&gt; b&#x27;7d20000d&#x27; : b&#x27;} \x00\r&#x27;
-INFO::2017-06-19 22:16:04,021::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,022::Controller &gt;&gt;&gt; b&#x27;6c78010d&#x27; : b&#x27;lx\x01\r&#x27;
-INFO::2017-06-19 22:16:04,022::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,033::Controller &gt;&gt;&gt; b&#x27;790e010d&#x27; : b&#x27;y\x0e\x01\r&#x27;
-INFO::2017-06-19 22:16:04,034::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,034::Controller &gt;&gt;&gt; b&#x27;095c010d&#x27; : b&#x27;\t\\\x01\r&#x27;
-INFO::2017-06-19 22:16:04,034::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,035::Controller &gt;&gt;&gt; b&#x27;041b000d&#x27; : b&#x27;\x04\x1b\x00\r&#x27;
-INFO::2017-06-19 22:16:04,035::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,035::Controller &gt;&gt;&gt; b&#x27;5f36000d&#x27; : b&#x27;_6\x00\r&#x27;
-INFO::2017-06-19 22:16:04,035::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,036::Controller &gt;&gt;&gt; b&#x27;7308000d&#x27; : b&#x27;s\x08\x00\r&#x27;
-INFO::2017-06-19 22:16:04,036::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,036::Controller &gt;&gt;&gt; b&#x27;296e010d&#x27; : b&#x27;)n\x01\r&#x27;
-INFO::2017-06-19 22:16:04,037::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,037::Controller &gt;&gt;&gt; b&#x27;6718000d&#x27; : b&#x27;g\x18\x00\r&#x27;
-INFO::2017-06-19 22:16:04,037::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,038::Controller &gt;&gt;&gt; b&#x27;7e02000d&#x27; : b&#x27;~\x02\x00\r&#x27;
-INFO::2017-06-19 22:16:04,038::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,049::Controller &gt;&gt;&gt; b&#x27;6e36010d&#x27; : b&#x27;n6\x01\r&#x27;
-INFO::2017-06-19 22:16:04,049::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,050::Controller &gt;&gt;&gt; b&#x27;1a37010d&#x27; : b&#x27;\x1a7\x01\r&#x27;
-INFO::2017-06-19 22:16:04,050::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,050::Controller &gt;&gt;&gt; b&#x27;6523000d&#x27; : b&#x27;e#\x00\r&#x27;
-INFO::2017-06-19 22:16:04,051::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,051::Controller &gt;&gt;&gt; b&#x27;7a33000d&#x27; : b&#x27;z3\x00\r&#x27;
-INFO::2017-06-19 22:16:04,051::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,052::Controller &gt;&gt;&gt; b&#x27;1800010d&#x27; : b&#x27;\x18\x00\x01\r&#x27;
-INFO::2017-06-19 22:16:04,052::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,052::Controller &gt;&gt;&gt; b&#x27;0005010d&#x27; : b&#x27;\x00\x05\x01\r&#x27;
-INFO::2017-06-19 22:16:04,052::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,053::Controller &gt;&gt;&gt; b&#x27;1b72010d&#x27; : b&#x27;\x1br\x01\r&#x27;
-INFO::2017-06-19 22:16:04,053::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,054::Controller &gt;&gt;&gt; b&#x27;371b000d&#x27; : b&#x27;7\x1b\x00\r&#x27;
-INFO::2017-06-19 22:16:04,054::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,065::Controller &gt;&gt;&gt; b&#x27;7816000d&#x27; : b&#x27;x\x16\x00\r&#x27;
-INFO::2017-06-19 22:16:04,065::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,066::Controller &gt;&gt;&gt; b&#x27;4a31000d&#x27; : b&#x27;J1\x00\r&#x27;
-INFO::2017-06-19 22:16:04,066::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,066::Controller &gt;&gt;&gt; b&#x27;0228010d&#x27; : b&#x27;\x02(\x01\r&#x27;
-INFO::2017-06-19 22:16:04,067::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,067::Controller &gt;&gt;&gt; b&#x27;6b0e000d&#x27; : b&#x27;k\x0e\x00\r&#x27;
-INFO::2017-06-19 22:16:04,067::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,068::Controller &gt;&gt;&gt; b&#x27;3377010d&#x27; : b&#x27;3w\x01\r&#x27;
-INFO::2017-06-19 22:16:04,068::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,068::Controller &gt;&gt;&gt; b&#x27;1910010d&#x27; : b&#x27;\x19\x10\x01\r&#x27;
-INFO::2017-06-19 22:16:04,068::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,069::Controller &gt;&gt;&gt; b&#x27;0b01010d&#x27; : b&#x27;\x0b\x01\x01\r&#x27;
-INFO::2017-06-19 22:16:04,069::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,069::Controller &gt;&gt;&gt; b&#x27;1768010d&#x27; : b&#x27;\x17h\x01\r&#x27;
-INFO::2017-06-19 22:16:04,070::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,081::Controller &gt;&gt;&gt; b&#x27;7712000d&#x27; : b&#x27;w\x12\x00\r&#x27;
-INFO::2017-06-19 22:16:04,081::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,082::Controller &gt;&gt;&gt; b&#x27;687f010d&#x27; : b&#x27;h\x7f\x01\r&#x27;
-INFO::2017-06-19 22:16:04,082::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,082::Controller &gt;&gt;&gt; b&#x27;2709000d&#x27; : b&quot;&#x27;\t\x00\r&quot;
-INFO::2017-06-19 22:16:04,083::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,083::Controller &gt;&gt;&gt; b&#x27;716c010d&#x27; : b&#x27;ql\x01\r&#x27;
-INFO::2017-06-19 22:16:04,083::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:04,083::Controller &gt;&gt;&gt; b&#x27;0874010d&#x27; : b&#x27;\x08t\x01\r&#x27;
-INFO::2017-06-19 22:16:04,084::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:05,085::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-INFO::2017-06-19 22:16:05,085::Controller Attempting to read 3 bytes for 1 packet
-DEBUG::2017-06-19 22:16:06,086::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
-INFO::2017-06-19 22:16:06,086::Test DVS packets have counts: x=64, y=54, pol=2
+            <div class="log">---------------------------- Captured stderr setup -----------------------------<br/>DEBUG::2017-06-20 12:31:02,431::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:02,433::Controller Opened serial port COM9
+DEBUG::2017-06-20 12:31:02,433::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:02,444::Controller &gt;&gt;&gt; b&#x27;4d4245440d&#x27; : b&#x27;MBED\r&#x27;
+DEBUG::2017-06-20 12:31:02,546::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:02,646::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:02,771::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:02,772::Controller Opened serial port COM6
+DEBUG::2017-06-20 12:31:02,773::Controller &lt;&lt;&lt; b&#x27;69645f5f0d&#x27; : &#x27;id__&#x27;
+DEBUG::2017-06-20 12:31:02,785::Controller &gt;&gt;&gt; b&#x27;69645f5f0d&#x27; : b&#x27;id__\r&#x27;
+DEBUG::2017-06-20 12:31:02,786::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:02,786::Controller Response received: 000 Success
+DEBUG::2017-06-20 12:31:02,800::Controller &gt;&gt;&gt; b&#x27;496e746572666163650d&#x27; : b&#x27;Interface\r&#x27;
+DEBUG::2017-06-20 12:31:02,801::Controller Responding device found on port COM6
+DEBUG::2017-06-20 12:31:02,932::Controller &gt;&gt;&gt; b&#x27;&#x27; : b&#x27;&#x27;
+DEBUG::2017-06-20 12:31:02,933::Controller Opened serial port COM6
+----------------------------- Captured stderr call -----------------------------<br/>DEBUG::2017-06-20 12:31:02,936::Controller &lt;&lt;&lt; b&#x27;6664767300000d&#x27; : &#x27;fdvs  &#x27;
+DEBUG::2017-06-20 12:31:02,945::Controller &gt;&gt;&gt; b&#x27;6664767300000d&#x27; : b&#x27;fdvs\x00\x00\r&#x27;
+DEBUG::2017-06-20 12:31:02,961::Controller &gt;&gt;&gt; b&#x27;30303020537563636573730d&#x27; : b&#x27;000 Success\r&#x27;
+INFO::2017-06-20 12:31:02,961::Controller Response received: 000 Success
+INFO::2017-06-20 12:31:02,962::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:02,962::Controller &gt;&gt;&gt; b&#x27;4008000d&#x27; : b&#x27;@\x08\x00\r&#x27;
+INFO::2017-06-20 12:31:02,963::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:02,993::Controller &gt;&gt;&gt; b&#x27;4009000d&#x27; : b&#x27;@\t\x00\r&#x27;
+INFO::2017-06-20 12:31:02,993::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,009::Controller &gt;&gt;&gt; b&#x27;5c0a000d&#x27; : b&#x27;\\\n\x00\r&#x27;
+INFO::2017-06-20 12:31:03,009::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,040::Controller &gt;&gt;&gt; b&#x27;4901000d&#x27; : b&#x27;I\x01\x00\r&#x27;
+INFO::2017-06-20 12:31:03,041::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,041::Controller &gt;&gt;&gt; b&#x27;450d&#x27; : b&#x27;E\r&#x27;
+INFO::2017-06-20 12:31:03,042::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,042::Controller &gt;&gt;&gt; b&#x27;000d&#x27; : b&#x27;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,042::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,073::Controller &gt;&gt;&gt; b&#x27;0121000d&#x27; : b&#x27;\x01!\x00\r&#x27;
+INFO::2017-06-20 12:31:03,073::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,074::Controller &gt;&gt;&gt; b&#x27;131e000d&#x27; : b&#x27;\x13\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:03,074::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,089::Controller &gt;&gt;&gt; b&#x27;6a50000d&#x27; : b&#x27;jP\x00\r&#x27;
+INFO::2017-06-20 12:31:03,089::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,090::Controller &gt;&gt;&gt; b&#x27;4d0a000d&#x27; : b&#x27;M\n\x00\r&#x27;
+INFO::2017-06-20 12:31:03,090::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,091::Controller &gt;&gt;&gt; b&#x27;780e000d&#x27; : b&#x27;x\x0e\x00\r&#x27;
+INFO::2017-06-20 12:31:03,091::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,136::Controller &gt;&gt;&gt; b&#x27;7912000d&#x27; : b&#x27;y\x12\x00\r&#x27;
+INFO::2017-06-20 12:31:03,136::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,152::Controller &gt;&gt;&gt; b&#x27;6505000d&#x27; : b&#x27;e\x05\x00\r&#x27;
+INFO::2017-06-20 12:31:03,153::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,201::Controller &gt;&gt;&gt; b&#x27;5126000d&#x27; : b&#x27;Q&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,201::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,216::Controller &gt;&gt;&gt; b&#x27;0917000d&#x27; : b&#x27;\t\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:03,217::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,232::Controller &gt;&gt;&gt; b&#x27;0c34000d&#x27; : b&#x27;\x0c4\x00\r&#x27;
+INFO::2017-06-20 12:31:03,233::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,265::Controller &gt;&gt;&gt; b&#x27;1339000d&#x27; : b&#x27;\x139\x00\r&#x27;
+INFO::2017-06-20 12:31:03,265::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,266::Controller &gt;&gt;&gt; b&#x27;3917000d&#x27; : b&#x27;9\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:03,266::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,267::Controller &gt;&gt;&gt; b&#x27;042e000d&#x27; : b&#x27;\x04.\x00\r&#x27;
+INFO::2017-06-20 12:31:03,267::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,268::Controller &gt;&gt;&gt; b&#x27;0116000d&#x27; : b&#x27;\x01\x16\x00\r&#x27;
+INFO::2017-06-20 12:31:03,268::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,280::Controller &gt;&gt;&gt; b&#x27;2b19000d&#x27; : b&#x27;+\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:03,281::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,282::Controller &gt;&gt;&gt; b&#x27;1338000d&#x27; : b&#x27;\x138\x00\r&#x27;
+INFO::2017-06-20 12:31:03,282::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,296::Controller &gt;&gt;&gt; b&#x27;1705000d&#x27; : b&#x27;\x17\x05\x00\r&#x27;
+INFO::2017-06-20 12:31:03,298::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,328::Controller &gt;&gt;&gt; b&#x27;762b000d&#x27; : b&#x27;v+\x00\r&#x27;
+INFO::2017-06-20 12:31:03,328::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,329::Controller &gt;&gt;&gt; b&#x27;4c19000d&#x27; : b&#x27;L\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:03,329::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,330::Controller &gt;&gt;&gt; b&#x27;1c3a000d&#x27; : b&#x27;\x1c:\x00\r&#x27;
+INFO::2017-06-20 12:31:03,331::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,344::Controller &gt;&gt;&gt; b&#x27;0e39000d&#x27; : b&#x27;\x0e9\x00\r&#x27;
+INFO::2017-06-20 12:31:03,345::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,345::Controller &gt;&gt;&gt; b&#x27;3619000d&#x27; : b&#x27;6\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:03,346::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,346::Controller &gt;&gt;&gt; b&#x27;2c12000d&#x27; : b&#x27;,\x12\x00\r&#x27;
+INFO::2017-06-20 12:31:03,347::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,347::Controller &gt;&gt;&gt; b&#x27;1231000d&#x27; : b&#x27;\x121\x00\r&#x27;
+INFO::2017-06-20 12:31:03,348::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,348::Controller &gt;&gt;&gt; b&#x27;1805000d&#x27; : b&#x27;\x18\x05\x00\r&#x27;
+INFO::2017-06-20 12:31:03,349::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,360::Controller &gt;&gt;&gt; b&#x27;0622000d&#x27; : b&#x27;\x06&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,361::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,376::Controller &gt;&gt;&gt; b&#x27;082d000d&#x27; : b&#x27;\x08-\x00\r&#x27;
+INFO::2017-06-20 12:31:03,377::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,377::Controller &gt;&gt;&gt; b&#x27;0028000d&#x27; : b&#x27;\x00(\x00\r&#x27;
+INFO::2017-06-20 12:31:03,378::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,378::Controller &gt;&gt;&gt; b&#x27;0521000d&#x27; : b&#x27;\x05!\x00\r&#x27;
+INFO::2017-06-20 12:31:03,379::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,379::Controller &gt;&gt;&gt; b&#x27;0220000d&#x27; : b&#x27;\x02 \x00\r&#x27;
+INFO::2017-06-20 12:31:03,380::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,380::Controller &gt;&gt;&gt; b&#x27;7d17000d&#x27; : b&#x27;}\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:03,381::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,392::Controller &gt;&gt;&gt; b&#x27;2c3d000d&#x27; : b&#x27;,=\x00\r&#x27;
+INFO::2017-06-20 12:31:03,393::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,393::Controller &gt;&gt;&gt; b&#x27;4d0b000d&#x27; : b&#x27;M\x0b\x00\r&#x27;
+INFO::2017-06-20 12:31:03,394::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,394::Controller &gt;&gt;&gt; b&#x27;0620000d&#x27; : b&#x27;\x06 \x00\r&#x27;
+INFO::2017-06-20 12:31:03,395::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,408::Controller &gt;&gt;&gt; b&#x27;1425000d&#x27; : b&#x27;\x14%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,409::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,409::Controller &gt;&gt;&gt; b&#x27;072e000d&#x27; : b&#x27;\x07.\x00\r&#x27;
+INFO::2017-06-20 12:31:03,410::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,410::Controller &gt;&gt;&gt; b&#x27;0823000d&#x27; : b&#x27;\x08#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,411::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,411::Controller &gt;&gt;&gt; b&#x27;0126000d&#x27; : b&#x27;\x01&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,412::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,424::Controller &gt;&gt;&gt; b&#x27;0925000d&#x27; : b&#x27;\t%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,424::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,425::Controller &gt;&gt;&gt; b&#x27;0015000d&#x27; : b&#x27;\x00\x15\x00\r&#x27;
+INFO::2017-06-20 12:31:03,425::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,426::Controller &gt;&gt;&gt; b&#x27;594a000d&#x27; : b&#x27;YJ\x00\r&#x27;
+INFO::2017-06-20 12:31:03,426::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,440::Controller &gt;&gt;&gt; b&#x27;1c0b000d&#x27; : b&#x27;\x1c\x0b\x00\r&#x27;
+INFO::2017-06-20 12:31:03,440::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,441::Controller &gt;&gt;&gt; b&#x27;1b17010d&#x27; : b&#x27;\x1b\x17\x01\r&#x27;
+INFO::2017-06-20 12:31:03,441::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,457::Controller &gt;&gt;&gt; b&#x27;2c0c000d&#x27; : b&#x27;,\x0c\x00\r&#x27;
+INFO::2017-06-20 12:31:03,457::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,458::Controller &gt;&gt;&gt; b&#x27;4409000d&#x27; : b&#x27;D\t\x00\r&#x27;
+INFO::2017-06-20 12:31:03,458::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,459::Controller &gt;&gt;&gt; b&#x27;5445000d&#x27; : b&#x27;TE\x00\r&#x27;
+INFO::2017-06-20 12:31:03,459::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,473::Controller &gt;&gt;&gt; b&#x27;092a000d&#x27; : b&#x27;\t*\x00\r&#x27;
+INFO::2017-06-20 12:31:03,473::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,474::Controller &gt;&gt;&gt; b&#x27;0718000d&#x27; : b&#x27;\x07\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:03,474::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,488::Controller &gt;&gt;&gt; b&#x27;4437000d&#x27; : b&#x27;D7\x00\r&#x27;
+INFO::2017-06-20 12:31:03,489::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,504::Controller &gt;&gt;&gt; b&#x27;510b000d&#x27; : b&#x27;Q\x0b\x00\r&#x27;
+INFO::2017-06-20 12:31:03,505::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,506::Controller &gt;&gt;&gt; b&#x27;6a0c000d&#x27; : b&#x27;j\x0c\x00\r&#x27;
+INFO::2017-06-20 12:31:03,506::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,521::Controller &gt;&gt;&gt; b&#x27;081d000d&#x27; : b&#x27;\x08\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:03,521::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,536::Controller &gt;&gt;&gt; b&#x27;1d3b000d&#x27; : b&#x27;\x1d;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,537::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,538::Controller &gt;&gt;&gt; b&#x27;2606000d&#x27; : b&#x27;&amp;\x06\x00\r&#x27;
+INFO::2017-06-20 12:31:03,538::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,568::Controller &gt;&gt;&gt; b&#x27;740e000d&#x27; : b&#x27;t\x0e\x00\r&#x27;
+INFO::2017-06-20 12:31:03,569::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,584::Controller &gt;&gt;&gt; b&#x27;7b32000d&#x27; : b&#x27;{2\x00\r&#x27;
+INFO::2017-06-20 12:31:03,584::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,585::Controller &gt;&gt;&gt; b&#x27;3250000d&#x27; : b&#x27;2P\x00\r&#x27;
+INFO::2017-06-20 12:31:03,585::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,586::Controller &gt;&gt;&gt; b&#x27;4f29000d&#x27; : b&#x27;O)\x00\r&#x27;
+INFO::2017-06-20 12:31:03,587::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,587::Controller &gt;&gt;&gt; b&#x27;473f000d&#x27; : b&#x27;G?\x00\r&#x27;
+INFO::2017-06-20 12:31:03,587::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,648::Controller &gt;&gt;&gt; b&#x27;583b000d&#x27; : b&#x27;X;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,648::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,664::Controller &gt;&gt;&gt; b&#x27;1f34000d&#x27; : b&#x27;\x1f4\x00\r&#x27;
+INFO::2017-06-20 12:31:03,664::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,680::Controller &gt;&gt;&gt; b&#x27;0335000d&#x27; : b&#x27;\x035\x00\r&#x27;
+INFO::2017-06-20 12:31:03,680::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,696::Controller &gt;&gt;&gt; b&#x27;240d&#x27; : b&#x27;$\r&#x27;
+INFO::2017-06-20 12:31:03,696::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,697::Controller &gt;&gt;&gt; b&#x27;000d&#x27; : b&#x27;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,697::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,698::Controller &gt;&gt;&gt; b&#x27;4d10000d&#x27; : b&#x27;M\x10\x00\r&#x27;
+INFO::2017-06-20 12:31:03,698::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,699::Controller &gt;&gt;&gt; b&#x27;6f34000d&#x27; : b&#x27;o4\x00\r&#x27;
+INFO::2017-06-20 12:31:03,699::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,700::Controller &gt;&gt;&gt; b&#x27;2e1d000d&#x27; : b&#x27;.\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:03,700::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,712::Controller &gt;&gt;&gt; b&#x27;7822000d&#x27; : b&#x27;x&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,713::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,713::Controller &gt;&gt;&gt; b&#x27;4111000d&#x27; : b&#x27;A\x11\x00\r&#x27;
+INFO::2017-06-20 12:31:03,714::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,714::Controller &gt;&gt;&gt; b&#x27;0739000d&#x27; : b&#x27;\x079\x00\r&#x27;
+INFO::2017-06-20 12:31:03,715::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,728::Controller &gt;&gt;&gt; b&#x27;242a000d&#x27; : b&#x27;$*\x00\r&#x27;
+INFO::2017-06-20 12:31:03,729::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,729::Controller &gt;&gt;&gt; b&#x27;3413000d&#x27; : b&#x27;4\x13\x00\r&#x27;
+INFO::2017-06-20 12:31:03,730::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,731::Controller &gt;&gt;&gt; b&#x27;5521000d&#x27; : b&#x27;U!\x00\r&#x27;
+INFO::2017-06-20 12:31:03,731::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,744::Controller &gt;&gt;&gt; b&#x27;3800000d&#x27; : b&#x27;8\x00\x00\r&#x27;
+INFO::2017-06-20 12:31:03,745::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,760::Controller &gt;&gt;&gt; b&#x27;350a000d&#x27; : b&#x27;5\n\x00\r&#x27;
+INFO::2017-06-20 12:31:03,761::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,792::Controller &gt;&gt;&gt; b&#x27;7122000d&#x27; : b&#x27;q&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,793::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,793::Controller &gt;&gt;&gt; b&#x27;011d000d&#x27; : b&#x27;\x01\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:03,794::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,808::Controller &gt;&gt;&gt; b&#x27;0657000d&#x27; : b&#x27;\x06W\x00\r&#x27;
+INFO::2017-06-20 12:31:03,808::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,824::Controller &gt;&gt;&gt; b&#x27;3c05000d&#x27; : b&#x27;&lt;\x05\x00\r&#x27;
+INFO::2017-06-20 12:31:03,824::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,824::Controller &gt;&gt;&gt; b&#x27;3a05000d&#x27; : b&#x27;:\x05\x00\r&#x27;
+INFO::2017-06-20 12:31:03,824::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,825::Controller &gt;&gt;&gt; b&#x27;6f14000d&#x27; : b&#x27;o\x14\x00\r&#x27;
+INFO::2017-06-20 12:31:03,825::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,840::Controller &gt;&gt;&gt; b&#x27;352a000d&#x27; : b&#x27;5*\x00\r&#x27;
+INFO::2017-06-20 12:31:03,840::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,841::Controller &gt;&gt;&gt; b&#x27;6852000d&#x27; : b&#x27;hR\x00\r&#x27;
+INFO::2017-06-20 12:31:03,841::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,842::Controller &gt;&gt;&gt; b&#x27;7219000d&#x27; : b&#x27;r\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:03,842::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,843::Controller &gt;&gt;&gt; b&#x27;3a05010d&#x27; : b&#x27;:\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:03,843::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,856::Controller &gt;&gt;&gt; b&#x27;6e3b000d&#x27; : b&#x27;n;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,856::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,857::Controller &gt;&gt;&gt; b&#x27;011f000d&#x27; : b&#x27;\x01\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:03,857::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,858::Controller &gt;&gt;&gt; b&#x27;1d45000d&#x27; : b&#x27;\x1dE\x00\r&#x27;
+INFO::2017-06-20 12:31:03,858::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,872::Controller &gt;&gt;&gt; b&#x27;0e27000d&#x27; : b&quot;\x0e&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:03,872::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,873::Controller &gt;&gt;&gt; b&#x27;0026000d&#x27; : b&#x27;\x00&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,873::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,874::Controller &gt;&gt;&gt; b&#x27;415f000d&#x27; : b&#x27;A_\x00\r&#x27;
+INFO::2017-06-20 12:31:03,874::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,888::Controller &gt;&gt;&gt; b&#x27;4f3e000d&#x27; : b&#x27;O&gt;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,888::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,889::Controller &gt;&gt;&gt; b&#x27;3f08000d&#x27; : b&#x27;?\x08\x00\r&#x27;
+INFO::2017-06-20 12:31:03,889::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,890::Controller &gt;&gt;&gt; b&#x27;0c2b000d&#x27; : b&#x27;\x0c+\x00\r&#x27;
+INFO::2017-06-20 12:31:03,890::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,891::Controller &gt;&gt;&gt; b&#x27;7832000d&#x27; : b&#x27;x2\x00\r&#x27;
+INFO::2017-06-20 12:31:03,891::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,892::Controller &gt;&gt;&gt; b&#x27;2512010d&#x27; : b&#x27;%\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:03,892::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,893::Controller &gt;&gt;&gt; b&#x27;571d000d&#x27; : b&#x27;W\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:03,893::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,894::Controller &gt;&gt;&gt; b&#x27;0222000d&#x27; : b&#x27;\x02&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,894::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,895::Controller &gt;&gt;&gt; b&#x27;0626000d&#x27; : b&#x27;\x06&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,895::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,904::Controller &gt;&gt;&gt; b&#x27;0422000d&#x27; : b&#x27;\x04&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,904::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,905::Controller &gt;&gt;&gt; b&#x27;0625000d&#x27; : b&#x27;\x06%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,905::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,906::Controller &gt;&gt;&gt; b&#x27;4a03000d&#x27; : b&#x27;J\x03\x00\r&#x27;
+INFO::2017-06-20 12:31:03,906::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,907::Controller &gt;&gt;&gt; b&#x27;0322000d&#x27; : b&#x27;\x03&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,907::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,908::Controller &gt;&gt;&gt; b&#x27;0825000d&#x27; : b&#x27;\x08%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,908::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,920::Controller &gt;&gt;&gt; b&#x27;0523000d&#x27; : b&#x27;\x05#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,920::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,921::Controller &gt;&gt;&gt; b&#x27;0725000d&#x27; : b&#x27;\x07%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,921::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,922::Controller &gt;&gt;&gt; b&#x27;3a06000d&#x27; : b&#x27;:\x06\x00\r&#x27;
+INFO::2017-06-20 12:31:03,922::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,923::Controller &gt;&gt;&gt; b&#x27;210c010d&#x27; : b&#x27;!\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:03,923::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,924::Controller &gt;&gt;&gt; b&#x27;1026000d&#x27; : b&#x27;\x10&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,924::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,936::Controller &gt;&gt;&gt; b&#x27;3b37000d&#x27; : b&#x27;;7\x00\r&#x27;
+INFO::2017-06-20 12:31:03,936::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,937::Controller &gt;&gt;&gt; b&#x27;6e46000d&#x27; : b&#x27;nF\x00\r&#x27;
+INFO::2017-06-20 12:31:03,937::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,938::Controller &gt;&gt;&gt; b&#x27;1707010d&#x27; : b&#x27;\x17\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:03,938::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,939::Controller &gt;&gt;&gt; b&#x27;0321000d&#x27; : b&#x27;\x03!\x00\r&#x27;
+INFO::2017-06-20 12:31:03,939::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,940::Controller &gt;&gt;&gt; b&#x27;051f000d&#x27; : b&#x27;\x05\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:03,940::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,940::Controller &gt;&gt;&gt; b&#x27;0023000d&#x27; : b&#x27;\x00#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,941::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,941::Controller &gt;&gt;&gt; b&#x27;0b23000d&#x27; : b&#x27;\x0b#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,942::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,942::Controller &gt;&gt;&gt; b&#x27;250d&#x27; : b&#x27;%\r&#x27;
+INFO::2017-06-20 12:31:03,943::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,943::Controller &gt;&gt;&gt; b&#x27;010d&#x27; : b&#x27;\x01\r&#x27;
+INFO::2017-06-20 12:31:03,943::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,944::Controller &gt;&gt;&gt; b&#x27;250d&#x27; : b&#x27;%\r&#x27;
+INFO::2017-06-20 12:31:03,944::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,952::Controller &gt;&gt;&gt; b&#x27;010d&#x27; : b&#x27;\x01\r&#x27;
+INFO::2017-06-20 12:31:03,952::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,952::Controller &gt;&gt;&gt; b&#x27;250d&#x27; : b&#x27;%\r&#x27;
+INFO::2017-06-20 12:31:03,953::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,953::Controller &gt;&gt;&gt; b&#x27;010d&#x27; : b&#x27;\x01\r&#x27;
+INFO::2017-06-20 12:31:03,954::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,954::Controller &gt;&gt;&gt; b&#x27;0c24000d&#x27; : b&#x27;\x0c$\x00\r&#x27;
+INFO::2017-06-20 12:31:03,955::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,955::Controller &gt;&gt;&gt; b&#x27;0a23000d&#x27; : b&#x27;\n#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,956::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,956::Controller &gt;&gt;&gt; b&#x27;0923000d&#x27; : b&#x27;\t#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,957::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,957::Controller &gt;&gt;&gt; b&#x27;0c25000d&#x27; : b&#x27;\x0c%\x00\r&#x27;
+INFO::2017-06-20 12:31:03,957::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,958::Controller &gt;&gt;&gt; b&#x27;3474000d&#x27; : b&#x27;4t\x00\r&#x27;
+INFO::2017-06-20 12:31:03,959::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,959::Controller &gt;&gt;&gt; b&#x27;0623000d&#x27; : b&#x27;\x06#\x00\r&#x27;
+INFO::2017-06-20 12:31:03,961::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,968::Controller &gt;&gt;&gt; b&#x27;0524000d&#x27; : b&#x27;\x05$\x00\r&#x27;
+INFO::2017-06-20 12:31:03,969::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,969::Controller &gt;&gt;&gt; b&#x27;0824000d&#x27; : b&#x27;\x08$\x00\r&#x27;
+INFO::2017-06-20 12:31:03,970::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,970::Controller &gt;&gt;&gt; b&#x27;0226000d&#x27; : b&#x27;\x02&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,971::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,971::Controller &gt;&gt;&gt; b&#x27;0326000d&#x27; : b&#x27;\x03&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,972::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,972::Controller &gt;&gt;&gt; b&#x27;230e010d&#x27; : b&#x27;#\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:03,973::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,973::Controller &gt;&gt;&gt; b&#x27;4316000d&#x27; : b&#x27;C\x16\x00\r&#x27;
+INFO::2017-06-20 12:31:03,974::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,974::Controller &gt;&gt;&gt; b&#x27;0926000d&#x27; : b&#x27;\t&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,975::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,975::Controller &gt;&gt;&gt; b&#x27;0820000d&#x27; : b&#x27;\x08 \x00\r&#x27;
+INFO::2017-06-20 12:31:03,976::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,984::Controller &gt;&gt;&gt; b&#x27;3339000d&#x27; : b&#x27;39\x00\r&#x27;
+INFO::2017-06-20 12:31:03,985::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,985::Controller &gt;&gt;&gt; b&#x27;0726000d&#x27; : b&#x27;\x07&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:03,986::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,986::Controller &gt;&gt;&gt; b&#x27;0828000d&#x27; : b&#x27;\x08(\x00\r&#x27;
+INFO::2017-06-20 12:31:03,987::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,987::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:03,987::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,988::Controller &gt;&gt;&gt; b&#x27;41000d&#x27; : b&#x27;A\x00\r&#x27;
+INFO::2017-06-20 12:31:03,988::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,989::Controller &gt;&gt;&gt; b&#x27;0624000d&#x27; : b&#x27;\x06$\x00\r&#x27;
+INFO::2017-06-20 12:31:03,989::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,990::Controller &gt;&gt;&gt; b&#x27;790a000d&#x27; : b&#x27;y\n\x00\r&#x27;
+INFO::2017-06-20 12:31:03,991::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,991::Controller &gt;&gt;&gt; b&#x27;200a010d&#x27; : b&#x27; \n\x01\r&#x27;
+INFO::2017-06-20 12:31:03,992::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:03,992::Controller &gt;&gt;&gt; b&#x27;6b01000d&#x27; : b&#x27;k\x01\x00\r&#x27;
+INFO::2017-06-20 12:31:03,993::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,000::Controller &gt;&gt;&gt; b&#x27;3641000d&#x27; : b&#x27;6A\x00\r&#x27;
+INFO::2017-06-20 12:31:04,000::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,001::Controller &gt;&gt;&gt; b&#x27;021d000d&#x27; : b&#x27;\x02\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,001::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,002::Controller &gt;&gt;&gt; b&#x27;0a27000d&#x27; : b&quot;\n&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,002::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,003::Controller &gt;&gt;&gt; b&#x27;0120000d&#x27; : b&#x27;\x01 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,003::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,004::Controller &gt;&gt;&gt; b&#x27;2613010d&#x27; : b&#x27;&amp;\x13\x01\r&#x27;
+INFO::2017-06-20 12:31:04,004::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,005::Controller &gt;&gt;&gt; b&#x27;4441000d&#x27; : b&#x27;DA\x00\r&#x27;
+INFO::2017-06-20 12:31:04,005::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,006::Controller &gt;&gt;&gt; b&#x27;2211010d&#x27; : b&#x27;&quot;\x11\x01\r&#x27;
+INFO::2017-06-20 12:31:04,006::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,007::Controller &gt;&gt;&gt; b&#x27;0621000d&#x27; : b&#x27;\x06!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,007::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,016::Controller &gt;&gt;&gt; b&#x27;021c000d&#x27; : b&#x27;\x02\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,016::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,017::Controller &gt;&gt;&gt; b&#x27;0218000d&#x27; : b&#x27;\x02\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,017::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,018::Controller &gt;&gt;&gt; b&#x27;2916010d&#x27; : b&#x27;)\x16\x01\r&#x27;
+INFO::2017-06-20 12:31:04,019::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,019::Controller &gt;&gt;&gt; b&#x27;0a1e000d&#x27; : b&#x27;\n\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,020::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,020::Controller &gt;&gt;&gt; b&#x27;152b000d&#x27; : b&#x27;\x15+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,021::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,021::Controller &gt;&gt;&gt; b&#x27;061d000d&#x27; : b&#x27;\x06\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,021::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,022::Controller &gt;&gt;&gt; b&#x27;7771000d&#x27; : b&#x27;wq\x00\r&#x27;
+INFO::2017-06-20 12:31:04,023::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,023::Controller &gt;&gt;&gt; b&#x27;2004010d&#x27; : b&#x27; \x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,024::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,032::Controller &gt;&gt;&gt; b&#x27;0924000d&#x27; : b&#x27;\t$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,032::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,033::Controller &gt;&gt;&gt; b&#x27;012d000d&#x27; : b&#x27;\x01-\x00\r&#x27;
+INFO::2017-06-20 12:31:04,033::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,034::Controller &gt;&gt;&gt; b&#x27;0722000d&#x27; : b&#x27;\x07&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,034::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,035::Controller &gt;&gt;&gt; b&#x27;082a000d&#x27; : b&#x27;\x08*\x00\r&#x27;
+INFO::2017-06-20 12:31:04,035::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,036::Controller &gt;&gt;&gt; b&#x27;230a010d&#x27; : b&#x27;#\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,036::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,037::Controller &gt;&gt;&gt; b&#x27;0821000d&#x27; : b&#x27;\x08!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,037::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,038::Controller &gt;&gt;&gt; b&#x27;0437000d&#x27; : b&#x27;\x047\x00\r&#x27;
+INFO::2017-06-20 12:31:04,038::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,039::Controller &gt;&gt;&gt; b&#x27;0428000d&#x27; : b&#x27;\x04(\x00\r&#x27;
+INFO::2017-06-20 12:31:04,039::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,048::Controller &gt;&gt;&gt; b&#x27;071d000d&#x27; : b&#x27;\x07\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,048::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,049::Controller &gt;&gt;&gt; b&#x27;0234000d&#x27; : b&#x27;\x024\x00\r&#x27;
+INFO::2017-06-20 12:31:04,050::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,050::Controller &gt;&gt;&gt; b&#x27;230b010d&#x27; : b&#x27;#\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,051::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,051::Controller &gt;&gt;&gt; b&#x27;0320000d&#x27; : b&#x27;\x03 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,052::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,052::Controller &gt;&gt;&gt; b&#x27;142b000d&#x27; : b&#x27;\x14+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,052::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,053::Controller &gt;&gt;&gt; b&#x27;2009010d&#x27; : b&#x27; \t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,054::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,054::Controller &gt;&gt;&gt; b&#x27;0525000d&#x27; : b&#x27;\x05%\x00\r&#x27;
+INFO::2017-06-20 12:31:04,055::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,055::Controller &gt;&gt;&gt; b&#x27;250e010d&#x27; : b&#x27;%\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,056::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,064::Controller &gt;&gt;&gt; b&#x27;081e000d&#x27; : b&#x27;\x08\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,064::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,065::Controller &gt;&gt;&gt; b&#x27;062c000d&#x27; : b&#x27;\x06,\x00\r&#x27;
+INFO::2017-06-20 12:31:04,065::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,066::Controller &gt;&gt;&gt; b&#x27;1129000d&#x27; : b&#x27;\x11)\x00\r&#x27;
+INFO::2017-06-20 12:31:04,066::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,067::Controller &gt;&gt;&gt; b&#x27;0029000d&#x27; : b&#x27;\x00)\x00\r&#x27;
+INFO::2017-06-20 12:31:04,067::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,068::Controller &gt;&gt;&gt; b&#x27;091c000d&#x27; : b&#x27;\t\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,068::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,069::Controller &gt;&gt;&gt; b&#x27;0b29000d&#x27; : b&#x27;\x0b)\x00\r&#x27;
+INFO::2017-06-20 12:31:04,069::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,070::Controller &gt;&gt;&gt; b&#x27;1728000d&#x27; : b&#x27;\x17(\x00\r&#x27;
+INFO::2017-06-20 12:31:04,070::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,071::Controller &gt;&gt;&gt; b&#x27;0c22000d&#x27; : b&#x27;\x0c&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,071::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,080::Controller &gt;&gt;&gt; b&#x27;0f21000d&#x27; : b&#x27;\x0f!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,080::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,081::Controller &gt;&gt;&gt; b&#x27;2711010d&#x27; : b&quot;&#x27;\x11\x01\r&quot;
+INFO::2017-06-20 12:31:04,081::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,082::Controller &gt;&gt;&gt; b&#x27;7021000d&#x27; : b&#x27;p!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,082::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,083::Controller &gt;&gt;&gt; b&#x27;280f010d&#x27; : b&#x27;(\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,083::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,084::Controller &gt;&gt;&gt; b&#x27;0a25000d&#x27; : b&#x27;\n%\x00\r&#x27;
+INFO::2017-06-20 12:31:04,084::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,085::Controller &gt;&gt;&gt; b&#x27;1827000d&#x27; : b&quot;\x18&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,085::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,086::Controller &gt;&gt;&gt; b&#x27;0323000d&#x27; : b&#x27;\x03#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,086::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,087::Controller &gt;&gt;&gt; b&#x27;2610010d&#x27; : b&#x27;&amp;\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,087::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,096::Controller &gt;&gt;&gt; b&#x27;0a26000d&#x27; : b&#x27;\n&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,096::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,097::Controller &gt;&gt;&gt; b&#x27;0921000d&#x27; : b&#x27;\t!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,097::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,098::Controller &gt;&gt;&gt; b&#x27;5a21000d&#x27; : b&#x27;Z!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,098::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,099::Controller &gt;&gt;&gt; b&#x27;270e010d&#x27; : b&quot;&#x27;\x0e\x01\r&quot;
+INFO::2017-06-20 12:31:04,099::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,100::Controller &gt;&gt;&gt; b&#x27;280a010d&#x27; : b&#x27;(\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,100::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,101::Controller &gt;&gt;&gt; b&#x27;7a0a000d&#x27; : b&#x27;z\n\x00\r&#x27;
+INFO::2017-06-20 12:31:04,101::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,102::Controller &gt;&gt;&gt; b&#x27;0334000d&#x27; : b&#x27;\x034\x00\r&#x27;
+INFO::2017-06-20 12:31:04,102::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,103::Controller &gt;&gt;&gt; b&#x27;0b27000d&#x27; : b&quot;\x0b&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,103::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,111::Controller &gt;&gt;&gt; b&#x27;032b000d&#x27; : b&#x27;\x03+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,112::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,113::Controller &gt;&gt;&gt; b&#x27;041d000d&#x27; : b&#x27;\x04\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,113::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,114::Controller &gt;&gt;&gt; b&#x27;1320000d&#x27; : b&#x27;\x13 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,114::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,115::Controller &gt;&gt;&gt; b&#x27;0022000d&#x27; : b&#x27;\x00&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,115::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,116::Controller &gt;&gt;&gt; b&#x27;2714010d&#x27; : b&quot;&#x27;\x14\x01\r&quot;
+INFO::2017-06-20 12:31:04,116::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,117::Controller &gt;&gt;&gt; b&#x27;5574000d&#x27; : b&#x27;Ut\x00\r&#x27;
+INFO::2017-06-20 12:31:04,117::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,118::Controller &gt;&gt;&gt; b&#x27;0526000d&#x27; : b&#x27;\x05&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,118::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,119::Controller &gt;&gt;&gt; b&#x27;2917010d&#x27; : b&#x27;)\x17\x01\r&#x27;
+INFO::2017-06-20 12:31:04,119::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,127::Controller &gt;&gt;&gt; b&#x27;2b0c010d&#x27; : b&#x27;+\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,128::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,129::Controller &gt;&gt;&gt; b&#x27;180c010d&#x27; : b&#x27;\x18\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,129::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,130::Controller &gt;&gt;&gt; b&#x27;4d5b000d&#x27; : b&#x27;M[\x00\r&#x27;
+INFO::2017-06-20 12:31:04,130::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,131::Controller &gt;&gt;&gt; b&#x27;0024000d&#x27; : b&#x27;\x00$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,131::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,132::Controller &gt;&gt;&gt; b&#x27;2912010d&#x27; : b&#x27;)\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,132::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,133::Controller &gt;&gt;&gt; b&#x27;7015000d&#x27; : b&#x27;p\x15\x00\r&#x27;
+INFO::2017-06-20 12:31:04,133::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,134::Controller &gt;&gt;&gt; b&#x27;041f000d&#x27; : b&#x27;\x04\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,134::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,135::Controller &gt;&gt;&gt; b&#x27;6304000d&#x27; : b&#x27;c\x04\x00\r&#x27;
+INFO::2017-06-20 12:31:04,135::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,143::Controller &gt;&gt;&gt; b&#x27;0e23000d&#x27; : b&#x27;\x0e#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,144::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,144::Controller &gt;&gt;&gt; b&#x27;1327000d&#x27; : b&quot;\x13&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,145::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,145::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,146::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,146::Controller &gt;&gt;&gt; b&#x27;2b000d&#x27; : b&#x27;+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,146::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,147::Controller &gt;&gt;&gt; b&#x27;1912010d&#x27; : b&#x27;\x19\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,147::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,148::Controller &gt;&gt;&gt; b&#x27;260b010d&#x27; : b&#x27;&amp;\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,149::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,149::Controller &gt;&gt;&gt; b&#x27;0737000d&#x27; : b&#x27;\x077\x00\r&#x27;
+INFO::2017-06-20 12:31:04,149::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,150::Controller &gt;&gt;&gt; b&#x27;0e2b000d&#x27; : b&#x27;\x0e+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,150::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,151::Controller &gt;&gt;&gt; b&#x27;1b05010d&#x27; : b&#x27;\x1b\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,151::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,160::Controller &gt;&gt;&gt; b&#x27;2307010d&#x27; : b&#x27;#\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,160::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,160::Controller &gt;&gt;&gt; b&#x27;0727000d&#x27; : b&quot;\x07&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,161::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,161::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,162::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,162::Controller &gt;&gt;&gt; b&#x27;3a000d&#x27; : b&#x27;:\x00\r&#x27;
+INFO::2017-06-20 12:31:04,163::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,163::Controller &gt;&gt;&gt; b&#x27;1623000d&#x27; : b&#x27;\x16#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,163::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,164::Controller &gt;&gt;&gt; b&#x27;011e000d&#x27; : b&#x27;\x01\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,164::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,165::Controller &gt;&gt;&gt; b&#x27;0419000d&#x27; : b&#x27;\x04\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:04,165::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,166::Controller &gt;&gt;&gt; b&#x27;2b13010d&#x27; : b&#x27;+\x13\x01\r&#x27;
+INFO::2017-06-20 12:31:04,166::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,167::Controller &gt;&gt;&gt; b&#x27;0a3b000d&#x27; : b&#x27;\n;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,167::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,176::Controller &gt;&gt;&gt; b&#x27;2406010d&#x27; : b&#x27;$\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,176::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,177::Controller &gt;&gt;&gt; b&#x27;0b0a010d&#x27; : b&#x27;\x0b\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,178::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,178::Controller &gt;&gt;&gt; b&#x27;0620000d&#x27; : b&#x27;\x06 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,179::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,179::Controller &gt;&gt;&gt; b&#x27;292f000d&#x27; : b&#x27;)/\x00\r&#x27;
+INFO::2017-06-20 12:31:04,180::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,180::Controller &gt;&gt;&gt; b&#x27;2810010d&#x27; : b&#x27;(\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,181::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,181::Controller &gt;&gt;&gt; b&#x27;2f14010d&#x27; : b&#x27;/\x14\x01\r&#x27;
+INFO::2017-06-20 12:31:04,181::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,182::Controller &gt;&gt;&gt; b&#x27;0b1e000d&#x27; : b&#x27;\x0b\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,182::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,183::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,183::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,184::Controller &gt;&gt;&gt; b&#x27;25000d&#x27; : b&#x27;%\x00\r&#x27;
+INFO::2017-06-20 12:31:04,184::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,192::Controller &gt;&gt;&gt; b&#x27;2913010d&#x27; : b&#x27;)\x13\x01\r&#x27;
+INFO::2017-06-20 12:31:04,192::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,193::Controller &gt;&gt;&gt; b&#x27;0a1f000d&#x27; : b&#x27;\n\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,193::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,194::Controller &gt;&gt;&gt; b&#x27;1922000d&#x27; : b&#x27;\x19&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,194::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,195::Controller &gt;&gt;&gt; b&#x27;2910010d&#x27; : b&#x27;)\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,195::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,196::Controller &gt;&gt;&gt; b&#x27;1b2a000d&#x27; : b&#x27;\x1b*\x00\r&#x27;
+INFO::2017-06-20 12:31:04,196::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,197::Controller &gt;&gt;&gt; b&#x27;2200010d&#x27; : b&#x27;&quot;\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,197::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,198::Controller &gt;&gt;&gt; b&#x27;7f28000d&#x27; : b&#x27;\x7f(\x00\r&#x27;
+INFO::2017-06-20 12:31:04,198::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,199::Controller &gt;&gt;&gt; b&#x27;1c01010d&#x27; : b&#x27;\x1c\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,199::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,208::Controller &gt;&gt;&gt; b&#x27;180e010d&#x27; : b&#x27;\x18\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,208::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,209::Controller &gt;&gt;&gt; b&#x27;031f000d&#x27; : b&#x27;\x03\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,209::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,210::Controller &gt;&gt;&gt; b&#x27;2c12010d&#x27; : b&#x27;,\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,210::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,211::Controller &gt;&gt;&gt; b&#x27;0f1c000d&#x27; : b&#x27;\x0f\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,211::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,212::Controller &gt;&gt;&gt; b&#x27;1a02010d&#x27; : b&#x27;\x1a\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,212::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,213::Controller &gt;&gt;&gt; b&#x27;0327000d&#x27; : b&quot;\x03&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,213::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,214::Controller &gt;&gt;&gt; b&#x27;5508000d&#x27; : b&#x27;U\x08\x00\r&#x27;
+INFO::2017-06-20 12:31:04,214::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,215::Controller &gt;&gt;&gt; b&#x27;0117000d&#x27; : b&#x27;\x01\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:04,215::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,224::Controller &gt;&gt;&gt; b&#x27;061b000d&#x27; : b&#x27;\x06\x1b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,224::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,225::Controller &gt;&gt;&gt; b&#x27;1b26000d&#x27; : b&#x27;\x1b&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,225::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,226::Controller &gt;&gt;&gt; b&#x27;1e06010d&#x27; : b&#x27;\x1e\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,227::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,227::Controller &gt;&gt;&gt; b&#x27;1206010d&#x27; : b&#x27;\x12\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,228::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,228::Controller &gt;&gt;&gt; b&#x27;2a08010d&#x27; : b&#x27;*\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,229::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,229::Controller &gt;&gt;&gt; b&#x27;2b16010d&#x27; : b&#x27;+\x16\x01\r&#x27;
+INFO::2017-06-20 12:31:04,230::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,230::Controller &gt;&gt;&gt; b&#x27;081c000d&#x27; : b&#x27;\x08\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,231::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,231::Controller &gt;&gt;&gt; b&#x27;2e10010d&#x27; : b&#x27;.\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,232::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,240::Controller &gt;&gt;&gt; b&#x27;0019000d&#x27; : b&#x27;\x00\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:04,240::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,241::Controller &gt;&gt;&gt; b&#x27;2706010d&#x27; : b&quot;&#x27;\x06\x01\r&quot;
+INFO::2017-06-20 12:31:04,241::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,242::Controller &gt;&gt;&gt; b&#x27;0a23000d&#x27; : b&#x27;\n#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,242::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,243::Controller &gt;&gt;&gt; b&#x27;1b27000d&#x27; : b&quot;\x1b&#x27;\x00\r&quot;
+INFO::2017-06-20 12:31:04,243::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,244::Controller &gt;&gt;&gt; b&#x27;1105010d&#x27; : b&#x27;\x11\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,244::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,245::Controller &gt;&gt;&gt; b&#x27;210e010d&#x27; : b&#x27;!\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,245::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,246::Controller &gt;&gt;&gt; b&#x27;300c010d&#x27; : b&#x27;0\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,246::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,247::Controller &gt;&gt;&gt; b&#x27;0a1e000d&#x27; : b&#x27;\n\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,247::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,256::Controller &gt;&gt;&gt; b&#x27;0a1b000d&#x27; : b&#x27;\n\x1b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,256::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,257::Controller &gt;&gt;&gt; b&#x27;0b22000d&#x27; : b&#x27;\x0b&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,257::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,258::Controller &gt;&gt;&gt; b&#x27;141f000d&#x27; : b&#x27;\x14\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,258::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,259::Controller &gt;&gt;&gt; b&#x27;3a06010d&#x27; : b&#x27;:\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,259::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,260::Controller &gt;&gt;&gt; b&#x27;5603000d&#x27; : b&#x27;V\x03\x00\r&#x27;
+INFO::2017-06-20 12:31:04,260::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,261::Controller &gt;&gt;&gt; b&#x27;0c03010d&#x27; : b&#x27;\x0c\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,261::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,262::Controller &gt;&gt;&gt; b&#x27;2d09010d&#x27; : b&#x27;-\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,262::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,262::Controller &gt;&gt;&gt; b&#x27;0621000d&#x27; : b&#x27;\x06!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,263::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,263::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,264::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,272::Controller &gt;&gt;&gt; b&#x27;1d000d&#x27; : b&#x27;\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,272::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,273::Controller &gt;&gt;&gt; b&#x27;1402010d&#x27; : b&#x27;\x14\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,273::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,274::Controller &gt;&gt;&gt; b&#x27;290f010d&#x27; : b&#x27;)\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,274::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,275::Controller &gt;&gt;&gt; b&#x27;3107010d&#x27; : b&#x27;1\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,276::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,276::Controller &gt;&gt;&gt; b&#x27;1401010d&#x27; : b&#x27;\x14\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,277::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,277::Controller &gt;&gt;&gt; b&#x27;1c0a010d&#x27; : b&#x27;\x1c\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,278::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,278::Controller &gt;&gt;&gt; b&#x27;042b000d&#x27; : b&#x27;\x04+\x00\r&#x27;
+INFO::2017-06-20 12:31:04,278::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,279::Controller &gt;&gt;&gt; b&#x27;2d05010d&#x27; : b&#x27;-\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,279::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,288::Controller &gt;&gt;&gt; b&#x27;0224000d&#x27; : b&#x27;\x02$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,288::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,289::Controller &gt;&gt;&gt; b&#x27;1c21010d&#x27; : b&#x27;\x1c!\x01\r&#x27;
+INFO::2017-06-20 12:31:04,289::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,290::Controller &gt;&gt;&gt; b&#x27;654e000d&#x27; : b&#x27;eN\x00\r&#x27;
+INFO::2017-06-20 12:31:04,290::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,291::Controller &gt;&gt;&gt; b&#x27;2212010d&#x27; : b&#x27;&quot;\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,291::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,292::Controller &gt;&gt;&gt; b&#x27;7e3d000d&#x27; : b&#x27;~=\x00\r&#x27;
+INFO::2017-06-20 12:31:04,292::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,293::Controller &gt;&gt;&gt; b&#x27;021a000d&#x27; : b&#x27;\x02\x1a\x00\r&#x27;
+INFO::2017-06-20 12:31:04,293::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,294::Controller &gt;&gt;&gt; b&#x27;2f08010d&#x27; : b&#x27;/\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,294::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,295::Controller &gt;&gt;&gt; b&#x27;1f0c010d&#x27; : b&#x27;\x1f\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,295::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,304::Controller &gt;&gt;&gt; b&#x27;3202010d&#x27; : b&#x27;2\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,304::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,305::Controller &gt;&gt;&gt; b&#x27;071f000d&#x27; : b&#x27;\x07\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,305::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,306::Controller &gt;&gt;&gt; b&#x27;2b04010d&#x27; : b&#x27;+\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,306::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,307::Controller &gt;&gt;&gt; b&#x27;3f04010d&#x27; : b&#x27;?\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,307::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,308::Controller &gt;&gt;&gt; b&#x27;231c010d&#x27; : b&#x27;#\x1c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,308::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,309::Controller &gt;&gt;&gt; b&#x27;1209010d&#x27; : b&#x27;\x12\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,309::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,310::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,310::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,311::Controller &gt;&gt;&gt; b&#x27;1e000d&#x27; : b&#x27;\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,311::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,311::Controller &gt;&gt;&gt; b&#x27;4245000d&#x27; : b&#x27;BE\x00\r&#x27;
+INFO::2017-06-20 12:31:04,312::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,320::Controller &gt;&gt;&gt; b&#x27;300a010d&#x27; : b&#x27;0\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,320::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,320::Controller &gt;&gt;&gt; b&#x27;330f010d&#x27; : b&#x27;3\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,321::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,321::Controller &gt;&gt;&gt; b&#x27;1021000d&#x27; : b&#x27;\x10!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,321::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,322::Controller &gt;&gt;&gt; b&#x27;1600010d&#x27; : b&#x27;\x16\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,322::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,322::Controller &gt;&gt;&gt; b&#x27;0e18000d&#x27; : b&#x27;\x0e\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,322::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,323::Controller &gt;&gt;&gt; b&#x27;1f1a010d&#x27; : b&#x27;\x1f\x1a\x01\r&#x27;
+INFO::2017-06-20 12:31:04,323::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,323::Controller &gt;&gt;&gt; b&#x27;290a010d&#x27; : b&#x27;)\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,324::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,324::Controller &gt;&gt;&gt; b&#x27;1e0a010d&#x27; : b&#x27;\x1e\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,324::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,335::Controller &gt;&gt;&gt; b&#x27;260e010d&#x27; : b&#x27;&amp;\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,335::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,336::Controller &gt;&gt;&gt; b&#x27;3113010d&#x27; : b&#x27;1\x13\x01\r&#x27;
+INFO::2017-06-20 12:31:04,336::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,336::Controller &gt;&gt;&gt; b&#x27;0a1d000d&#x27; : b&#x27;\n\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,337::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,337::Controller &gt;&gt;&gt; b&#x27;2520010d&#x27; : b&#x27;% \x01\r&#x27;
+INFO::2017-06-20 12:31:04,337::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,338::Controller &gt;&gt;&gt; b&#x27;004e000d&#x27; : b&#x27;\x00N\x00\r&#x27;
+INFO::2017-06-20 12:31:04,338::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,338::Controller &gt;&gt;&gt; b&#x27;2702010d&#x27; : b&quot;&#x27;\x02\x01\r&quot;
+INFO::2017-06-20 12:31:04,338::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,339::Controller &gt;&gt;&gt; b&#x27;0624000d&#x27; : b&#x27;\x06$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,339::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,339::Controller &gt;&gt;&gt; b&#x27;1b1e010d&#x27; : b&#x27;\x1b\x1e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,340::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,351::Controller &gt;&gt;&gt; b&#x27;1121000d&#x27; : b&#x27;\x11!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,352::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,352::Controller &gt;&gt;&gt; b&#x27;0522010d&#x27; : b&#x27;\x05&quot;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,352::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,353::Controller &gt;&gt;&gt; b&#x27;0627010d&#x27; : b&quot;\x06&#x27;\x01\r&quot;
+INFO::2017-06-20 12:31:04,353::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,353::Controller &gt;&gt;&gt; b&#x27;3a26010d&#x27; : b&#x27;:&amp;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,354::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,354::Controller &gt;&gt;&gt; b&#x27;2317010d&#x27; : b&#x27;#\x17\x01\r&#x27;
+INFO::2017-06-20 12:31:04,354::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,355::Controller &gt;&gt;&gt; b&#x27;0b29010d&#x27; : b&#x27;\x0b)\x01\r&#x27;
+INFO::2017-06-20 12:31:04,355::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,355::Controller &gt;&gt;&gt; b&#x27;171c010d&#x27; : b&#x27;\x17\x1c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,355::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,356::Controller &gt;&gt;&gt; b&#x27;1e04010d&#x27; : b&#x27;\x1e\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,356::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,368::Controller &gt;&gt;&gt; b&#x27;1a04010d&#x27; : b&#x27;\x1a\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,368::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,369::Controller &gt;&gt;&gt; b&#x27;2704010d&#x27; : b&quot;&#x27;\x04\x01\r&quot;
+INFO::2017-06-20 12:31:04,369::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,369::Controller &gt;&gt;&gt; b&#x27;1903010d&#x27; : b&#x27;\x19\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,369::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,370::Controller &gt;&gt;&gt; b&#x27;6724000d&#x27; : b&#x27;g$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,370::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,370::Controller &gt;&gt;&gt; b&#x27;3506010d&#x27; : b&#x27;5\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,371::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,371::Controller &gt;&gt;&gt; b&#x27;1028010d&#x27; : b&#x27;\x10(\x01\r&#x27;
+INFO::2017-06-20 12:31:04,371::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,371::Controller &gt;&gt;&gt; b&#x27;050a010d&#x27; : b&#x27;\x05\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,372::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,372::Controller &gt;&gt;&gt; b&#x27;032a010d&#x27; : b&#x27;\x03*\x01\r&#x27;
+INFO::2017-06-20 12:31:04,372::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,384::Controller &gt;&gt;&gt; b&#x27;032d010d&#x27; : b&#x27;\x03-\x01\r&#x27;
+INFO::2017-06-20 12:31:04,384::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,384::Controller &gt;&gt;&gt; b&#x27;1908010d&#x27; : b&#x27;\x19\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,384::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,384::Controller &gt;&gt;&gt; b&#x27;0e1a000d&#x27; : b&#x27;\x0e\x1a\x00\r&#x27;
+INFO::2017-06-20 12:31:04,385::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,385::Controller &gt;&gt;&gt; b&#x27;3307010d&#x27; : b&#x27;3\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,385::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,386::Controller &gt;&gt;&gt; b&#x27;2a07010d&#x27; : b&#x27;*\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,386::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,386::Controller &gt;&gt;&gt; b&#x27;131d000d&#x27; : b&#x27;\x13\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,386::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,387::Controller &gt;&gt;&gt; b&#x27;1b06010d&#x27; : b&#x27;\x1b\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,387::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,387::Controller &gt;&gt;&gt; b&#x27;1b21000d&#x27; : b&#x27;\x1b!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,388::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,399::Controller &gt;&gt;&gt; b&#x27;1e21010d&#x27; : b&#x27;\x1e!\x01\r&#x27;
+INFO::2017-06-20 12:31:04,400::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,400::Controller &gt;&gt;&gt; b&#x27;2f06010d&#x27; : b&#x27;/\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,400::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,401::Controller &gt;&gt;&gt; b&#x27;1320000d&#x27; : b&#x27;\x13 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,401::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,401::Controller &gt;&gt;&gt; b&#x27;2007010d&#x27; : b&#x27; \x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,402::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,402::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,402::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,402::Controller &gt;&gt;&gt; b&#x27;21000d&#x27; : b&#x27;!\x00\r&#x27;
+INFO::2017-06-20 12:31:04,403::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,403::Controller &gt;&gt;&gt; b&#x27;101e000d&#x27; : b&#x27;\x10\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,403::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,404::Controller &gt;&gt;&gt; b&#x27;1d35010d&#x27; : b&#x27;\x1d5\x01\r&#x27;
+INFO::2017-06-20 12:31:04,404::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,404::Controller &gt;&gt;&gt; b&#x27;693d000d&#x27; : b&#x27;i=\x00\r&#x27;
+INFO::2017-06-20 12:31:04,404::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,416::Controller &gt;&gt;&gt; b&#x27;1326000d&#x27; : b&#x27;\x13&amp;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,416::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,417::Controller &gt;&gt;&gt; b&#x27;3001010d&#x27; : b&#x27;0\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,417::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,417::Controller &gt;&gt;&gt; b&#x27;1124000d&#x27; : b&#x27;\x11$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,417::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,418::Controller &gt;&gt;&gt; b&#x27;1916010d&#x27; : b&#x27;\x19\x16\x01\r&#x27;
+INFO::2017-06-20 12:31:04,418::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,419::Controller &gt;&gt;&gt; b&#x27;3308010d&#x27; : b&#x27;3\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,419::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,419::Controller &gt;&gt;&gt; b&#x27;1609010d&#x27; : b&#x27;\x16\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,419::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,420::Controller &gt;&gt;&gt; b&#x27;1423000d&#x27; : b&#x27;\x14#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,420::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,420::Controller &gt;&gt;&gt; b&#x27;1524000d&#x27; : b&#x27;\x15$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,421::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,431::Controller &gt;&gt;&gt; b&#x27;161f000d&#x27; : b&#x27;\x16\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,431::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,432::Controller &gt;&gt;&gt; b&#x27;051c010d&#x27; : b&#x27;\x05\x1c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,432::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,433::Controller &gt;&gt;&gt; b&#x27;1635010d&#x27; : b&#x27;\x165\x01\r&#x27;
+INFO::2017-06-20 12:31:04,433::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,433::Controller &gt;&gt;&gt; b&#x27;3033010d&#x27; : b&#x27;03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,433::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,434::Controller &gt;&gt;&gt; b&#x27;2506010d&#x27; : b&#x27;%\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,434::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,434::Controller &gt;&gt;&gt; b&#x27;2103010d&#x27; : b&#x27;!\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,434::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,435::Controller &gt;&gt;&gt; b&#x27;0503010d&#x27; : b&#x27;\x05\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,435::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,435::Controller &gt;&gt;&gt; b&#x27;0131010d&#x27; : b&#x27;\x011\x01\r&#x27;
+INFO::2017-06-20 12:31:04,436::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,447::Controller &gt;&gt;&gt; b&#x27;012d010d&#x27; : b&#x27;\x01-\x01\r&#x27;
+INFO::2017-06-20 12:31:04,447::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,448::Controller &gt;&gt;&gt; b&#x27;0925010d&#x27; : b&#x27;\t%\x01\r&#x27;
+INFO::2017-06-20 12:31:04,448::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,448::Controller &gt;&gt;&gt; b&#x27;0433010d&#x27; : b&#x27;\x043\x01\r&#x27;
+INFO::2017-06-20 12:31:04,449::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,449::Controller &gt;&gt;&gt; b&#x27;0e2f010d&#x27; : b&#x27;\x0e/\x01\r&#x27;
+INFO::2017-06-20 12:31:04,449::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,450::Controller &gt;&gt;&gt; b&#x27;0035010d&#x27; : b&#x27;\x005\x01\r&#x27;
+INFO::2017-06-20 12:31:04,450::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,450::Controller &gt;&gt;&gt; b&#x27;360a010d&#x27; : b&#x27;6\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,451::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,451::Controller &gt;&gt;&gt; b&#x27;060a010d&#x27; : b&#x27;\x06\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,451::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,451::Controller &gt;&gt;&gt; b&#x27;1334010d&#x27; : b&#x27;\x134\x01\r&#x27;
+INFO::2017-06-20 12:31:04,452::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,463::Controller &gt;&gt;&gt; b&#x27;1b03010d&#x27; : b&#x27;\x1b\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,463::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,464::Controller &gt;&gt;&gt; b&#x27;2f01010d&#x27; : b&#x27;/\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,464::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,464::Controller &gt;&gt;&gt; b&#x27;3209010d&#x27; : b&#x27;2\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,465::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,466::Controller &gt;&gt;&gt; b&#x27;5856000d&#x27; : b&#x27;XV\x00\r&#x27;
+INFO::2017-06-20 12:31:04,466::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,467::Controller &gt;&gt;&gt; b&#x27;052c000d&#x27; : b&#x27;\x05,\x00\r&#x27;
+INFO::2017-06-20 12:31:04,467::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,467::Controller &gt;&gt;&gt; b&#x27;0308000d&#x27; : b&#x27;\x03\x08\x00\r&#x27;
+INFO::2017-06-20 12:31:04,468::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,468::Controller &gt;&gt;&gt; b&#x27;330a010d&#x27; : b&#x27;3\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,469::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,469::Controller &gt;&gt;&gt; b&#x27;170a010d&#x27; : b&#x27;\x17\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,470::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,479::Controller &gt;&gt;&gt; b&#x27;1f10010d&#x27; : b&#x27;\x1f\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,479::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,480::Controller &gt;&gt;&gt; b&#x27;2305010d&#x27; : b&#x27;#\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,480::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,481::Controller &gt;&gt;&gt; b&#x27;0005010d&#x27; : b&#x27;\x00\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,482::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,482::Controller &gt;&gt;&gt; b&#x27;2335010d&#x27; : b&#x27;#5\x01\r&#x27;
+INFO::2017-06-20 12:31:04,483::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,483::Controller &gt;&gt;&gt; b&#x27;3b07010d&#x27; : b&#x27;;\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,484::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,484::Controller &gt;&gt;&gt; b&#x27;5473000d&#x27; : b&#x27;Ts\x00\r&#x27;
+INFO::2017-06-20 12:31:04,485::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,485::Controller &gt;&gt;&gt; b&#x27;1420000d&#x27; : b&#x27;\x14 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,486::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,486::Controller &gt;&gt;&gt; b&#x27;250c010d&#x27; : b&#x27;%\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,487::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,496::Controller &gt;&gt;&gt; b&#x27;022d000d&#x27; : b&#x27;\x02-\x00\r&#x27;
+INFO::2017-06-20 12:31:04,496::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,497::Controller &gt;&gt;&gt; b&#x27;1313000d&#x27; : b&#x27;\x13\x13\x00\r&#x27;
+INFO::2017-06-20 12:31:04,497::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,498::Controller &gt;&gt;&gt; b&#x27;1a0b010d&#x27; : b&#x27;\x1a\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,498::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,499::Controller &gt;&gt;&gt; b&#x27;792d000d&#x27; : b&#x27;y-\x00\r&#x27;
+INFO::2017-06-20 12:31:04,500::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,500::Controller &gt;&gt;&gt; b&#x27;0116000d&#x27; : b&#x27;\x01\x16\x00\r&#x27;
+INFO::2017-06-20 12:31:04,501::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,501::Controller &gt;&gt;&gt; b&#x27;2b01010d&#x27; : b&#x27;+\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,502::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,502::Controller &gt;&gt;&gt; b&#x27;0801010d&#x27; : b&#x27;\x08\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,503::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,503::Controller &gt;&gt;&gt; b&#x27;2134010d&#x27; : b&#x27;!4\x01\r&#x27;
+INFO::2017-06-20 12:31:04,504::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,512::Controller &gt;&gt;&gt; b&#x27;0909000d&#x27; : b&#x27;\t\t\x00\r&#x27;
+INFO::2017-06-20 12:31:04,512::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,513::Controller &gt;&gt;&gt; b&#x27;3600010d&#x27; : b&#x27;6\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,513::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,514::Controller &gt;&gt;&gt; b&#x27;1622000d&#x27; : b&#x27;\x16&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,514::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,515::Controller &gt;&gt;&gt; b&#x27;101b000d&#x27; : b&#x27;\x10\x1b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,515::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,516::Controller &gt;&gt;&gt; b&#x27;4f1f000d&#x27; : b&#x27;O\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,516::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,517::Controller &gt;&gt;&gt; b&#x27;000b000d&#x27; : b&#x27;\x00\x0b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,517::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,518::Controller &gt;&gt;&gt; b&#x27;210b010d&#x27; : b&#x27;!\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,518::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,519::Controller &gt;&gt;&gt; b&#x27;3b0f010d&#x27; : b&#x27;;\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,519::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,527::Controller &gt;&gt;&gt; b&#x27;2f12010d&#x27; : b&#x27;/\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,528::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,529::Controller &gt;&gt;&gt; b&#x27;2f09010d&#x27; : b&#x27;/\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,529::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,530::Controller &gt;&gt;&gt; b&#x27;131f000d&#x27; : b&#x27;\x13\x1f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,530::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,531::Controller &gt;&gt;&gt; b&#x27;151b000d&#x27; : b&#x27;\x15\x1b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,531::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,532::Controller &gt;&gt;&gt; b&#x27;2116010d&#x27; : b&#x27;!\x16\x01\r&#x27;
+INFO::2017-06-20 12:31:04,532::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,533::Controller &gt;&gt;&gt; b&#x27;3708010d&#x27; : b&#x27;7\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,533::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,534::Controller &gt;&gt;&gt; b&#x27;2017010d&#x27; : b&#x27; \x17\x01\r&#x27;
+INFO::2017-06-20 12:31:04,534::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,535::Controller &gt;&gt;&gt; b&#x27;1116000d&#x27; : b&#x27;\x11\x16\x00\r&#x27;
+INFO::2017-06-20 12:31:04,535::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,543::Controller &gt;&gt;&gt; b&#x27;261f010d&#x27; : b&#x27;&amp;\x1f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,544::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,545::Controller &gt;&gt;&gt; b&#x27;182c010d&#x27; : b&#x27;\x18,\x01\r&#x27;
+INFO::2017-06-20 12:31:04,545::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,546::Controller &gt;&gt;&gt; b&#x27;2209010d&#x27; : b&#x27;&quot;\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,546::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,547::Controller &gt;&gt;&gt; b&#x27;0510000d&#x27; : b&#x27;\x05\x10\x00\r&#x27;
+INFO::2017-06-20 12:31:04,547::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,548::Controller &gt;&gt;&gt; b&#x27;2902010d&#x27; : b&#x27;)\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,548::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,549::Controller &gt;&gt;&gt; b&#x27;0811000d&#x27; : b&#x27;\x08\x11\x00\r&#x27;
+INFO::2017-06-20 12:31:04,549::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,550::Controller &gt;&gt;&gt; b&#x27;2006010d&#x27; : b&#x27; \x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,550::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,551::Controller &gt;&gt;&gt; b&#x27;121a000d&#x27; : b&#x27;\x12\x1a\x00\r&#x27;
+INFO::2017-06-20 12:31:04,551::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,559::Controller &gt;&gt;&gt; b&#x27;0902010d&#x27; : b&#x27;\t\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,560::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,560::Controller &gt;&gt;&gt; b&#x27;0936010d&#x27; : b&#x27;\t6\x01\r&#x27;
+INFO::2017-06-20 12:31:04,561::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,561::Controller &gt;&gt;&gt; b&#x27;1b1c000d&#x27; : b&#x27;\x1b\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,562::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,562::Controller &gt;&gt;&gt; b&#x27;0c77010d&#x27; : b&#x27;\x0cw\x01\r&#x27;
+INFO::2017-06-20 12:31:04,563::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,563::Controller &gt;&gt;&gt; b&#x27;0a24010d&#x27; : b&#x27;\n$\x01\r&#x27;
+INFO::2017-06-20 12:31:04,564::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,564::Controller &gt;&gt;&gt; b&#x27;153b010d&#x27; : b&#x27;\x15;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,565::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,565::Controller &gt;&gt;&gt; b&#x27;0117000d&#x27; : b&#x27;\x01\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:04,566::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,566::Controller &gt;&gt;&gt; b&#x27;3607010d&#x27; : b&#x27;6\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,567::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,575::Controller &gt;&gt;&gt; b&#x27;3a10010d&#x27; : b&#x27;:\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,576::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,576::Controller &gt;&gt;&gt; b&#x27;161a010d&#x27; : b&#x27;\x16\x1a\x01\r&#x27;
+INFO::2017-06-20 12:31:04,577::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,577::Controller &gt;&gt;&gt; b&#x27;040d&#x27; : b&#x27;\x04\r&#x27;
+INFO::2017-06-20 12:31:04,577::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,578::Controller &gt;&gt;&gt; b&#x27;000d&#x27; : b&#x27;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,578::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,579::Controller &gt;&gt;&gt; b&#x27;3906010d&#x27; : b&#x27;9\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,579::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,580::Controller &gt;&gt;&gt; b&#x27;1824000d&#x27; : b&#x27;\x18$\x00\r&#x27;
+INFO::2017-06-20 12:31:04,580::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,581::Controller &gt;&gt;&gt; b&#x27;141e000d&#x27; : b&#x27;\x14\x1e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,581::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,582::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,582::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,583::Controller &gt;&gt;&gt; b&#x27;19000d&#x27; : b&#x27;\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:04,583::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,584::Controller &gt;&gt;&gt; b&#x27;0515000d&#x27; : b&#x27;\x05\x15\x00\r&#x27;
+INFO::2017-06-20 12:31:04,584::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,591::Controller &gt;&gt;&gt; b&#x27;2608010d&#x27; : b&#x27;&amp;\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,591::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,592::Controller &gt;&gt;&gt; b&#x27;1122010d&#x27; : b&#x27;\x11&quot;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,593::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,593::Controller &gt;&gt;&gt; b&#x27;5917000d&#x27; : b&#x27;Y\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:04,594::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,594::Controller &gt;&gt;&gt; b&#x27;250b010d&#x27; : b&#x27;%\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,595::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,595::Controller &gt;&gt;&gt; b&#x27;1b03010d&#x27; : b&#x27;\x1b\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,595::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,596::Controller &gt;&gt;&gt; b&#x27;3c05010d&#x27; : b&#x27;&lt;\x05\x01\r&#x27;
+INFO::2017-06-20 12:31:04,596::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,597::Controller &gt;&gt;&gt; b&#x27;060b000d&#x27; : b&#x27;\x06\x0b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,597::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,598::Controller &gt;&gt;&gt; b&#x27;0817000d&#x27; : b&#x27;\x08\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:04,599::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,607::Controller &gt;&gt;&gt; b&#x27;191d000d&#x27; : b&#x27;\x19\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,607::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,608::Controller &gt;&gt;&gt; b&#x27;131c000d&#x27; : b&#x27;\x13\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,608::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,609::Controller &gt;&gt;&gt; b&#x27;3e06010d&#x27; : b&#x27;&gt;\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,609::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,610::Controller &gt;&gt;&gt; b&#x27;1219000d&#x27; : b&#x27;\x12\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:04,610::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,611::Controller &gt;&gt;&gt; b&#x27;390a010d&#x27; : b&#x27;9\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,611::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,612::Controller &gt;&gt;&gt; b&#x27;170a010d&#x27; : b&#x27;\x17\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,612::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,613::Controller &gt;&gt;&gt; b&#x27;3d10010d&#x27; : b&#x27;=\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,613::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,614::Controller &gt;&gt;&gt; b&#x27;220d&#x27; : b&#x27;&quot;\r&#x27;
+INFO::2017-06-20 12:31:04,614::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,615::Controller &gt;&gt;&gt; b&#x27;010d&#x27; : b&#x27;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,615::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,624::Controller &gt;&gt;&gt; b&#x27;0301000d&#x27; : b&#x27;\x03\x01\x00\r&#x27;
+INFO::2017-06-20 12:31:04,624::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,625::Controller &gt;&gt;&gt; b&#x27;3c08010d&#x27; : b&#x27;&lt;\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,625::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,626::Controller &gt;&gt;&gt; b&#x27;080f000d&#x27; : b&#x27;\x08\x0f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,626::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,627::Controller &gt;&gt;&gt; b&#x27;1111000d&#x27; : b&#x27;\x11\x11\x00\r&#x27;
+INFO::2017-06-20 12:31:04,627::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,628::Controller &gt;&gt;&gt; b&#x27;1519000d&#x27; : b&#x27;\x15\x19\x00\r&#x27;
+INFO::2017-06-20 12:31:04,628::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,629::Controller &gt;&gt;&gt; b&#x27;181c000d&#x27; : b&#x27;\x18\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,629::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,630::Controller &gt;&gt;&gt; b&#x27;1a1b000d&#x27; : b&#x27;\x1a\x1b\x00\r&#x27;
+INFO::2017-06-20 12:31:04,630::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,631::Controller &gt;&gt;&gt; b&#x27;0911000d&#x27; : b&#x27;\t\x11\x00\r&#x27;
+INFO::2017-06-20 12:31:04,631::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,639::Controller &gt;&gt;&gt; b&#x27;0901010d&#x27; : b&#x27;\t\x01\x01\r&#x27;
+INFO::2017-06-20 12:31:04,640::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,641::Controller &gt;&gt;&gt; b&#x27;2743000d&#x27; : b&quot;&#x27;C\x00\r&quot;
+INFO::2017-06-20 12:31:04,641::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,642::Controller &gt;&gt;&gt; b&#x27;011b010d&#x27; : b&#x27;\x01\x1b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,642::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,643::Controller &gt;&gt;&gt; b&#x27;0720010d&#x27; : b&#x27;\x07 \x01\r&#x27;
+INFO::2017-06-20 12:31:04,643::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,644::Controller &gt;&gt;&gt; b&#x27;1238010d&#x27; : b&#x27;\x128\x01\r&#x27;
+INFO::2017-06-20 12:31:04,644::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,645::Controller &gt;&gt;&gt; b&#x27;1817000d&#x27; : b&#x27;\x18\x17\x00\r&#x27;
+INFO::2017-06-20 12:31:04,645::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,646::Controller &gt;&gt;&gt; b&#x27;390b010d&#x27; : b&#x27;9\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,646::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,647::Controller &gt;&gt;&gt; b&#x27;1320000d&#x27; : b&#x27;\x13 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,647::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,655::Controller &gt;&gt;&gt; b&#x27;1718000d&#x27; : b&#x27;\x17\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,656::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,657::Controller &gt;&gt;&gt; b&#x27;3e0b010d&#x27; : b&#x27;&gt;\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,663::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,664::Controller &gt;&gt;&gt; b&#x27;3e0b010d&#x27; : b&#x27;&gt;\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,664::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,665::Controller &gt;&gt;&gt; b&#x27;240b010d&#x27; : b&#x27;$\x0b\x01\r&#x27;
+INFO::2017-06-20 12:31:04,665::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,666::Controller &gt;&gt;&gt; b&#x27;0f18000d&#x27; : b&#x27;\x0f\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,666::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,667::Controller &gt;&gt;&gt; b&#x27;1520000d&#x27; : b&#x27;\x15 \x00\r&#x27;
+INFO::2017-06-20 12:31:04,667::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,668::Controller &gt;&gt;&gt; b&#x27;3764000d&#x27; : b&#x27;7d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,668::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,669::Controller &gt;&gt;&gt; b&#x27;2d14010d&#x27; : b&#x27;-\x14\x01\r&#x27;
+INFO::2017-06-20 12:31:04,669::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,671::Controller &gt;&gt;&gt; b&#x27;7048000d&#x27; : b&#x27;pH\x00\r&#x27;
+INFO::2017-06-20 12:31:04,672::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,672::Controller &gt;&gt;&gt; b&#x27;1725000d&#x27; : b&#x27;\x17%\x00\r&#x27;
+INFO::2017-06-20 12:31:04,673::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,673::Controller &gt;&gt;&gt; b&#x27;0145000d&#x27; : b&#x27;\x01E\x00\r&#x27;
+INFO::2017-06-20 12:31:04,674::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,674::Controller &gt;&gt;&gt; b&#x27;1b23000d&#x27; : b&#x27;\x1b#\x00\r&#x27;
+INFO::2017-06-20 12:31:04,675::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,675::Controller &gt;&gt;&gt; b&#x27;1922000d&#x27; : b&#x27;\x19&quot;\x00\r&#x27;
+INFO::2017-06-20 12:31:04,676::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,676::Controller &gt;&gt;&gt; b&#x27;021a000d&#x27; : b&#x27;\x02\x1a\x00\r&#x27;
+INFO::2017-06-20 12:31:04,677::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,677::Controller &gt;&gt;&gt; b&#x27;0207010d&#x27; : b&#x27;\x02\x07\x01\r&#x27;
+INFO::2017-06-20 12:31:04,678::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,678::Controller &gt;&gt;&gt; b&#x27;0242010d&#x27; : b&#x27;\x02B\x01\r&#x27;
+INFO::2017-06-20 12:31:04,679::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,687::Controller &gt;&gt;&gt; b&#x27;173e010d&#x27; : b&#x27;\x17&gt;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,688::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,688::Controller &gt;&gt;&gt; b&#x27;020a000d&#x27; : b&#x27;\x02\n\x00\r&#x27;
+INFO::2017-06-20 12:31:04,689::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,689::Controller &gt;&gt;&gt; b&#x27;3608010d&#x27; : b&#x27;6\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,690::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,690::Controller &gt;&gt;&gt; b&#x27;1308010d&#x27; : b&#x27;\x13\x08\x01\r&#x27;
+INFO::2017-06-20 12:31:04,691::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,691::Controller &gt;&gt;&gt; b&#x27;6925000d&#x27; : b&#x27;i%\x00\r&#x27;
+INFO::2017-06-20 12:31:04,692::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,692::Controller &gt;&gt;&gt; b&#x27;3c10010d&#x27; : b&#x27;&lt;\x10\x01\r&#x27;
+INFO::2017-06-20 12:31:04,693::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,693::Controller &gt;&gt;&gt; b&#x27;3204010d&#x27; : b&#x27;2\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,694::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,694::Controller &gt;&gt;&gt; b&#x27;3204010d&#x27; : b&#x27;2\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,695::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,695::Controller &gt;&gt;&gt; b&#x27;160d&#x27; : b&#x27;\x16\r&#x27;
+INFO::2017-06-20 12:31:04,695::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,703::Controller &gt;&gt;&gt; b&#x27;010d&#x27; : b&#x27;\x01\r&#x27;
+INFO::2017-06-20 12:31:04,704::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,704::Controller &gt;&gt;&gt; b&#x27;1e60000d&#x27; : b&#x27;\x1e`\x00\r&#x27;
+INFO::2017-06-20 12:31:04,705::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,705::Controller &gt;&gt;&gt; b&#x27;1012000d&#x27; : b&#x27;\x10\x12\x00\r&#x27;
+INFO::2017-06-20 12:31:04,706::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,706::Controller &gt;&gt;&gt; b&#x27;0e65010d&#x27; : b&#x27;\x0ee\x01\r&#x27;
+INFO::2017-06-20 12:31:04,707::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,707::Controller &gt;&gt;&gt; b&#x27;121c000d&#x27; : b&#x27;\x12\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,708::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,708::Controller &gt;&gt;&gt; b&#x27;2f33000d&#x27; : b&#x27;/3\x00\r&#x27;
+INFO::2017-06-20 12:31:04,709::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,710::Controller &gt;&gt;&gt; b&#x27;3d09010d&#x27; : b&#x27;=\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,710::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,711::Controller &gt;&gt;&gt; b&#x27;0f25010d&#x27; : b&#x27;\x0f%\x01\r&#x27;
+INFO::2017-06-20 12:31:04,711::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,719::Controller &gt;&gt;&gt; b&#x27;151f010d&#x27; : b&#x27;\x15\x1f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,719::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,721::Controller &gt;&gt;&gt; b&#x27;3104010d&#x27; : b&#x27;1\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,721::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,722::Controller &gt;&gt;&gt; b&#x27;435c000d&#x27; : b&#x27;C\\\x00\r&#x27;
+INFO::2017-06-20 12:31:04,722::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,723::Controller &gt;&gt;&gt; b&#x27;0618000d&#x27; : b&#x27;\x06\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,723::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,723::Controller &gt;&gt;&gt; b&#x27;3000010d&#x27; : b&#x27;0\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,723::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,725::Controller &gt;&gt;&gt; b&#x27;5c14000d&#x27; : b&#x27;\\\x14\x00\r&#x27;
+INFO::2017-06-20 12:31:04,725::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,726::Controller &gt;&gt;&gt; b&#x27;594a000d&#x27; : b&#x27;YJ\x00\r&#x27;
+INFO::2017-06-20 12:31:04,726::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,727::Controller &gt;&gt;&gt; b&#x27;0213000d&#x27; : b&#x27;\x02\x13\x00\r&#x27;
+INFO::2017-06-20 12:31:04,728::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,735::Controller &gt;&gt;&gt; b&#x27;1618000d&#x27; : b&#x27;\x16\x18\x00\r&#x27;
+INFO::2017-06-20 12:31:04,736::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,736::Controller &gt;&gt;&gt; b&#x27;435d000d&#x27; : b&#x27;C]\x00\r&#x27;
+INFO::2017-06-20 12:31:04,737::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,737::Controller &gt;&gt;&gt; b&#x27;216c000d&#x27; : b&#x27;!l\x00\r&#x27;
+INFO::2017-06-20 12:31:04,738::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,738::Controller &gt;&gt;&gt; b&#x27;252c000d&#x27; : b&#x27;%,\x00\r&#x27;
+INFO::2017-06-20 12:31:04,739::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,739::Controller &gt;&gt;&gt; b&#x27;4947000d&#x27; : b&#x27;IG\x00\r&#x27;
+INFO::2017-06-20 12:31:04,740::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,740::Controller &gt;&gt;&gt; b&#x27;0714000d&#x27; : b&#x27;\x07\x14\x00\r&#x27;
+INFO::2017-06-20 12:31:04,741::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,741::Controller &gt;&gt;&gt; b&#x27;370c010d&#x27; : b&#x27;7\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,742::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,743::Controller &gt;&gt;&gt; b&#x27;2d0c010d&#x27; : b&#x27;-\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,743::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,751::Controller &gt;&gt;&gt; b&#x27;081d000d&#x27; : b&#x27;\x08\x1d\x00\r&#x27;
+INFO::2017-06-20 12:31:04,752::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,752::Controller &gt;&gt;&gt; b&#x27;210a010d&#x27; : b&#x27;!\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,753::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,753::Controller &gt;&gt;&gt; b&#x27;3402010d&#x27; : b&#x27;4\x02\x01\r&#x27;
+INFO::2017-06-20 12:31:04,754::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,754::Controller &gt;&gt;&gt; b&#x27;0410000d&#x27; : b&#x27;\x04\x10\x00\r&#x27;
+INFO::2017-06-20 12:31:04,755::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,755::Controller &gt;&gt;&gt; b&#x27;270c010d&#x27; : b&quot;&#x27;\x0c\x01\r&quot;
+INFO::2017-06-20 12:31:04,756::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,756::Controller &gt;&gt;&gt; b&#x27;7f0c000d&#x27; : b&#x27;\x7f\x0c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,757::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,757::Controller &gt;&gt;&gt; b&#x27;0d&#x27; : b&#x27;\r&#x27;
+INFO::2017-06-20 12:31:04,757::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,758::Controller &gt;&gt;&gt; b&#x27;5c000d&#x27; : b&#x27;\\\x00\r&#x27;
+INFO::2017-06-20 12:31:04,758::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,759::Controller &gt;&gt;&gt; b&#x27;510e000d&#x27; : b&#x27;Q\x0e\x00\r&#x27;
+INFO::2017-06-20 12:31:04,759::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,767::Controller &gt;&gt;&gt; b&#x27;6773000d&#x27; : b&#x27;gs\x00\r&#x27;
+INFO::2017-06-20 12:31:04,767::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,768::Controller &gt;&gt;&gt; b&#x27;1312000d&#x27; : b&#x27;\x13\x12\x00\r&#x27;
+INFO::2017-06-20 12:31:04,768::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,769::Controller &gt;&gt;&gt; b&#x27;6740000d&#x27; : b&#x27;g@\x00\r&#x27;
+INFO::2017-06-20 12:31:04,769::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,770::Controller &gt;&gt;&gt; b&#x27;000f000d&#x27; : b&#x27;\x00\x0f\x00\r&#x27;
+INFO::2017-06-20 12:31:04,770::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,771::Controller &gt;&gt;&gt; b&#x27;2a0f010d&#x27; : b&#x27;*\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,771::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,772::Controller &gt;&gt;&gt; b&#x27;3917010d&#x27; : b&#x27;9\x17\x01\r&#x27;
+INFO::2017-06-20 12:31:04,772::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,773::Controller &gt;&gt;&gt; b&#x27;042a000d&#x27; : b&#x27;\x04*\x00\r&#x27;
+INFO::2017-06-20 12:31:04,774::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,774::Controller &gt;&gt;&gt; b&#x27;465f000d&#x27; : b&#x27;F_\x00\r&#x27;
+INFO::2017-06-20 12:31:04,775::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,783::Controller &gt;&gt;&gt; b&#x27;2d04010d&#x27; : b&#x27;-\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,783::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,784::Controller &gt;&gt;&gt; b&#x27;2d04010d&#x27; : b&#x27;-\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,784::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,785::Controller &gt;&gt;&gt; b&#x27;2d04010d&#x27; : b&#x27;-\x04\x01\r&#x27;
+INFO::2017-06-20 12:31:04,785::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,786::Controller &gt;&gt;&gt; b&#x27;3b00010d&#x27; : b&#x27;;\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,786::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,787::Controller &gt;&gt;&gt; b&#x27;3b00010d&#x27; : b&#x27;;\x00\x01\r&#x27;
+INFO::2017-06-20 12:31:04,787::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,788::Controller &gt;&gt;&gt; b&#x27;2909010d&#x27; : b&#x27;)\t\x01\r&#x27;
+INFO::2017-06-20 12:31:04,788::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,789::Controller &gt;&gt;&gt; b&#x27;7342000d&#x27; : b&#x27;sB\x00\r&#x27;
+INFO::2017-06-20 12:31:04,789::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,790::Controller &gt;&gt;&gt; b&#x27;041c000d&#x27; : b&#x27;\x04\x1c\x00\r&#x27;
+INFO::2017-06-20 12:31:04,790::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,799::Controller &gt;&gt;&gt; b&#x27;0913000d&#x27; : b&#x27;\t\x13\x00\r&#x27;
+INFO::2017-06-20 12:31:04,799::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,816::Controller &gt;&gt;&gt; b&#x27;5f7a000d&#x27; : b&#x27;_z\x00\r&#x27;
+INFO::2017-06-20 12:31:04,816::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,831::Controller &gt;&gt;&gt; b&#x27;3e73000d&#x27; : b&#x27;&gt;s\x00\r&#x27;
+INFO::2017-06-20 12:31:04,832::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,833::Controller &gt;&gt;&gt; b&#x27;6952000d&#x27; : b&#x27;iR\x00\r&#x27;
+INFO::2017-06-20 12:31:04,833::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,847::Controller &gt;&gt;&gt; b&#x27;594f000d&#x27; : b&#x27;YO\x00\r&#x27;
+INFO::2017-06-20 12:31:04,848::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,863::Controller &gt;&gt;&gt; b&#x27;4203010d&#x27; : b&#x27;B\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,863::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,864::Controller &gt;&gt;&gt; b&#x27;4203010d&#x27; : b&#x27;B\x03\x01\r&#x27;
+INFO::2017-06-20 12:31:04,865::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,865::Controller &gt;&gt;&gt; b&#x27;1c06010d&#x27; : b&#x27;\x1c\x06\x01\r&#x27;
+INFO::2017-06-20 12:31:04,866::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,867::Controller &gt;&gt;&gt; b&#x27;4f5e000d&#x27; : b&#x27;O^\x00\r&#x27;
+INFO::2017-06-20 12:31:04,867::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,879::Controller &gt;&gt;&gt; b&#x27;6641000d&#x27; : b&#x27;fA\x00\r&#x27;
+INFO::2017-06-20 12:31:04,879::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,880::Controller &gt;&gt;&gt; b&#x27;4946000d&#x27; : b&#x27;IF\x00\r&#x27;
+INFO::2017-06-20 12:31:04,881::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,881::Controller &gt;&gt;&gt; b&#x27;310c010d&#x27; : b&#x27;1\x0c\x01\r&#x27;
+INFO::2017-06-20 12:31:04,882::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,882::Controller &gt;&gt;&gt; b&#x27;1074000d&#x27; : b&#x27;\x10t\x00\r&#x27;
+INFO::2017-06-20 12:31:04,882::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,911::Controller &gt;&gt;&gt; b&#x27;6b38000d&#x27; : b&#x27;k8\x00\r&#x27;
+INFO::2017-06-20 12:31:04,912::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,927::Controller &gt;&gt;&gt; b&#x27;2d0a010d&#x27; : b&#x27;-\n\x01\r&#x27;
+INFO::2017-06-20 12:31:04,927::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,928::Controller &gt;&gt;&gt; b&#x27;5476000d&#x27; : b&#x27;Tv\x00\r&#x27;
+INFO::2017-06-20 12:31:04,929::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,943::Controller &gt;&gt;&gt; b&#x27;240f010d&#x27; : b&#x27;$\x0f\x01\r&#x27;
+INFO::2017-06-20 12:31:04,944::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,944::Controller &gt;&gt;&gt; b&#x27;5374000d&#x27; : b&#x27;St\x00\r&#x27;
+INFO::2017-06-20 12:31:04,945::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,946::Controller &gt;&gt;&gt; b&#x27;360e010d&#x27; : b&#x27;6\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,946::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,947::Controller &gt;&gt;&gt; b&#x27;330e010d&#x27; : b&#x27;3\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,947::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,948::Controller &gt;&gt;&gt; b&#x27;2914010d&#x27; : b&#x27;)\x14\x01\r&#x27;
+INFO::2017-06-20 12:31:04,948::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,949::Controller &gt;&gt;&gt; b&#x27;220e010d&#x27; : b&#x27;&quot;\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,949::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,959::Controller &gt;&gt;&gt; b&#x27;1f12010d&#x27; : b&#x27;\x1f\x12\x01\r&#x27;
+INFO::2017-06-20 12:31:04,960::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,960::Controller &gt;&gt;&gt; b&#x27;340e010d&#x27; : b&#x27;4\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,961::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,961::Controller &gt;&gt;&gt; b&#x27;340e010d&#x27; : b&#x27;4\x0e\x01\r&#x27;
+INFO::2017-06-20 12:31:04,962::Controller Attempting to read 3 bytes for 1 packet
+DEBUG::2017-06-20 12:31:04,975::Controller &gt;&gt;&gt; b&#x27;0225010d&#x27; : b&#x27;\x02%\x01\r&#x27;
+INFO::2017-06-20 12:31:04,975::Test DVS packets have counts: x=110, y=91, pol=2
 </div></td></tr></tbody></table></body></html>

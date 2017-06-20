@@ -284,7 +284,7 @@ static void usart_rx_task(void *pvParameters)
                 {
                     /* No point writing success here as board reset will clear
                        UART buffer before it can send */
-                    // NVIC_SystemReset();
+                    NVIC_SystemReset();
                 }
                 else if (strcmp(cmd_buf, PC_CMD_DVS_FWD) == 0)
                 {
